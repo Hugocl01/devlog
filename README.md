@@ -1,13 +1,28 @@
-# Astro with Tailwind
+# 🌐 Blog de Desarrollo Web
 
-```sh
-npm create astro@latest -- --template with-tailwindcss
-```
+¡Bienvenido a mi blog! 🚀
+Aquí comparto mis **aprendizajes, trucos y experiencias** en el mundo del desarrollo de aplicaciones web, desde JavaScript, frameworks modernos, hasta buenas prácticas y herramientas que voy descubriendo.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/with-tailwindcss)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/with-tailwindcss)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/with-tailwindcss/devcontainer.json)
+---
 
-Astro comes with [Tailwind](https://tailwindcss.com) support out of the box. This example showcases how to style your Astro project with Tailwind.
+## 📝 Sobre el proyecto
 
-For complete setup instructions, please see our [Tailwind Integration Guide](https://docs.astro.build/en/guides/integrations-guide/tailwind).
+Este blog está construido con **[Astro](https://astro.build/)**, utilizando **Content Collections** para organizar los artículos en Markdown.
+El objetivo es tener un espacio donde **registrar mis progresos** y **compartir conocimientos útiles** con otros desarrolladores.
+
+---
+
+## 🚀 Características
+
+- ⚡ Renderizado estático con Astro para velocidad y SEO.
+- 🎨 Diseño limpio con **Tailwind CSS**.
+- 🧩 Componentes reutilizables con **shadcn/ui**.
+- 📚 Organización de contenido con **Content Collections**.
+- 🛠️ Integración con herramientas modernas como **Prettier**.
+---
+
+## 📜 Licencia
+
+Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+
+---
