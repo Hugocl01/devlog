@@ -1,0 +1,24 @@
+---
+title: "Bienvenido a mi blog"
+description: "Un espacio donde comparto mis experiencias como desarrollador web, mis proyectos personales y curiosidades sobre tecnología."
+date: 2025-11-13
+author: "Hugo"
+tags: ["Desarrollo web", "Tecnología", "Proyectos"]
+draft: false
+---
+
+# 👋 ¡Bienvenido a mi blog!
+
+Hola, soy **Hugo**, desarrollador web apasionado por la tecnología, el código limpio y todo lo que tenga que ver con crear cosas útiles (y a veces solo divertidas) en Internet.
+
+He decidido abrir este espacio para compartir mi experiencia como desarrollador: los **proyectos personales** en los que trabajo, los **retos que enfrento** en el día a día y lo que voy **aprendiendo en el camino**. También encontrarás **curiosidades del mundo tech**, reflexiones sobre herramientas y lenguajes, y mi opinión sobre las **tendencias que están dando forma al futuro del desarrollo web**.
+
+La idea no es solo hablar de código, sino también de la **parte humana detrás del teclado**: la motivación, la frustración cuando algo no compila, la alegría de ver un proyecto terminado… y todo lo que hay entre medio.
+
+Si te interesa el **desarrollo web**, la **innovación tecnológica** o simplemente te gusta leer sobre cómo otros viven este apasionante mundo digital, **estás en el lugar correcto** 🚀
+
+Gracias por pasarte por aquí.
+Espero que disfrutes los artículos y que juntos aprendamos algo nuevo en cada publicación.
+
+Nos leemos pronto.
+**– Hugo**

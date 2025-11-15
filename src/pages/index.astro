@@ -1,25 +1,73 @@
 ---
-import '../styles/global.css';
-// Component Imports
-import Button from '../components/Button.astro';
+import { getCollection } from "astro:content";
+import BlogLayout from "@/layouts/BlogLayout.astro";
+import PostCard from "@/components/blog/PostCard.astro";
 
-// Full Astro Component Syntax:
-// https://docs.astro.build/basics/astro-components/
+const allPosts = (await getCollection("posts"))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const featuredPosts = allPosts.slice(0, 3);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro + TailwindCSS</title>
-	</head>
+<BlogLayout title="Inicio">
+  <div class="flex-1">
+    <section class="container mx-auto px-4 py-20">
+      <div class="flex flex-col items-center text-center">
+        <h1 class="text-balance text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl">
+          Bienvenido a Mi Blog
+        </h1>
+        <p
+          class="mt-6 max-w-2xl text-balance text-lg leading-relaxed text-muted-foreground md:text-xl"
+        >
+          Descubre artículos sobre desarrollo web, tecnología, mejores prácticas y más. Comparto mi
+          experiencia y aprendizaje con la comunidad.
+        </p>
+        <div class="mt-8 flex gap-4">
+          <a
+            href="/blog"
+            class="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-8 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            Ver todos los posts
+          </a>
+          <a
+            href="/about"
+            class="inline-flex h-11 items-center justify-center rounded-lg border border-input bg-background px-8 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            Acerca de mí
+          </a>
+        </div>
+      </div>
+    </section>
 
-	<body>
-		<div class="grid place-items-center h-screen content-center">
-			<Button>Tailwind Button in Astro!</Button>
-			<a href="/markdown-page" class="p-4 underline">Markdown is also supported...</a>
-		</div>
-	</body>
-</html>
+    <section class="mx-auto max-w-6xl px-4 py-12">
+      <div class="mb-8 flex items-center justify-between">
+        <div>
+          <h2 class="text-3xl font-bold tracking-tight">Posts Destacados</h2>
+          <p class="mt-2 text-muted-foreground">Los artículos más recientes y populares</p>
+        </div>
+        <a
+          href="/blog"
+          class="inline-flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Ver todos →
+        </a>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {
+          /* 2. Usamos el componente dentro del map */
+          featuredPosts.map((post) => (
+            <PostCard
+              slug={post.slug}
+              title={post.data.title}
+              description={post.data.description}
+              date={post.data.date}
+              tags={post.data.tags}
+            />
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</BlogLayout>

@@ -1,0 +1,65 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  description: string;
+  date: Date;
+  tags: string[];
+}
+
+import { Badge } from "../ui/badge";
+import { MoveRight } from "@lucide/astro";
+
+const { slug, title, description, date, tags } = Astro.props;
+const url = `/blog/${slug}`;
+
+const formattedDate = date.toLocaleDateString("es-ES", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<a
+  href={url}
+  class="group block h-full rounded-lg border border-border bg-card p-6 transition-all
+         hover:shadow-xl hover:border-primary/50 focus-within:ring-2
+         focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none"
+  aria-labelledby={`title-${slug}`}
+>
+  <article class="flex h-full flex-col">
+    <h2
+      id={`title-${slug}`}
+      class="mb-2 text-balance text-2xl font-bold tracking-tight text-foreground
+             transition-colors group-hover:text-primary"
+    >
+      {title}
+    </h2>
+
+    <time datetime={date.toISOString()} class="mb-4 block text-sm text-muted-foreground">
+      {formattedDate}
+    </time>
+
+    <p class="mb-6 text-pretty text-base text-muted-foreground line-clamp-3">
+      {description}
+    </p>
+
+    <div class="mt-auto flex flex-col items-start gap-4 pt-4">
+      <div class="flex flex-wrap gap-2">
+        {tags?.map((tag) => <Badge variant="secondary">{tag}</Badge>)}
+      </div>
+
+      <span
+        class="inline-flex items-center gap-1 text-sm font-medium text-primary
+               transition-all group-hover:gap-2"
+        aria-hidden="true"
+      >
+        Leer más
+        <MoveRight
+          class="h-4 w-4 transition-transform group-hover:translate-x-1"
+          stroke-width="2.5"
+        />
+      </span>
+    </div>
+  </article>
+</a>

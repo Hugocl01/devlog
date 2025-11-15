@@ -1,0 +1,37 @@
+---
+import { getCollection } from "astro:content";
+import BlogLayout from "@/layouts/BlogLayout.astro";
+import PostCard from "@/components/blog/PostCard.astro";
+
+const posts = (await getCollection("posts"))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BlogLayout>
+  <div class="container mx-auto px-4">
+    <header class="py-16 text-center md:py-20">
+      <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
+        Todos los Artículos
+      </h1>
+      <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+        Explora **{posts.length}** publicaciones sobre desarrollo, diseño y tecnología. Encuentra el
+        tema que más te interese.
+      </p>
+    </header>
+
+    <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-2 lg:grid-cols-3">
+      {
+        posts.map(({ slug, data }) => (
+          <PostCard
+            slug={slug}
+            title={data.title}
+            description={data.description}
+            date={data.date}
+            tags={data.tags}
+          />
+        ))
+      }
+    </section>
+  </div>
+</BlogLayout>
