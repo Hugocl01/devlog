@@ -1,0 +1,52 @@
+---
+import BaseLayout from "@/layouts/main.astro";
+
+const portfolioUrl = "https://hugocl01.github.io/";
+---
+
+<BaseLayout>
+  <section class="mx-auto max-w-3xl py-20 px-4 prose">
+    <header class="mb-12 text-center">
+      <h1 class="text-5xl sm:text-6xl font-extrabold tracking-tight mb-4">Sobre mí</h1>
+      <p class="text-lg text-muted-foreground">Un espacio para contarte quién soy y qué hago.</p>
+      <div class="mt-6">
+        <a
+          href={portfolioUrl}
+          class="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-8 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Ver mi portfolio
+        </a>
+      </div>
+    </header>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold">Quién soy</h2>
+      <p>
+        ¡Hola! Soy <strong>Hugo</strong>, desarrollador web junior desde hace unos meses. Estoy
+        aprendiendo cada día y descubriendo lo que significa trabajar en proyectos reales.
+      </p>
+      <p>
+        Este blog es mi espacio para documentar mi progreso, reflexionar sobre lo que voy
+        aprendiendo y compartir mis experiencias mientras crezco como desarrollador.
+      </p>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold">Por qué escribo</h2>
+      <p>
+        Escribo en este blog para mostrar mi progreso como desarrollador, compartir ideas, proyectos
+        y aprendizajes. Quiero que sea un espacio donde pueda ver mi evolución y, al mismo tiempo,
+        inspirar o ayudar a otros que estén empezando.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-bold">Mis proyectos e ideas</h2>
+      <p>
+        Aquí comparto los proyectos en los que estoy trabajando, ideas que quiero explorar y
+        soluciones que voy encontrando. Cada entrada refleja mi camino como desarrollador junior y
+        las lecciones que voy aprendiendo en el proceso.
+      </p>
+    </section>
+  </section>
+</BaseLayout>
