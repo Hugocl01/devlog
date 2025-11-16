@@ -1,0 +1,42 @@
+---
+import { getCollection } from "astro:content";
+import BlogLayout from "@/layouts/BlogLayout.astro";
+
+const posts = await getCollection("posts");
+const tagMap = new Map();
+posts.forEach((post) => {
+  if (!post.data.draft) {
+    post.data.tags?.forEach((tag) => {
+      tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+    });
+  }
+});
+const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+---
+
+<BlogLayout>
+  <div class="container mx-auto px-4">
+    <header class="py-16 text-center md:py-20">
+      <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
+        Todas las Etiquetas
+      </h1>
+      <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+        Navega por todas las etiquetas del blog y descubre contenido relacionado.
+      </p>
+    </header>
+
+    <section class="max-w-3xl mx-auto pb-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {
+        tags.map(([tag, count]) => (
+          <a
+            href={`/tags/${tag}`}
+            class="flex items-center justify-between px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+          >
+            <span class="capitalize font-medium">{tag}</span>
+            <span class="text-sm text-muted-foreground">{count}</span>
+          </a>
+        ))
+      }
+    </section>
+  </div>
+</BlogLayout>

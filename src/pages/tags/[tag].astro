@@ -1,0 +1,58 @@
+---
+import { getCollection } from "astro:content";
+import BlogLayout from "@/layouts/BlogLayout.astro";
+import PostCard from "@/components/blog/PostCard.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  const tags = new Set();
+  posts.forEach((post) => {
+    post.data.tags?.forEach((tag) => tags.add(tag));
+  });
+
+  return [...tags].map((tag) => ({
+    params: { tag },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+
+const posts = (await getCollection("posts"))
+  .filter((post) => post.data.tags?.includes(tag) && !post.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BlogLayout>
+  <div class="container mx-auto px-4">
+    <header class="py-16 text-center md:py-20">
+      <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
+        Etiqueta: <span class="capitalize">{tag}</span>
+      </h1>
+
+      <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+        {
+          posts.length === 0
+            ? `No hay artículos con esta etiqueta.`
+            : `Explora ${posts.length} artículos relacionados con "${tag}".`
+        }
+      </p>
+    </header>
+
+    {
+      posts.length > 0 && (
+        <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-2 lg:grid-cols-3">
+          {posts.map(({ slug, data }) => (
+            <PostCard
+              slug={slug}
+              title={data.title}
+              description={data.description}
+              date={data.date}
+              tags={data.tags}
+            />
+          ))}
+        </section>
+      )
+    }
+  </div>
+</BlogLayout>
