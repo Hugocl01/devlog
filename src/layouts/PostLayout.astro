@@ -4,49 +4,52 @@ import BaseLayout from "@/layouts/main.astro";
 const { title, date, author, cover } = Astro.props;
 
 const formattedDate = date
-  ? new Date(date).toLocaleDateString("es-ES", {
-      dateStyle: "long",
-    })
-  : "Fecha Desconocida";
+  ? new Date(date).toLocaleDateString("es-ES", { dateStyle: "long" })
+  : "Fecha desconocida";
 ---
 
 <BaseLayout title={title}>
-  <article class="max-w-4xl mx-auto px-4 py-16">
+  <article class="max-w-4xl mx-auto px-4 py-20 sm:py-24">
     {
       cover && (
-        <img
-          src={cover.src ?? cover}
-          alt={title}
-          class="rounded-xl mb-12 w-full object-cover max-h-[400px]"
-        />
+        <figure class="mb-12 max-h-[400px] overflow-hidden rounded-xl">
+          <img
+            src={cover.src ?? cover}
+            alt={`Imagen de portada del post: ${title}`}
+            class="w-full object-cover"
+          />
+          {cover.caption && (
+            <figcaption class="mt-2 text-center text-sm text-muted-foreground">
+              {cover.caption}
+            </figcaption>
+          )}
+        </figure>
       )
     }
 
     <header
       class="max-w-3xl mx-auto mb-12 pb-6 border-b border-gray-200/50 dark:border-gray-700/50"
     >
-      <div class="flex items-center justify-start text-sm text-muted-foreground mb-4">
+      <div class="flex items-center justify-between gap-2 text-sm text-muted-foreground mb-4">
+        <p class="tabular-nums">
+          Publicado el {formattedDate}
+        </p>
+
         {
           author && (
-            <p class="font-medium mr-4">
+            <p class="font-medium">
               Por <strong>{author}</strong>
             </p>
           )
         }
-
-        <span class="text-gray-400">|</span>
-
-        <p class="ml-4 tabular-nums">
-          Publicado el {formattedDate}
-        </p>
       </div>
 
-      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight text-foreground">
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
         {title}
       </h1>
     </header>
 
-    <div class="max-w-3xl mx-auto prose prose-base prose-neutral dark:prose-invert">
+    <div class="max-w-3xl mx-auto prose prose-lg sm:prose-base prose-neutral dark:prose-invert">
       <slot />
     </div>
   </article>
