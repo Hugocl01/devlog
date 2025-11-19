@@ -1,7 +1,8 @@
 ---
 import BaseLayout from "@/layouts/main.astro";
 
-const { title, date, author, cover } = Astro.props;
+const { title, date, author, cover, prev, next } = Astro.props;
+import { MoveLeft, MoveRight } from "@lucide/astro";
 
 const formattedDate = date
   ? new Date(date).toLocaleDateString("es-ES", { dateStyle: "long" })
@@ -52,5 +53,73 @@ const formattedDate = date
     <div class="max-w-3xl mx-auto prose prose-lg sm:prose-base prose-neutral dark:prose-invert">
       <slot />
     </div>
+
+    <nav
+      class="max-w-3xl mx-auto mt-16 pt-10 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between gap-4"
+    >
+      {
+        prev ? (
+          <a
+            href={`/blog/${prev.slug}`}
+            class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all
+             hover:shadow-xl hover:border-primary/50 focus-within:ring-2
+             focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none max-w-sm"
+          >
+            <div class="flex flex-col">
+              <span class="text-xs text-muted-foreground mb-1">Anterior</span>
+
+              <h3 class="text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
+                {prev.data.title}
+              </h3>
+
+              <span
+                class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary
+                 transition-all group-hover:gap-2"
+              >
+                <MoveLeft
+                  class="h-4 w-4 transition-transform group-hover:-translate-x-1"
+                  stroke-width="2.5"
+                />
+                Leer anterior
+              </span>
+            </div>
+          </a>
+        ) : (
+          <div class="flex-1 max-w-sm" />
+        )
+      }
+
+      {
+        next ? (
+          <a
+            href={`/blog/${next.slug}`}
+            class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all
+             hover:shadow-xl hover:border-primary/50 focus-within:ring-2
+             focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none text-right max-w-sm"
+          >
+            <div class="flex flex-col items-end">
+              <span class="text-xs text-muted-foreground mb-1">Siguiente</span>
+
+              <h3 class="text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
+                {next.data.title}
+              </h3>
+
+              <span
+                class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary
+                 transition-all group-hover:gap-2"
+              >
+                Leer siguiente
+                <MoveRight
+                  class="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  stroke-width="2.5"
+                />
+              </span>
+            </div>
+          </a>
+        ) : (
+          <div class="flex-1 max-w-sm" />
+        )
+      }
+    </nav>
   </article>
 </BaseLayout>

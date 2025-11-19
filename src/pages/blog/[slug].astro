@@ -4,13 +4,17 @@ import PostLayout from "@/layouts/PostLayout.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
-  return posts.map((post) => ({
+  return posts.map((post, index) => ({
     params: { slug: post.slug },
-    props: { post },
+    props: {
+      post,
+      prev: posts[index - 1] ?? null,
+      next: posts[index + 1] ?? null,
+    },
   }));
 }
 
-const { post } = Astro.props;
+const { post, prev, next } = Astro.props;
 const { Content } = await post.render();
 ---
 
@@ -20,6 +24,8 @@ const { Content } = await post.render();
   author={post.data.author}
   tags={post.data.tags}
   description={post.data.description}
+  prev={prev}
+  next={next}
 >
   <Content />
 </PostLayout>
