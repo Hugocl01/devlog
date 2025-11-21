@@ -1,6 +1,6 @@
 # 🌐 Blog de Desarrollo Web
 
-¡Bienvenido a mi blog! 🚀
+¡Bienvenido a DevLog! 🚀
 Aquí comparto mis **aprendizajes, trucos y experiencias** en el mundo del desarrollo de aplicaciones web, desde JavaScript, frameworks modernos, hasta buenas prácticas y herramientas que voy descubriendo.
 
 ---
