@@ -1,8 +1,27 @@
 ---
 import BaseLayout from "@/layouts/main.astro";
-
-const { title, date, author, cover, prev, next } = Astro.props;
+import type { CollectionEntry } from "astro:content";
+import { Badge } from "@/components/ui/badge";
 import { MoveLeft, MoveRight } from "@lucide/astro";
+
+type Cover =
+  | string
+  | {
+      src: string;
+      caption?: string;
+    };
+
+type PostLayoutProps = {
+  title: string;
+  date: string | Date;
+  author?: string;
+  tags?: string[];
+  cover?: Cover;
+  prev?: CollectionEntry<"posts"> | null;
+  next?: CollectionEntry<"posts"> | null;
+};
+
+const { title, date, author, tags, cover, prev, next } = Astro.props as PostLayoutProps;
 
 const formattedDate = date
   ? new Date(date).toLocaleDateString("es-ES", { dateStyle: "long" })
@@ -14,12 +33,21 @@ const formattedDate = date
     {
       cover && (
         <figure class="mb-12 max-h-[400px] overflow-hidden rounded-xl">
-          <img
-            src={cover.src ?? cover}
-            alt={`Imagen de portada del post: ${title}`}
-            class="w-full object-cover"
-          />
-          {cover.caption && (
+          {typeof cover === "string" ? (
+            <img
+              src={cover}
+              alt={`Imagen de portada del post: ${title}`}
+              class="w-full object-cover"
+            />
+          ) : (
+            <img
+              src={cover.src}
+              alt={`Imagen de portada del post: ${title}`}
+              class="w-full object-cover"
+            />
+          )}
+
+          {typeof cover !== "string" && cover.caption && (
             <figcaption class="mt-2 text-center text-sm text-muted-foreground">
               {cover.caption}
             </figcaption>
@@ -48,6 +76,10 @@ const formattedDate = date
       <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
         {title}
       </h1>
+
+      <div class="flex flex-wrap gap-2">
+        {(tags ?? []).map((tag) => <Badge variant="secondary">{tag}</Badge>)}
+      </div>
     </header>
 
     <div class="max-w-3xl mx-auto prose prose-lg sm:prose-base prose-neutral dark:prose-invert">
