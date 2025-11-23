@@ -2,7 +2,6 @@
 import { getCollection } from "astro:content";
 import BlogLayout from "@/layouts/BlogLayout.astro";
 import PostCard from "@/components/blog/PostCard.astro";
-import { Button } from "@/components/ui/button";
 
 const allPosts = (await getCollection("posts"))
   .filter((post) => !post.data.draft)
@@ -42,16 +41,6 @@ const featuredPosts = allPosts.slice(0, 3);
     </section>
 
     <section class="mx-auto max-w-6xl px-4 py-12">
-      <div class="mt-8 flex gap-4">
-        <Button asChild>
-          <a href="/blog"> Ver todos los posts </a>
-        </Button>
-
-        <Button asChild variant="outline">
-          <a href="/about"> Acerca de mí </a>
-        </Button>
-      </div>
-
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {
           featuredPosts.map((post) => (
