@@ -114,7 +114,13 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+hr {
+  margin: 0.5rem 0;
+  border-color: transparent;
 }
