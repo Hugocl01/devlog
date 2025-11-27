@@ -59,7 +59,9 @@ const formattedDate = date
     <header
       class="max-w-3xl mx-auto mb-12 pb-6 border-b border-gray-200/50 dark:border-gray-700/50"
     >
-      <div class="flex items-center justify-between gap-2 text-sm text-muted-foreground mb-4">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground mb-4"
+      >
         <p class="tabular-nums">
           Publicado el {formattedDate}
         </p>
@@ -82,7 +84,9 @@ const formattedDate = date
       </div>
     </header>
 
-    <div class="max-w-3xl mx-auto prose prose-lg sm:prose-base prose-neutral leading-relaxed dark:prose-invert">
+    <div
+      class="max-w-3xl mx-auto prose prose-lg sm:prose-base prose-neutral leading-relaxed dark:prose-invert"
+    >
       <slot />
     </div>
 
