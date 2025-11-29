@@ -8,7 +8,7 @@ interface Props {
 }
 
 import { Badge } from "../ui/badge";
-import { MoveRight } from "@lucide/astro";
+import { ChevronRight } from "@lucide/astro";
 
 const { slug, title, description, date, tags } = Astro.props;
 const url = `/blog/${slug}`;
@@ -55,7 +55,7 @@ const formattedDate = date.toLocaleDateString("es-ES", {
         aria-hidden="true"
       >
         Leer más
-        <MoveRight
+        <ChevronRight
           class="h-4 w-4 transition-transform group-hover:translate-x-1"
           stroke-width="2.5"
         />
