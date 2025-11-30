@@ -18,6 +18,8 @@ import {
 
 import { SearchX, ChevronRight } from "lucide-react";
 
+import { tagUrl } from "@/lib/tag";
+
 interface TagSearchProps {
     tags: [string, number][];
 }
@@ -43,7 +45,7 @@ export default function TagSearch({ tags }: TagSearchProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
                     {filtered.map(([tag, count]) => (
                         <Item variant={"outline"} key={tag} asChild>
-                            <a href={`/tags/${tag}`}>
+                            <a href={`/tags/${tagUrl(tag)}`}>
                                 <ItemContent>
                                     <ItemTitle>{tag}</ItemTitle>
                                     <ItemDescription>

@@ -3,23 +3,33 @@ import { getCollection } from "astro:content";
 import BlogLayout from "@/layouts/BlogLayout.astro";
 import PostCard from "@/components/blog/PostCard.astro";
 
+import { tagUrl } from "@/lib/tag";
+
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
-  const tags = new Set();
-  posts.forEach((post) => {
-    post.data.tags?.forEach((tag) => tags.add(tag));
-  });
+  const tags = new Set<string>();
+
+  posts.forEach((post) => post.data.tags?.forEach((tag) => tags.add(tag)));
 
   return [...tags].map((tag) => ({
-    params: { tag },
-    props: { tag },
+    params: {
+      tag: tagUrl(tag).replace("/tags/", "").replace(/\//g, ""), // extrae solo el slug
+    },
+    props: { originalTag: tag },
   }));
 }
 
-const { tag } = Astro.props;
+const { originalTag } = Astro.props;
 
 const posts = (await getCollection("posts"))
-  .filter((post) => post.data.tags?.includes(tag) && !post.data.draft)
+  .filter(
+    (post) =>
+      post.data.tags?.some(
+        (t) =>
+          tagUrl(t).replace("/tags/", "").replace(/\//g, "") ===
+          tagUrl(originalTag)
+      ) && !post.data.draft
+  )
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
@@ -27,14 +37,14 @@ const posts = (await getCollection("posts"))
   <div class="container mx-auto px-4">
     <header class="py-16 text-center md:py-20">
       <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
-        Etiqueta: <span class="capitalize">{tag}</span>
+        Etiqueta: {originalTag}</span>
       </h1>
 
       <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
         {
           posts.length === 0
             ? `No hay artículos con esta etiqueta.`
-            : `Explora ${posts.length} artículos relacionados con "${tag}".`
+            : `Explora ${posts.length} artículos relacionados con "${originalTag}".`
         }
       </p>
     </header>
