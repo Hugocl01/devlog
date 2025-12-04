@@ -4,6 +4,8 @@ import type { CollectionEntry } from "astro:content";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "@lucide/astro";
 
+import { tagUrl } from "@/lib/tag";
+
 type Cover =
   | string
   | {
@@ -75,12 +77,18 @@ const formattedDate = date
         }
       </div>
 
-      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-4">
         {title}
       </h1>
 
       <div class="flex flex-wrap gap-2">
-        {(tags ?? []).map((tag) => <Badge variant="secondary">{tag}</Badge>)}
+        {
+          (tags ?? []).map((tag) => (
+            <a href={`/tags/${tagUrl(tag)}`}>
+              <Badge variant="secondary">{tag}</Badge>
+            </a>
+          ))
+        }
       </div>
     </header>
 
