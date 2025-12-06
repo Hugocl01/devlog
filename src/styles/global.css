@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -118,9 +119,4 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-hr {
-  margin: 0.5rem 0;
-  border-color: transparent;
 }
