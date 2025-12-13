@@ -1,7 +1,28 @@
-# 🌐 Blog de Desarrollo Web
+# 🌐 DevLog - Blog de Desarrollo Web
 
 ¡Bienvenido a DevLog! 🚀
-Aquí comparto mis **aprendizajes, trucos y experiencias** en el mundo del desarrollo de aplicaciones web, desde JavaScript, frameworks modernos, hasta buenas prácticas y herramientas que voy descubriendo.
+Aquí comparto mis **aprendizajes, trucos y experiencias** en el mundo del desarrollo de aplicaciones web, desde JavaScript o PHP, frameworks como React o Laravel, hasta buenas prácticas y herramientas que voy descubriendo.
+
+---
+
+## 🧠 ¿Qué encontrarás aquí?
+- Artículos sobre desarrollo web
+- Experiencias con frameworks modernos
+- Buenas prácticas de arquitectura y mantenimiento
+- Opinión técnica basada en experiencia
+- Actualidad sobre el sector tecnológico
+- Noticias y tendencias
+
+Si estás construyendo proyectos web y te interesa hacerlo de forma limpia, mantenible y escalable, este blog es para ti.
+
+---
+
+## 🎯 Objetivo del proyecto
+
+DevLog nace con tres objetivos claros:
+1. Documentar mi evolución como desarrollador
+2. Consolidar conocimientos escribiendo sobre ellos
+3. Compartir contenido útil y honesto con otros desarrolladores
 
 ---
 
