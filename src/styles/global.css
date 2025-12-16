@@ -120,3 +120,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  code {
+    @apply bg-gray-200 dark:bg-gray-700 rounded px-1.5 py-0.5 font-mono text-sm;
+  }
+}
