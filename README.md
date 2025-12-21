@@ -1,7 +1,12 @@
 # 🌐 DevLog - Blog de Desarrollo Web
 
-¡Bienvenido a DevLog! 🚀
-Aquí comparto mis **aprendizajes, trucos y experiencias** en el mundo del desarrollo de aplicaciones web, desde JavaScript o PHP, frameworks como React o Laravel, hasta buenas prácticas y herramientas que voy descubriendo.
+[![Netlify Status](https://api.netlify.com/api/v1/badges/dca4cd1d-9da8-46a3-9e04-9bd572c61f95/deploy-status)](https://app.netlify.com/projects/hugocl01-devlog/deploys)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Astro](https://img.shields.io/badge/Astro-000000?logo=astro&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-38B2AC?logo=tailwindcss&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+
+DevLog es un **blog personal de desarrollo web** donde comparto **aprendizajes, experiencias y opinión técnica** sobre el mundo del desarrollo de aplicaciones web, desde JavaScript o PHP, frameworks como React o Laravel, hasta buenas prácticas y herramientas que voy descubriendo.
 
 ---
 
