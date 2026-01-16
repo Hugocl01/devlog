@@ -12,6 +12,7 @@ export async function GET(context) {
       .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
       .map((post) => ({
         title: post.data.title,
+        description: post.data.description,
         pubDate: post.data.date,
         author: post.data.author,
         categories: post.data.tags,
