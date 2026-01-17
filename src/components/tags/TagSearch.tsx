@@ -18,7 +18,7 @@ import {
 
 import { SearchX, ChevronRight } from "lucide-react";
 
-import { tagUrl } from "@/lib/tag";
+import { tagUrl } from "@/utils/tag";
 
 interface TagSearchProps {
     tags: [string, number][];

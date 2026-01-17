@@ -3,7 +3,7 @@ import { getCollection } from "astro:content";
 import BlogLayout from "@/layouts/BlogLayout.astro";
 import PostCard from "@/components/blog/PostCard.astro";
 
-import { tagUrl } from "@/lib/tag";
+import { tagUrl } from "@/utils/tag";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
