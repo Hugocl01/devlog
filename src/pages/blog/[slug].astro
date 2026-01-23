@@ -3,7 +3,9 @@ import { getCollection } from "astro:content";
 import PostLayout from "@/layouts/PostLayout.astro";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts");
+  const posts = (await getCollection("posts"))
+    .filter((post) => !post.data.draft)
+    .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
   return posts.map((post, index) => ({
     params: { slug: post.slug },
     props: {
