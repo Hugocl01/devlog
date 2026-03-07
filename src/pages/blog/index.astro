@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BlogLayout from "@/layouts/BlogLayout.astro";
 import PostCard from "@/components/blog/PostCard.astro";
+import { calculateReadingTime } from "@/utils/readingTime";
 
 const posts = (await getCollection("posts"))
   .filter((post) => !post.data.draft)
@@ -22,13 +23,14 @@ const posts = (await getCollection("posts"))
 
     <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-1 lg:grid-cols-1">
       {
-        posts.map(({ slug, data }) => (
+        posts.map(({ slug, data, body }) => (
           <PostCard
             slug={slug}
             title={data.title}
             description={data.description}
             date={data.date}
             tags={data.tags}
+            readingTime={body ? calculateReadingTime(body) : undefined}
           />
         ))
       }

@@ -21,9 +21,10 @@ type PostLayoutProps = {
   cover?: Cover;
   prev?: CollectionEntry<"posts"> | null;
   next?: CollectionEntry<"posts"> | null;
+  readingTime?: number;
 };
 
-const { title, date, author, tags, cover, prev, next } = Astro.props as PostLayoutProps;
+const { title, date, author, tags, cover, prev, next, readingTime } = Astro.props as PostLayoutProps;
 
 const formattedDate = date
   ? new Date(date).toLocaleDateString("es-ES", { dateStyle: "long" })
@@ -66,6 +67,7 @@ const formattedDate = date
       >
         <p class="tabular-nums">
           Publicado el {formattedDate}
+          {readingTime && ` • ${readingTime} min de lectura`}
         </p>
 
         {

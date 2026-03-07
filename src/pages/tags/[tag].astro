@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BlogLayout from "@/layouts/BlogLayout.astro";
 import PostCard from "@/components/blog/PostCard.astro";
+import { calculateReadingTime } from "@/utils/readingTime";
 
 import { tagUrl } from "@/utils/tag";
 
@@ -25,10 +26,8 @@ const posts = (await getCollection("posts"))
   .filter(
     (post) =>
       post.data.tags?.some(
-        (t) =>
-          tagUrl(t).replace("/tags/", "").replace(/\//g, "") ===
-          tagUrl(originalTag)
-      ) && !post.data.draft
+        (t) => tagUrl(t).replace("/tags/", "").replace(/\//g, "") === tagUrl(originalTag),
+      ) && !post.data.draft,
   )
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
@@ -37,32 +36,33 @@ const posts = (await getCollection("posts"))
   <div class="container mx-auto px-4">
     <header class="py-16 text-center md:py-20">
       <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
-        Etiqueta: {originalTag}</span>
+        Etiqueta: {originalTag}
       </h1>
-
-      <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-        {
-          posts.length === 0
-            ? `No hay artículos con esta etiqueta.`
-            : `Explora ${posts.length} artículos relacionados con "${originalTag}".`
-        }
-      </p>
     </header>
 
-    {
-      posts.length > 0 && (
-        <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-1 lg:grid-cols-1">
-          {posts.map(({ slug, data }) => (
-            <PostCard
-              slug={slug}
-              title={data.title}
-              description={data.description}
-              date={data.date}
-              tags={data.tags}
-            />
-          ))}
-        </section>
-      )
-    }
+    <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+      {
+        posts.length === 0
+          ? `No hay artículos con esta etiqueta.`
+          : `Explora ${posts.length} artículos relacionados con "${originalTag}".`
+      }
+    </p>
   </div>
+
+  {
+    posts.length > 0 && (
+      <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-1 lg:grid-cols-1">
+        {posts.map(({ slug, data, body }) => (
+          <PostCard
+            slug={slug}
+            title={data.title}
+            description={data.description}
+            date={data.date}
+            tags={data.tags}
+            readingTime={body ? calculateReadingTime(body) : undefined}
+          />
+        ))}
+      </section>
+    )
+  }
 </BlogLayout>

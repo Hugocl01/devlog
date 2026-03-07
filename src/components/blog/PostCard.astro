@@ -5,12 +5,13 @@ interface Props {
   description: string;
   date: Date;
   tags: string[];
+  readingTime?: number;
 }
 
 import { Badge } from "../ui/badge";
 import { ChevronRight } from "@lucide/astro";
 
-const { slug, title, description, date, tags } = Astro.props;
+const { slug, title, description, date, tags, readingTime } = Astro.props;
 const url = `/blog/${slug}`;
 
 const formattedDate = date.toLocaleDateString("es-ES", {
@@ -38,6 +39,7 @@ const formattedDate = date.toLocaleDateString("es-ES", {
 
     <time datetime={date.toISOString()} class="mb-4 block text-sm text-muted-foreground">
       {formattedDate}
+      {readingTime && ` • ${readingTime} min de lectura`}
     </time>
 
     <p class="mb-6 text-pretty text-base text-muted-foreground line-clamp-4">
