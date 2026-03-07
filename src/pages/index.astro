@@ -50,7 +50,7 @@ const featuredPosts = allPosts.slice(0, 3);
               title={post.data.title}
               description={post.data.description}
               date={post.data.date}
-              tags={post.data.tags}
+              tags={post.data.tags ?? []}
               readingTime={post.body ? calculateReadingTime(post.body) : undefined}
             />
           ))

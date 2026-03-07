@@ -10,6 +10,7 @@ interface Props {
 
 import { Badge } from "../ui/badge";
 import { ChevronRight } from "@lucide/astro";
+import { tagUrl } from "@/utils/tag";
 
 const { slug, title, description, date, tags, readingTime } = Astro.props;
 const url = `/blog/${slug}`;
@@ -21,20 +22,20 @@ const formattedDate = date.toLocaleDateString("es-ES", {
 });
 ---
 
-<a
-  href={url}
-  class="group block h-full rounded-lg border border-border bg-card p-6 transition-all
+<article
+  class="group relative flex h-full flex-col rounded-lg border border-border bg-card p-6 transition-all
          hover:shadow-xl hover:border-primary/50 focus-within:ring-2
-         focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none"
-  aria-labelledby={`title-${slug}`}
+         focus-within:ring-primary focus-within:ring-offset-2"
 >
-  <article class="flex h-full flex-col">
+  <div class="flex h-full flex-col">
     <h2
       id={`title-${slug}`}
       class="mb-2 text-balance text-2xl font-bold tracking-tight text-foreground
              transition-colors group-hover:text-primary"
     >
-      {title}
+      <a href={url} class="after:absolute after:inset-0 focus:outline-none">
+        {title}
+      </a>
     </h2>
 
     <time datetime={date.toISOString()} class="mb-4 block text-sm text-muted-foreground">
@@ -46,9 +47,18 @@ const formattedDate = date.toLocaleDateString("es-ES", {
       {description}
     </p>
 
-    <div class="mt-auto flex flex-col items-start gap-4">
+    <div class="mt-auto flex flex-col items-start gap-4 cursor-pointer">
       <div class="flex flex-wrap gap-2">
-        {tags?.map((tag) => <Badge variant="secondary">{tag}</Badge>)}
+        {
+          tags?.map((tag) => (
+            <a
+              href={`/tags/${tagUrl(tag)}`}
+              class="relative z-20 hover:opacity-80 transition-opacity"
+            >
+              <Badge variant="secondary">{tag}</Badge>
+            </a>
+          ))
+        }
       </div>
 
       <span
@@ -63,5 +73,5 @@ const formattedDate = date.toLocaleDateString("es-ES", {
         />
       </span>
     </div>
-  </article>
-</a>
+  </div>
+</article>
