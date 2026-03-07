@@ -2,7 +2,7 @@
 import BaseLayout from "@/layouts/main.astro";
 import type { CollectionEntry } from "astro:content";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Link2 } from "@lucide/astro";
+import { ChevronLeft, ChevronRight, Link2, Check } from "@lucide/astro";
 import { Image } from "astro:assets";
 
 import { tagUrl } from "@/utils/tag";
@@ -135,11 +135,13 @@ const formattedDate = date
           </svg>
         </a>
         <button
-          onclick={`navigator.clipboard.writeText('${Astro.url.toString()}'); alert('¡Enlace copiado al portapapeles!');`}
-          class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+          id="copy-link-btn"
+          data-url={Astro.url.toString()}
+          class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
           aria-label="Copiar enlace"
         >
-          <Link2 class="h-4 w-4" />
+          <Link2 class="h-4 w-4" id="copy-icon-link" />
+          <Check class="h-4 w-4 text-green-500 hidden" id="copy-icon-check" />
         </button>
       </div>
     </div>
@@ -213,3 +215,34 @@ const formattedDate = date
     </nav>
   </article>
 </BaseLayout>
+
+<script>
+  const setupCopyBtn = () => {
+    const copyBtn = document.getElementById("copy-link-btn");
+    if (!copyBtn || copyBtn.dataset.listener) return;
+    copyBtn.dataset.listener = "true";
+
+    copyBtn.addEventListener("click", async () => {
+      const url = copyBtn.getAttribute("data-url");
+      if (!url) return;
+      try {
+        await navigator.clipboard.writeText(url);
+        const iconLink = document.getElementById("copy-icon-link");
+        const iconCheck = document.getElementById("copy-icon-check");
+        if (iconLink && iconCheck) {
+          iconLink.classList.add("hidden");
+          iconCheck.classList.remove("hidden");
+          setTimeout(() => {
+            iconLink.classList.remove("hidden");
+            iconCheck.classList.add("hidden");
+          }, 2000);
+        }
+      } catch (e) {
+        console.error("Error al copiar enlace:", e);
+      }
+    });
+  };
+
+  setupCopyBtn();
+  document.addEventListener("astro:page-load", setupCopyBtn);
+</script>
