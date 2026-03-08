@@ -38,16 +38,21 @@ export default function TagSearch({ tags }: TagSearchProps) {
                 placeholder="Buscar etiquetas..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 focus:scale-[1.01] reveal"
             />
 
             {filtered.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
-                    {filtered.map(([tag, count]) => (
-                        <Item variant={"outline"} key={tag} asChild>
+                    {filtered.map(([tag, count], index) => (
+                        <Item
+                            variant={"outline"}
+                            key={tag}
+                            asChild
+                            className={`reveal stagger-${(index % 5) + 1} transition-all duration-500 hover:scale-[1.02] hover:shadow-lg hover:border-primary/30 active:scale-[0.98] group`}
+                        >
                             <a href={`/tags/${tagUrl(tag)}`}>
                                 <ItemContent>
-                                    <ItemTitle>{tag}</ItemTitle>
+                                    <ItemTitle className="group-hover:text-primary transition-colors">{tag}</ItemTitle>
                                     <ItemDescription>
                                         {count} {count === 1 ? "post" : "posts"}
                                     </ItemDescription>

@@ -6,13 +6,14 @@ interface Props {
   date: Date;
   tags: string[];
   readingTime?: number;
+  class?: string;
 }
 
 import { Badge } from "../ui/badge";
 import { ChevronRight } from "@lucide/astro";
 import { tagUrl } from "@/utils/tag";
 
-const { slug, title, description, date, tags, readingTime } = Astro.props;
+const { slug, title, description, date, tags, readingTime, class: className } = Astro.props;
 const url = `/blog/${slug}`;
 
 const formattedDate = date.toLocaleDateString("es-ES", {
@@ -23,9 +24,12 @@ const formattedDate = date.toLocaleDateString("es-ES", {
 ---
 
 <article
-  class="group relative flex h-full flex-col rounded-lg border border-border bg-card p-6 transition-all
-         hover:shadow-xl hover:border-primary/50 focus-within:ring-2
-         focus-within:ring-primary focus-within:ring-offset-2"
+  class:list={[
+    "group relative flex h-full flex-col rounded-lg border border-border bg-card p-6 transition-all duration-500 ease-premium",
+    "hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.01]",
+    "focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 reveal",
+    className,
+  ]}
 >
   <div class="flex h-full flex-col">
     <h2
@@ -53,7 +57,7 @@ const formattedDate = date.toLocaleDateString("es-ES", {
           tags?.map((tag) => (
             <a
               href={`/tags/${tagUrl(tag)}`}
-              class="relative z-20 hover:opacity-80 transition-opacity"
+              class="relative z-20 hover:opacity-80 transition-all duration-300 hover:scale-110 active:scale-95"
             >
               <Badge variant="secondary">{tag}</Badge>
             </a>
@@ -68,7 +72,7 @@ const formattedDate = date.toLocaleDateString("es-ES", {
       >
         Leer más
         <ChevronRight
-          class="h-4 w-4 transition-transform group-hover:translate-x-1"
+          class="h-4 w-4 transition-transform duration-300 ease-premium group-hover:translate-x-1"
           stroke-width="2.5"
         />
       </span>

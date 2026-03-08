@@ -19,8 +19,8 @@ const socialLinks = [
 <BaseLayout title="Contacto">
   <section class="max-w-4xl mx-auto py-16 px-4">
     <header class="text-center mb-16">
-      <h1 class="text-5xl sm:text-6xl font-extrabold tracking-tight mb-4">Conectemos</h1>
-      <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+      <h1 class="text-5xl sm:text-6xl font-extrabold tracking-tight mb-4 reveal">Conectemos</h1>
+      <p class="text-xl text-muted-foreground max-w-2xl mx-auto reveal stagger-1">
         Si tienes preguntas técnicas, ideas de colaboración, o simplemente quieres contactar, estos
         son los medios más directos.
       </p>
@@ -28,21 +28,21 @@ const socialLinks = [
 
     <div class="max-w-xl mx-auto space-y-8">
       <div class="space-y-6 text-center">
-        <h2 class="text-3xl font-bold mb-4 flex items-center justify-center">
+        <h2 class="text-3xl font-bold mb-4 flex items-center justify-center reveal stagger-2">
           <LaptopMinimal class="w-7 h-7 mr-4 text-primary" />
           Mi Red Profesional
         </h2>
-        <p class="text-lg text-muted-foreground mb-8">
+        <p class="text-lg text-muted-foreground mb-8 reveal stagger-3">
           Sígueme para ver mi progreso, código en vivo y actualizaciones de carrera como
           desarrollador.
         </p>
 
         <div class="flex space-x-8 justify-center">
           {
-            socialLinks.map((social) => (
+            socialLinks.map((social, index) => (
               <a
                 href={social.href}
-                class="text-muted-foreground transition-colors hover:text-foreground"
+                class={`text-muted-foreground transition-all duration-300 hover:text-foreground hover:scale-125 active:scale-90 reveal stagger-${index + 4}`}
                 aria-label={social.name}
               >
                 <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24">

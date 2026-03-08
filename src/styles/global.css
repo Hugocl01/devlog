@@ -40,6 +40,44 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-premium: cubic-bezier(0.87, 0, 0.13, 1);
+
+  --animate-fade-in: fade-in 0.6s var(--ease-premium) forwards;
+  --animate-slide-up: slide-up 0.8s var(--ease-premium) forwards;
+  --animate-scale-in: scale-in 0.5s var(--ease-premium) forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 :root {
@@ -124,5 +162,27 @@
 @layer components {
   code {
     @apply bg-gray-200 dark:bg-gray-700 rounded px-1.5 py-0.5 font-mono text-sm;
+  }
+}
+
+@layer utilities {
+  .stagger-1 { animation-delay: 75ms; }
+  .stagger-2 { animation-delay: 150ms; }
+  .stagger-3 { animation-delay: 225ms; }
+  .stagger-4 { animation-delay: 300ms; }
+  .stagger-5 { animation-delay: 375ms; }
+
+  .glass-card {
+    @apply backdrop-blur-md bg-card/80 border-border/50;
+  }
+
+  .reveal {
+    opacity: 0;
+    animation: var(--animate-slide-up);
+  }
+
+  .reveal-fade {
+    opacity: 0;
+    animation: var(--animate-fade-in);
   }
 }

@@ -14,8 +14,8 @@ import { SearchX } from "@lucide/astro";
 
 <BaseLayout title="Página no encontrada">
   <div class="flex items-center justify-center min-h-[70vh] py-16 px-4">
-    <Empty>
-      <EmptyHeader>
+    <Empty className="reveal">
+      <EmptyHeader className="reveal stagger-1">
         <EmptyMedia variant="icon">
           <SearchX />
         </EmptyMedia>
@@ -24,10 +24,10 @@ import { SearchX } from "@lucide/astro";
           No hemos podido encontrar la página que estás buscando.
         </EmptyDescription>
       </EmptyHeader>
-      <EmptyContent>
+      <EmptyContent className="reveal stagger-2">
         <a
           href="/"
-          class="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-8 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          class="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-8 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-300 hover:bg-primary/90 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           Volver al inicio
         </a>

@@ -89,10 +89,10 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
     }
 
     <header
-      class="max-w-3xl mx-auto mb-12 pb-6 border-b border-gray-200/50 dark:border-gray-700/50"
+      class="max-w-3xl mx-auto mb-12 pb-6 border-b border-gray-200/50 dark:border-gray-700/50 reveal"
     >
       <div
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground mb-4"
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground mb-4 reveal stagger-1"
       >
         <time class="tabular-nums" datetime={date ? new Date(date).toISOString() : undefined}>
           Publicado el {formattedDate}
@@ -108,11 +108,11 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
         }
       </div>
 
-      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-4">
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-4 reveal stagger-2">
         {title}
       </h1>
 
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap gap-2 reveal stagger-3">
         {
           (tags ?? []).map((tag) => (
             <a href={`/tags/${tagUrl(tag)}`}>
@@ -124,7 +124,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
     </header>
 
     <div
-      class="max-w-3xl mx-auto prose prose-lg sm:prose-base dark:prose-invert prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-a:text-blue-600 hover:prose-a:underline"
+      class="max-w-3xl mx-auto prose prose-lg sm:prose-base dark:prose-invert prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-a:text-blue-600 hover:prose-a:underline reveal stagger-4"
     >
       <slot />
     </div>
@@ -170,9 +170,9 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
         prev ? (
           <a
             href={`/blog/${prev.slug}`}
-            class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all
-             hover:shadow-xl hover:border-primary/50 focus-within:ring-2
-             focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none max-w-sm"
+            class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all duration-500 ease-premium
+             hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.01]
+             focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none max-w-sm reveal stagger-5"
           >
             <div class="flex flex-col">
               <span class="text-xs text-muted-foreground mb-1">Anterior</span>
@@ -202,9 +202,9 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
         next ? (
           <a
             href={`/blog/${next.slug}`}
-            class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all
-             hover:shadow-xl hover:border-primary/50 focus-within:ring-2
-             focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none text-right max-w-sm"
+            class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all duration-500 ease-premium
+             hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.01]
+             focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none text-right max-w-sm reveal stagger-5"
           >
             <div class="flex flex-col items-end">
               <span class="text-xs text-muted-foreground mb-1">Siguiente</span>

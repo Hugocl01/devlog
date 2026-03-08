@@ -41,7 +41,6 @@ const imageUrl = new URL(image, Astro.site).toString();
 
     <title>{title}</title>
 
-    <!-- Slot for page-specific head content (e.g. article meta, JSON-LD) -->
     <slot name="head" />
     <ClientRouter />
   </head>
@@ -51,7 +50,7 @@ const imageUrl = new URL(image, Astro.site).toString();
   >
     <Header />
 
-    <main>
+    <main transition:animate="fade">
       <slot />
     </main>
 
