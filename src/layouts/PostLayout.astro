@@ -15,6 +15,7 @@ type Cover =
     };
 
 type PostLayoutProps = {
+  id?: string;
   title: string;
   description?: string;
   date: string | Date;
@@ -26,7 +27,7 @@ type PostLayoutProps = {
   readingTime?: number;
 };
 
-const { title, description, date, author, tags, cover, prev, next, readingTime } =
+const { id, title, description, date, author, tags, cover, prev, next, readingTime } =
   Astro.props as PostLayoutProps;
 
 const isoDate = date ? new Date(date).toISOString() : undefined;
@@ -68,6 +69,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
               width={1200}
               height={630}
               class="w-full object-cover"
+              transition:name={`img-${id}`}
             />
           ) : (
             <Image
@@ -76,6 +78,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
               width={1200}
               height={630}
               class="w-full object-cover"
+              transition:name={`img-${id}`}
             />
           )}
 
@@ -108,14 +111,20 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
         }
       </div>
 
-      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-4 reveal stagger-2">
+      <h1
+        class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-4 reveal stagger-2"
+        transition:name={`title-${id}`}
+      >
         {title}
       </h1>
 
       <div class="flex flex-wrap gap-2 reveal stagger-3">
         {
           (tags ?? []).map((tag) => (
-            <a href={`/tags/${tagUrl(tag)}`}>
+            <a
+              href={`/tags/${tagUrl(tag)}`}
+              class="relative z-20 hover:opacity-80 transition-all duration-300 hover:scale-105 active:scale-95"
+            >
               <Badge variant="secondary">{tag}</Badge>
             </a>
           ))
@@ -169,9 +178,9 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
       {
         prev ? (
           <a
-            href={`/blog/${prev.slug}`}
+            href={`/blog/${prev.id}`}
             class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all duration-500 ease-premium
-             hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.01]
+             hover:shadow-premium hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.05]
              focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none max-w-sm reveal stagger-5"
           >
             <div class="flex flex-col">
@@ -201,9 +210,9 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
       {
         next ? (
           <a
-            href={`/blog/${next.slug}`}
+            href={`/blog/${next.id}`}
             class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all duration-500 ease-premium
-             hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.01]
+             hover:shadow-premium hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.05]
              focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none text-right max-w-sm reveal stagger-5"
           >
             <div class="flex flex-col items-end">

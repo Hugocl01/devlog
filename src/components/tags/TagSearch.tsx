@@ -44,24 +44,21 @@ export default function TagSearch({ tags }: TagSearchProps) {
             {filtered.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
                     {filtered.map(([tag, count], index) => (
-                        <Item
-                            variant={"outline"}
+                        <a
                             key={tag}
-                            asChild
-                            className={`reveal stagger-${(index % 5) + 1} transition-all duration-500 hover:scale-[1.02] hover:shadow-lg hover:border-primary/30 active:scale-[0.98] group`}
+                            href={`/tags/${tagUrl(tag)}`}
+                            className={`reveal stagger-${(index % 5) + 1} group relative flex items-center justify-between p-4 rounded-lg border border-border bg-card overflow-hidden transition-all duration-500 ease-premium hover:scale-[1.05] hover:-translate-y-1 hover:shadow-premium hover:border-primary/30 active:scale-[0.95]`}
                         >
-                            <a href={`/tags/${tagUrl(tag)}`}>
-                                <ItemContent>
-                                    <ItemTitle className="group-hover:text-primary transition-colors">{tag}</ItemTitle>
-                                    <ItemDescription>
-                                        {count} {count === 1 ? "post" : "posts"}
-                                    </ItemDescription>
-                                </ItemContent>
-                                <ItemActions>
-                                    <ChevronRight className="size-4" />
-                                </ItemActions>
-                            </a>
-                        </Item>
+                            <ItemContent>
+                                <ItemTitle className="group-hover:text-primary transition-colors">{tag}</ItemTitle>
+                                <ItemDescription>
+                                    {count} {count === 1 ? "post" : "posts"}
+                                </ItemDescription>
+                            </ItemContent>
+                            <ItemActions>
+                                <ChevronRight className="size-4" />
+                            </ItemActions>
+                        </a>
                     ))}
                 </div>
             ) : (

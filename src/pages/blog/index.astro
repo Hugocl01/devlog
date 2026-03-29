@@ -23,13 +23,14 @@ const posts = (await getCollection("posts"))
 
     <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-1 lg:grid-cols-1">
       {
-        posts.map(({ slug, data, body }, index) => (
+        posts.map(({ id, data, body }, index) => (
           <PostCard
-            slug={slug}
+            id={id}
             title={data.title}
             description={data.description}
             date={data.date}
             tags={data.tags ?? []}
+            cover={data.cover}
             readingTime={body ? calculateReadingTime(body) : undefined}
             class={`stagger-${(index % 5) + 1}`}
           />

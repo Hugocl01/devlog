@@ -33,7 +33,7 @@ const posts = (await getCollection("posts"))
 ---
 
 <BlogLayout title={`Posts etiquetados con "${originalTag}"`}>
-  <div class="container mx-auto px-4">
+  <div class="container mx-auto max-w-6xl px-4">
     <header class="py-16 text-center md:py-20">
       <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
         Etiqueta: {originalTag}
@@ -51,13 +51,13 @@ const posts = (await getCollection("posts"))
     {
       posts.length > 0 && (
         <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-1 lg:grid-cols-1">
-          {posts.map(({ slug, data, body }) => (
+          {posts.map(({ id, data, body }) => (
             <PostCard
-              slug={slug}
+              id={id}
               title={data.title}
               description={data.description}
               date={data.date}
-              tags={data.tags}
+              tags={data.tags ?? []}
               readingTime={body ? calculateReadingTime(body) : undefined}
             />
           ))}

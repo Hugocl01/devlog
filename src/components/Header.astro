@@ -1,6 +1,7 @@
 ---
 import { ChevronsLeftRightEllipsis } from "@lucide/astro";
 import HeaderMenu from "./nav/HeaderMenu";
+import { ThemeToggle } from "./ThemeToggle";
 
 const navigation = [
   { name: "Inicio", href: "/" },
@@ -18,6 +19,9 @@ const navigation = [
       <span>DevLog</span>
     </a>
 
-    <HeaderMenu items={navigation} client:load />
+    <div class="flex items-center gap-4">
+      <HeaderMenu items={navigation} client:load />
+      <ThemeToggle client:load />
+    </div>
   </nav>
 </header>
