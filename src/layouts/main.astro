@@ -39,7 +39,7 @@ const imageUrl = new URL(image, Astro.site).toString();
     <!-- RSS Feed Discovery -->
     <link rel="alternate" type="application/rss+xml" title="DevLog RSS Feed" href="/rss.xml" />
 
-    <title>{title}</title>
+    <title>{title === 'DevLog' ? title : `${title} | DevLog`}</title>
 
     <script is:inline>
       const getThemePreference = () => {

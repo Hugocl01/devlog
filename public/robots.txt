@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hugocl01-devlog.netlify.app/sitemap-index.xml
