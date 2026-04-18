@@ -186,8 +186,8 @@ export const Search = () => {
                 <div className="w-20 h-20 bg-primary/5 rounded-full border border-primary/10 flex items-center justify-center mb-6 shadow-modern shadow-primary/5">
                   <SearchIcon className="h-10 w-10 text-primary/40" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground/80 tracking-tight">Búsqueda Instantánea</h3>
-                <p className="text-muted-foreground mt-2 max-w-[300px] text-sm leading-relaxed">
+                <h3 className="text-xl font-bold text-foreground/90 dark:text-foreground/80 tracking-tight">Búsqueda Instantánea</h3>
+                <p className="text-foreground/70 dark:text-muted-foreground mt-2 max-w-[300px] text-sm leading-relaxed">
                   Encuentra exactamente lo que buscas en milisegundos.
                 </p>
                 {import.meta.env.DEV && (
@@ -195,15 +195,15 @@ export const Search = () => {
                     Modo Desarrollo: Índice disponible tras compilar
                   </Badge>
                 )}
-                <div className="hidden md:flex flex-wrap justify-center gap-6 mt-12 opacity-40 hover:opacity-100 transition-opacity">
-                  <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-                    <div className="flex gap-1.5">
+                <div className="hidden md:flex flex-wrap justify-center gap-6 mt-12 text-foreground/60 dark:text-muted-foreground/50 hover:text-foreground/90 dark:hover:text-muted-foreground transition-colors group/hints">
+                  <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest">
+                    <div className="flex gap-1.5 opacity-80 group-hover/hints:opacity-100 transition-opacity">
                       <Kbd>↑</Kbd>
                       <Kbd>↓</Kbd>
                     </div> Navegar
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-                    <Kbd className="text-[9px] px-1.5 py-0.5">ESC</Kbd> Cerrar
+                  <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest">
+                    <Kbd className="text-[9px] px-1.5 py-0.5 opacity-80 group-hover/hints:opacity-100 transition-opacity">ESC</Kbd> Cerrar
                   </div>
                 </div>
               </div>
@@ -211,11 +211,11 @@ export const Search = () => {
 
             {query && results.length === 0 && !isLoading && (
               <div className="py-20 text-center animate-in fade-in zoom-in-95 duration-300">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/60 mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/30 border border-border/60 text-foreground/40 dark:text-muted-foreground/60 mb-4">
                   <X className="h-8 w-8" />
                 </div>
-                <p className="text-lg font-bold text-foreground/60 italic">Sin resultados para "{query}"</p>
-                <p className="text-sm text-muted-foreground mt-1">Prueba con otros términos de búsqueda.</p>
+                <p className="text-lg font-bold text-foreground/80 dark:text-foreground/60 italic">Sin resultados para "{query}"</p>
+                <p className="text-sm text-foreground/70 dark:text-muted-foreground mt-1">Prueba con otros términos de búsqueda.</p>
               </div>
             )}
 
@@ -275,7 +275,7 @@ export const Search = () => {
                         {result.meta.title}
                       </h3>
                       <div
-                        className="text-xs text-muted-foreground line-clamp-2 mt-1 leading-snug opacity-80 group-hover:opacity-100 transition-opacity break-words"
+                        className="text-xs text-foreground/70 dark:text-muted-foreground group-hover:text-foreground/90 dark:group-hover:text-muted-foreground/90 line-clamp-2 mt-1 leading-snug transition-colors break-words"
                         dangerouslySetInnerHTML={{ __html: result.excerpt }}
                       />
                     </div>
@@ -291,14 +291,14 @@ export const Search = () => {
             )}
           </ScrollArea>
 
-          <div className="px-5 py-4 border-t border-border/50 bg-secondary/20 backdrop-blur-md flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-widest leading-none">
-            <div className="flex items-center gap-1.5 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all">
+          <div className="px-5 py-4 border-t border-border/50 bg-secondary/20 backdrop-blur-md flex justify-between items-center text-[10px] text-foreground/70 dark:text-muted-foreground font-bold uppercase tracking-widest leading-none">
+            <div className="flex items-center gap-1.5 grayscale opacity-90 dark:opacity-70 hover:grayscale-0 hover:opacity-100 transition-all">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               Búsqueda de DevLog
             </div>
             <div className="flex items-center gap-4">
-              <span className="hidden md:flex flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
-                <Kbd>ESC</Kbd> Cerrar
+              <span className="hidden md:flex flex items-center gap-1.5 text-foreground/60 dark:text-muted-foreground/60 hover:text-foreground/90 dark:hover:text-foreground transition-colors cursor-default">
+                <Kbd className="opacity-80">ESC</Kbd> Cerrar
               </span>
             </div>
           </div>
