@@ -1,0 +1,37 @@
+---
+import { getCollection, render } from "astro:content";
+import UpdateLayout from "@/layouts/UpdateLayout.astro";
+import { calculateReadingTime } from "@/utils/readingTime";
+
+export async function getStaticPaths() {
+  const updates = (await getCollection("updates"))
+    .filter((update) => !update.data.draft)
+    .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+  return updates.map((update, index) => ({
+    params: { id: update.id },
+    props: {
+      update,
+      prev: updates[index - 1] ?? null,
+      next: updates[index + 1] ?? null,
+    },
+  }));
+}
+
+const { update, prev, next } = Astro.props;
+const { Content } = await render(update);
+const readingTime = calculateReadingTime(update.body);
+---
+
+<UpdateLayout
+  id={update.id}
+  title={update.data.title}
+  description={update.data.description}
+  date={update.data.date}
+  author={update.data.author}
+  type={update.data.type}
+  prev={prev}
+  next={next}
+  readingTime={readingTime}
+>
+  <Content />
+</UpdateLayout>

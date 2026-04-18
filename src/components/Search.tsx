@@ -1,0 +1,308 @@
+import { useEffect, useState, useRef } from "react";
+import { Search as SearchIcon, Command, X, Loader2, FileText, ChevronRight, Tag } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Kbd } from "@/components/ui/kbd";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+
+interface PagefindResult {
+  id: string;
+  data: () => Promise<{
+    url: string;
+    excerpt: string;
+    filters: Record<string, any>;
+    meta: {
+      title: string;
+      image?: string;
+    };
+    sub_results: any[];
+  }>;
+}
+
+interface SearchResponse {
+  results: PagefindResult[];
+}
+
+export const Search = () => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMac, setIsMac] = useState(true);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const pagefindRef = useRef<any>(null);
+  const resultsContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    setIsMac(userAgent.includes('mac'));
+
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      loadPagefind();
+      setSelectedIndex(-1);
+    }
+  }, [open]);
+
+  const loadPagefind = async () => {
+    if (pagefindRef.current) return;
+
+    if (import.meta.env.DEV) {
+      console.warn("Pagefind search is not available in development mode.");
+      return;
+    }
+
+    try {
+      const prefix = "/";
+      const pagefindPath = `${prefix}pagefind/pagefind.js`;
+      pagefindRef.current = await import(/* @vite-ignore */ pagefindPath);
+      await pagefindRef.current.init();
+    } catch (e) {
+      console.error("Failed to load pagefind", e);
+    }
+  };
+
+  useEffect(() => {
+    const search = async () => {
+      if (!query || !pagefindRef.current) {
+        setResults([]);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const searchResponse: SearchResponse = await pagefindRef.current.search(query);
+        const limitedResults = searchResponse.results.slice(0, 10);
+        const detailedResults = await Promise.all(
+          limitedResults.map((result) => result.data())
+        );
+        setResults(detailedResults);
+      } catch (e) {
+        console.error("Search failed", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const timer = setTimeout(search, 200);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [query]);
+
+  useEffect(() => {
+    if (selectedIndex >= 0 && resultsContainerRef.current) {
+      const selectedElement = resultsContainerRef.current.children[selectedIndex] as HTMLElement;
+      if (selectedElement) {
+        selectedElement.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }
+    }
+  }, [selectedIndex]);
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="group relative flex items-center justify-center sm:justify-start gap-2 h-9 w-9 sm:w-auto sm:px-3 sm:py-1.5 text-sm font-medium text-muted-foreground/80 border border-border/60 rounded-full bg-secondary/30 hover:text-foreground modern-scale-sm modern-hover"
+        aria-label="Abrir buscador"
+      >
+        <SearchIcon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
+        <span className="hidden sm:inline-block whitespace-nowrap">Buscar...</span>
+        <Kbd className="hidden md:flex opacity-60 group-hover:opacity-100 transition-opacity">
+          {isMac ? <Command className="h-2.5 w-2.5" /> : "Ctrl"} K
+        </Kbd>
+      </button>
+
+      <Dialog open={open} onOpenChange={(val) => {
+        setOpen(val);
+        if (!val) setQuery("");
+      }}>
+        <DialogContent showCloseButton={false} className="w-[calc(100%-2rem)] sm:max-w-[700px] p-0 gap-0 overflow-hidden bg-card/40 backdrop-blur-md border-border/50 shadow-modern animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 rounded-2xl sm:top-[100px] sm:translate-y-0 sm:origin-top">
+          <div className="relative group/input p-5 border-b border-border/50 bg-gradient-to-b from-transparent to-primary/5">
+            <div className="absolute inset-y-0 left-9 flex items-center pointer-events-none">
+              <SearchIcon className={cn(
+                "h-5 w-5 transition-colors duration-300",
+                query ? "text-primary shadow-primary/20" : "text-muted-foreground/40"
+              )} />
+            </div>
+            <Input
+              placeholder="Explora artículos, guías y más..."
+              className="w-full h-12 pl-12 pr-12 text-lg bg-secondary/30 hover:bg-secondary/50 focus:bg-secondary/50 border border-border/60 focus:border-primary/50 rounded-full outline-none transition-all duration-300 focus:ring-4 focus:ring-primary/5 hover:shadow-lg hover:shadow-primary/5 focus:shadow-lg focus:shadow-primary/5"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev));
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+                } else if (e.key === "Enter" && selectedIndex >= 0) {
+                  e.preventDefault();
+                  window.location.href = results[selectedIndex].url;
+                }
+              }}
+              autoFocus
+            />
+            <div className="absolute inset-y-0 right-9 flex items-center gap-2">
+              {isLoading && <Loader2 className="h-5 w-5 animate-spin text-primary/60" />}
+              {query && !isLoading && (
+                <button
+                  onClick={() => setQuery("")}
+                  className="p-1.5 hover:bg-muted/50 rounded-full transition-colors text-muted-foreground/60 hover:text-foreground"
+                  aria-label="Borrar búsqueda"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          <ScrollArea className="h-[500px] w-full p-3">
+            {!query && (
+              <div className="py-20 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="w-20 h-20 bg-primary/5 rounded-full border border-primary/10 flex items-center justify-center mb-6 shadow-modern shadow-primary/5">
+                  <SearchIcon className="h-10 w-10 text-primary/40" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground/80 tracking-tight">Búsqueda Instantánea</h3>
+                <p className="text-muted-foreground mt-2 max-w-[300px] text-sm leading-relaxed">
+                  Encuentra exactamente lo que buscas en milisegundos.
+                </p>
+                {import.meta.env.DEV && (
+                  <Badge variant="secondary" className="mt-6 px-3 py-1 bg-amber-500/10 text-amber-500 border-amber-500/20 rounded-full">
+                    Modo Desarrollo: Índice disponible tras compilar
+                  </Badge>
+                )}
+                <div className="hidden md:flex flex-wrap justify-center gap-6 mt-12 opacity-40 hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                    <div className="flex gap-1.5">
+                      <Kbd>↑</Kbd>
+                      <Kbd>↓</Kbd>
+                    </div> Navegar
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                    <Kbd className="text-[9px] px-1.5 py-0.5">ESC</Kbd> Cerrar
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {query && results.length === 0 && !isLoading && (
+              <div className="py-20 text-center animate-in fade-in zoom-in-95 duration-300">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/60 mb-4">
+                  <X className="h-8 w-8" />
+                </div>
+                <p className="text-lg font-bold text-foreground/60 italic">Sin resultados para "{query}"</p>
+                <p className="text-sm text-muted-foreground mt-1">Prueba con otros términos de búsqueda.</p>
+              </div>
+            )}
+
+            {results.length > 0 && (
+              <div ref={resultsContainerRef} className="grid gap-2 p-1 ring-offset-background">
+                {results.map((result, index) => (
+                  <a
+                    key={result.url}
+                    href={result.url}
+                    className={cn(
+                      "group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 modern-hover modern-scale-lg",
+                      selectedIndex === index
+                        ? "bg-primary/[0.12] border-primary/40 shadow-lg shadow-primary/5"
+                        : "bg-secondary/5 border-border/10 hover:bg-primary/[0.08] hover:border-primary/40"
+                    )}
+                  >
+                    <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-border/40 shadow-sm group-hover:shadow-md transition-all duration-500 group-hover:scale-[1.02]">
+                      {result.meta.image ? (
+                        <img
+                          src={result.meta.image}
+                          alt=""
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className={cn(
+                          "h-full w-full flex items-center justify-center bg-gradient-to-br transition-colors duration-500",
+                          result.url.includes("/blog/")
+                            ? "from-blue-500/10 to-indigo-500/10 text-blue-500/40 opacity-80"
+                            : "from-purple-500/10 to-pink-500/10 text-purple-500/40 opacity-80"
+                        )}>
+                          {result.url.includes("/blog/") ? (
+                            <FileText className="h-8 w-8" />
+                          ) : (
+                            <Tag className="h-8 w-8" />
+                          )}
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-500" />
+                    </div>
+
+                    <div className="flex-1 min-w-0 md:pr-16">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-[9px] uppercase tracking-tighter h-4 px-1.5 bg-background/50 border-border/60 font-bold transition-colors",
+                            result.url.includes("/blog/")
+                              ? "group-hover:border-blue-500/50 group-hover:text-blue-500"
+                              : "group-hover:border-purple-500/50 group-hover:text-purple-500"
+                          )}
+                        >
+                          {result.url.includes("/blog/") ? "Post" : "Etiqueta"}
+                        </Badge>
+                      </div>
+                      <h3 className="font-bold text-base text-foreground group-hover:text-primary transition-colors line-clamp-1 flex items-center gap-2">
+                        {result.meta.title}
+                      </h3>
+                      <p
+                        className="text-xs text-muted-foreground line-clamp-2 mt-1.5 leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity"
+                        dangerouslySetInnerHTML={{ __html: result.excerpt }}
+                      />
+                    </div>
+
+                    <div className="absolute right-6 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 hidden md:block">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <ChevronRight className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+
+          <div className="px-5 py-4 border-t border-border/50 bg-secondary/20 backdrop-blur-md flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-widest leading-none">
+            <div className="flex items-center gap-1.5 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Búsqueda de DevLog
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="hidden md:flex flex items-center gap-1.5 hover:text-foreground transition-colors cursor-default">
+                <Kbd>ESC</Kbd> Cerrar
+              </span>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};

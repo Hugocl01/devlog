@@ -1,4 +1,14 @@
+# Robots.txt for Hugocl01 Devlog
+# Allow all web crawlers to access the site
 User-agent: *
 Allow: /
 
+# Disallow access to admin or private areas (if any in the future)
+# Disallow: /admin/
+# Disallow: /api/
+
+# Be nice to the server: add a small delay between requests
+Crawl-delay: 1
+
+# Sitemap for better indexing
 Sitemap: https://hugocl01-devlog.netlify.app/sitemap-index.xml

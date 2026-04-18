@@ -1,0 +1,95 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  description: string;
+  date: Date;
+  type: "feature" | "bugfix" | "improvement" | "general";
+  author: string;
+  readingTime?: number;
+  class?: string;
+}
+
+import { ChevronRight } from "@lucide/astro";
+import { formatDate, isoDate } from "@/utils/date";
+
+const { id, title, description, date, type, author, readingTime, class: className } = Astro.props;
+const url = `/updates/${id}`;
+const titleId = `title-${id}`;
+
+const typeColors = {
+  feature: "bg-green-500/10 border-green-500/30 text-green-700 dark:text-green-400",
+  bugfix: "bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-400",
+  improvement: "bg-blue-500/10 border-blue-500/30 text-blue-700 dark:text-blue-400",
+  general: "bg-gray-500/10 border-gray-500/30 text-gray-700 dark:text-gray-400",
+};
+
+const typeLabels = {
+  feature: "Característica",
+  bugfix: "Corrección",
+  improvement: "Mejora",
+  general: "General",
+};
+
+const formattedDate = formatDate(date);
+const publishedDate = isoDate(date);
+---
+
+<article
+  class:list={[
+    "group relative flex h-full flex-col rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm overflow-hidden modern-scale-lg modern-hover",
+    "hover:border-primary/50 hover:bg-secondary/30",
+    "focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 reveal",
+    className,
+  ]}
+>
+  <a
+    href={url}
+    aria-labelledby={titleId}
+    class="absolute inset-0 z-10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+  />
+
+  <div class="flex flex-1 h-full flex-col p-6">
+    <div class="flex items-start justify-between gap-4 mb-2">
+      <h2
+        id={titleId}
+        class="text-balance text-2xl font-bold tracking-tight text-foreground
+               transition-colors group-hover:text-primary"
+      >
+        {title}
+      </h2>
+      <span
+        class:list={[
+          "whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium flex-shrink-0",
+          typeColors[type],
+        ]}
+      >
+        {typeLabels[type]}
+      </span>
+    </div>
+
+    <time datetime={publishedDate} class="mb-4 block text-sm text-muted-foreground">
+      {formattedDate}
+      {readingTime && ` • ${readingTime} min de lectura`}
+      <span class="text-muted-foreground/80"> • Por {author}</span>
+    </time>
+
+    <p class="mb-6 text-pretty text-base text-muted-foreground line-clamp-4">
+      {description}
+    </p>
+
+    <div class="mt-auto">
+      <span
+        class="inline-flex items-center gap-1 text-sm font-medium text-primary
+               transition-all group-hover:gap-2"
+        aria-hidden="true"
+      >
+        Leer más
+        <ChevronRight
+          class="h-4 w-4 transition-transform duration-300 ease-modern group-hover:translate-x-1"
+          stroke-width="2.5"
+        />
+      </span>
+    </div>
+  </div>
+</article>

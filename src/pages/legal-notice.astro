@@ -41,19 +41,21 @@ const socialLinks = [
       posibles errores, omisiones o daños derivados del uso de la información aquí publicada.
     </p>
 
-    <div class="mt-8 text-center">
-      <p class="mb-4">Puedes contactarme a través de mis perfiles profesionales:</p>
+    <div class="mt-12 text-center not-prose">
+      <p class="mb-8 text-lg text-muted-foreground reveal">
+        Puedes contactarme a través de mis perfiles profesionales:
+      </p>
       <div class="inline-flex gap-8 justify-center">
         {
-          socialLinks.map((social) => (
+          socialLinks.map((social, index) => (
             <a
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-muted-foreground transition-colors hover:text-foreground"
+              class={`flex h-16 w-16 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 modern-scale-sm modern-hover hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 shadow-sm reveal stagger-${index + 1}`}
               aria-label={social.name}
             >
-              <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
                 <path d={social.icon} />
               </svg>
             </a>

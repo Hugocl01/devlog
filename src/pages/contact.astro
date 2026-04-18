@@ -37,15 +37,15 @@ const socialLinks = [
           desarrollador.
         </p>
 
-        <div class="flex space-x-8 justify-center">
+        <div class="flex space-x-6 justify-center">
           {
             socialLinks.map((social, index) => (
               <a
                 href={social.href}
-                class={`text-muted-foreground transition-all duration-300 hover:text-foreground hover:scale-125 active:scale-90 reveal stagger-${index + 4}`}
+                class={`flex h-16 w-16 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 modern-scale-sm modern-hover hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 shadow-sm reveal stagger-${index + 4}`}
                 aria-label={social.name}
               >
-                <svg class="h-12 w-12" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
                   <path d={social.icon} />
                 </svg>
               </a>

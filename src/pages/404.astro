@@ -16,8 +16,11 @@ import { SearchX } from "@lucide/astro";
   <div class="flex items-center justify-center min-h-[70vh] py-16 px-4">
     <Empty className="reveal">
       <EmptyHeader className="reveal stagger-1">
-        <EmptyMedia variant="icon">
-          <SearchX />
+        <EmptyMedia
+          variant="icon"
+          className="h-12 w-12 rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 mb-4"
+        >
+          <SearchX className="size-6" />
         </EmptyMedia>
         <EmptyTitle>Página no encontrada</EmptyTitle>
         <EmptyDescription>
@@ -27,7 +30,7 @@ import { SearchX } from "@lucide/astro";
       <EmptyContent className="reveal stagger-2">
         <a
           href="/"
-          class="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-8 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-300 hover:bg-primary/90 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          class="inline-flex h-11 items-center justify-center rounded-full bg-primary px-10 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:scale-105 hover:shadow-modern active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           Volver al inicio
         </a>

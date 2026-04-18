@@ -1,0 +1,86 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { ChevronLeft, ChevronRight } from "@lucide/astro";
+
+interface Props {
+  prev?: CollectionEntry<"posts"> | null;
+  next?: CollectionEntry<"posts"> | null;
+}
+
+const { prev, next } = Astro.props;
+---
+
+<nav
+  class="max-w-3xl mx-auto mt-12 pt-12 border-t border-border/40 flex flex-col sm:flex-row justify-between gap-6"
+  aria-label="Navegación entre posts"
+>
+  {
+    prev ? (
+      <a
+        href={`/blog/${prev.id}`}
+        aria-label={`Leer post anterior: ${prev.data.title}`}
+        class="group relative flex-1 min-w-0 rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm p-6 reveal stagger-5 modern-scale-lg modern-hover
+               hover:border-primary/50 hover:bg-secondary/30
+               focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none"
+      >
+        <div class="flex flex-col h-full">
+          <span class="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-3 block">Anterior</span>
+          
+          <h3 class="text-xl font-bold text-foreground transition-colors group-hover:text-primary line-clamp-2 mb-4">
+            {prev.data.title}
+          </h3>
+
+          <div class="mt-auto flex items-center gap-1.5 text-sm font-medium text-primary transition-all group-hover:gap-2.5">
+            <ChevronLeft
+              class="h-4 w-4 transition-transform group-hover:-translate-x-1"
+              stroke-width="2.5"
+            />
+            <span>Leer anterior</span>
+          </div>
+        </div>
+      </a>
+    ) : (
+      <div class="hidden sm:block flex-1" aria-hidden="true" />
+    )
+  }
+
+  {
+    next ? (
+      <a
+        href={`/blog/${next.id}`}
+        aria-label={`Leer post siguiente: ${next.data.title}`}
+        class="group relative flex-1 min-w-0 rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm p-6 reveal stagger-5 modern-scale-lg modern-hover
+               hover:border-primary/50 hover:bg-secondary/30
+               focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none text-right"
+      >
+        <div class="flex flex-col h-full items-end">
+          <span class="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-3 block">Siguiente</span>
+          
+          <h3 class="text-xl font-bold text-foreground transition-colors group-hover:text-primary line-clamp-2 mb-4">
+            {next.data.title}
+          </h3>
+
+          <div class="mt-auto flex items-center gap-1.5 text-sm font-medium text-primary transition-all group-hover:gap-2.5">
+            <span>Leer siguiente</span>
+            <ChevronRight
+              class="h-4 w-4 transition-transform group-hover:translate-x-1"
+              stroke-width="2.5"
+            />
+          </div>
+        </div>
+      </a>
+    ) : (
+      <div class="hidden sm:block flex-1" aria-hidden="true" />
+    )
+  }
+</nav>
+
+<style>
+  /* Ensure consistent height for adjacent cards on desktop */
+  @media (min-width: 640px) {
+    nav {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

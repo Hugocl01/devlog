@@ -1,0 +1,166 @@
+---
+import BaseLayout from "@/layouts/main.astro";
+import type { CollectionEntry } from "astro:content";
+import { Link2, Check } from "@lucide/astro";
+import { formatDate, isoDate as formatISODate } from "@/utils/date";
+import UpdateNavigation from "@/components/blog/UpdateNavigation.astro";
+
+type UpdateLayoutProps = {
+  id?: string;
+  title: string;
+  description?: string;
+  date: string | Date;
+  author?: string;
+  type?: "feature" | "bugfix" | "improvement" | "general";
+  prev?: CollectionEntry<"updates"> | null;
+  next?: CollectionEntry<"updates"> | null;
+  readingTime?: number;
+};
+
+const { id, title, description, date, author, type = "general", prev, next, readingTime } =
+  Astro.props as UpdateLayoutProps;
+
+const isoDate = date ? formatISODate(date) : undefined;
+const formattedDate = date ? formatDate(date) : "Fecha desconocida";
+
+const typeColors = {
+  feature: "bg-green-500/10 border-green-500/30 text-green-700 dark:text-green-400",
+  bugfix: "bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-400",
+  improvement: "bg-blue-500/10 border-blue-500/30 text-blue-700 dark:text-blue-400",
+  general: "bg-gray-500/10 border-gray-500/30 text-gray-700 dark:text-gray-400",
+};
+
+const typeLabels = {
+  feature: "Característica",
+  bugfix: "Corrección",
+  improvement: "Mejora",
+  general: "General",
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+>
+  <Fragment slot="head">
+    {isoDate && <meta property="article:published_time" content={isoDate} />}
+    {author && <meta property="article:author" content={author} />}
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": title,
+      "description": description,
+      "datePublished": isoDate,
+      "url": Astro.url.toString(),
+      ...(author && { "author": { "@type": "Person", "name": author } }),
+    })} />
+  </Fragment>
+  <article class="max-w-4xl mx-auto px-4 py-20 sm:py-24">
+    <header
+      class="max-w-3xl mx-auto mb-12 pb-6 border-b border-gray-200/50 dark:border-gray-700/50 reveal"
+    >
+      <div
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 reveal stagger-1"
+      >
+        <div class="flex items-center gap-3">
+          <span
+            class:list={[
+              "rounded-full border px-3 py-1 text-xs font-medium",
+              typeColors[type],
+            ]}
+          >
+            {typeLabels[type]}
+          </span>
+          <time class="tabular-nums text-sm text-muted-foreground" datetime={isoDate}>
+            {formattedDate}
+            {readingTime && ` • ${readingTime} min`}
+          </time>
+        </div>
+
+        {
+          author && (
+            <p class="font-medium text-sm">
+              Por <strong>{author}</strong>
+            </p>
+          )
+        }
+      </div>
+
+      <h1
+        class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight reveal stagger-2"
+      >
+        {title}
+      </h1>
+
+      {description && (
+        <p class="mt-4 text-lg text-muted-foreground reveal stagger-3">{description}</p>
+      )}
+    </header>
+
+    <div
+      class="max-w-3xl mx-auto prose prose-lg sm:prose-base dark:prose-invert prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-a:text-blue-600 hover:prose-a:underline reveal stagger-4"
+    >
+      <slot />
+    </div>
+
+    <div
+      class="max-w-3xl mx-auto mt-8 py-5 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4"
+    >
+      <p class="font-medium text-foreground">¿Te ha gustado? ¡Compártelo!</p>
+      <div class="flex gap-2">
+        <a
+          href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(Astro.url.toString())}&title=${encodeURIComponent(title)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 modern-scale-sm modern-hover group"
+          aria-label="Compartir en LinkedIn"
+        >
+          <svg
+            class="h-4 w-4 transition-transform group-hover:scale-110"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+            ></path>
+          </svg>
+        </a>
+        <button
+          id="copy-link-btn"
+          data-url={Astro.url.toString()}
+          class="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 modern-scale-sm modern-hover cursor-pointer group"
+          aria-label="Copiar enlace"
+        >
+          <Link2 class="h-4 w-4 transition-transform group-hover:scale-110" id="copy-icon-link" />
+          <Check class="h-4 w-4 text-green-500 hidden" id="copy-icon-check" />
+        </button>
+      </div>
+    </div>
+
+    <UpdateNavigation prev={prev} next={next} />
+  </article>
+</BaseLayout>
+
+<script>
+  const copyBtn = document.getElementById("copy-link-btn");
+  const copyIconLink = document.getElementById("copy-icon-link");
+  const copyIconCheck = document.getElementById("copy-icon-check");
+
+  copyBtn?.addEventListener("click", async () => {
+    const url = copyBtn.getAttribute("data-url");
+    if (url) {
+      try {
+        await navigator.clipboard.writeText(url);
+        copyIconLink?.classList.add("hidden");
+        copyIconCheck?.classList.remove("hidden");
+        setTimeout(() => {
+          copyIconCheck?.classList.add("hidden");
+          copyIconLink?.classList.remove("hidden");
+        }, 2000);
+      } catch (err) {
+        console.error("Error al copiar:", err);
+      }
+    }
+  });
+</script>

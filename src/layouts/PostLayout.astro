@@ -3,9 +3,11 @@ import BaseLayout from "@/layouts/main.astro";
 import type { CollectionEntry } from "astro:content";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Link2, Check } from "@lucide/astro";
+import PostNavigation from "@/components/blog/PostNavigation.astro";
 import { Image } from "astro:assets";
 
 import { tagUrl } from "@/utils/tag";
+import { formatDate, isoDate as formatISODate } from "@/utils/date";
 
 type Cover =
   | string
@@ -30,10 +32,8 @@ type PostLayoutProps = {
 const { id, title, description, date, author, tags, cover, prev, next, readingTime } =
   Astro.props as PostLayoutProps;
 
-const isoDate = date ? new Date(date).toISOString() : undefined;
-const formattedDate = date
-  ? new Date(date).toLocaleDateString("es-ES", { dateStyle: "long" })
-  : "Fecha desconocida";
+const isoDate = date ? formatISODate(date) : undefined;
+const formattedDate = date ? formatDate(date) : "Fecha desconocida";
 const coverImage = typeof cover === "string" ? cover : cover?.src;
 ---
 
@@ -58,7 +58,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
       ...(coverImage && { "image": new URL(coverImage, Astro.site).toString() }),
     })} />
   </Fragment>
-  <article class="max-w-4xl mx-auto px-4 py-20 sm:py-24">
+  <article class="max-w-4xl mx-auto px-4 py-20 sm:py-24" data-pagefind-body>
     {
       cover && (
         <figure class="mb-12 max-h-[400px] overflow-hidden rounded-xl">
@@ -70,6 +70,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
               height={630}
               class="w-full object-cover"
               transition:name={`img-${id}`}
+              data-pagefind-meta="image[src]"
             />
           ) : (
             <Image
@@ -79,6 +80,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
               height={630}
               class="w-full object-cover"
               transition:name={`img-${id}`}
+              data-pagefind-meta="image[src]"
             />
           )}
 
@@ -97,7 +99,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
       <div
         class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground mb-4 reveal stagger-1"
       >
-        <time class="tabular-nums" datetime={date ? new Date(date).toISOString() : undefined}>
+        <time class="tabular-nums" datetime={isoDate}>
           Publicado el {formattedDate}
           {readingTime && ` • ${readingTime} min de lectura`}
         </time>
@@ -125,7 +127,9 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
               href={`/tags/${tagUrl(tag)}`}
               class="relative z-20 hover:opacity-80 transition-all duration-300 hover:scale-105 active:scale-95"
             >
-              <Badge variant="secondary">{tag}</Badge>
+              <Badge variant="secondary" class="bg-primary/5 text-primary/70 border-primary/10 hover:bg-primary/10 hover:text-primary transition-all duration-300">
+                {tag}
+              </Badge>
             </a>
           ))
         }
@@ -147,7 +151,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
           href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(Astro.url.toString())}&title=${encodeURIComponent(title)}`}
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors group"
+          class="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 active:scale-95 group"
           aria-label="Compartir en LinkedIn"
         >
           <svg
@@ -163,82 +167,16 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
         <button
           id="copy-link-btn"
           data-url={Astro.url.toString()}
-          class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+          class="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 active:scale-95 cursor-pointer group"
           aria-label="Copiar enlace"
         >
-          <Link2 class="h-4 w-4" id="copy-icon-link" />
+          <Link2 class="h-4 w-4 transition-transform group-hover:scale-110" id="copy-icon-link" />
           <Check class="h-4 w-4 text-green-500 hidden" id="copy-icon-check" />
         </button>
       </div>
     </div>
 
-    <nav
-      class="max-w-3xl mx-auto mt-8 pt-8 border-t border-gray-200/50 dark:border-gray-700/50 flex justify-between gap-4"
-    >
-      {
-        prev ? (
-          <a
-            href={`/blog/${prev.id}`}
-            class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all duration-500 ease-premium
-             hover:shadow-premium hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.05]
-             focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none max-w-sm reveal stagger-5"
-          >
-            <div class="flex flex-col">
-              <span class="text-xs text-muted-foreground mb-1">Anterior</span>
-
-              <h3 class="text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
-                {prev.data.title}
-              </h3>
-
-              <span
-                class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary
-                 transition-all group-hover:gap-2"
-              >
-                <ChevronLeft
-                  class="h-4 w-4 transition-transform group-hover:-translate-x-1"
-                  stroke-width="2.5"
-                />
-                Leer anterior
-              </span>
-            </div>
-          </a>
-        ) : (
-          <div class="flex-1 max-w-sm" />
-        )
-      }
-
-      {
-        next ? (
-          <a
-            href={`/blog/${next.id}`}
-            class="group block flex-1 rounded-lg border border-border bg-card p-5 transition-all duration-500 ease-premium
-             hover:shadow-premium hover:border-primary/30 hover:-translate-y-1 hover:scale-[1.05]
-             focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus:outline-none text-right max-w-sm reveal stagger-5"
-          >
-            <div class="flex flex-col items-end">
-              <span class="text-xs text-muted-foreground mb-1">Siguiente</span>
-
-              <h3 class="text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
-                {next.data.title}
-              </h3>
-
-              <span
-                class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary
-                 transition-all group-hover:gap-2"
-              >
-                Leer siguiente
-                <ChevronRight
-                  class="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  stroke-width="2.5"
-                />
-              </span>
-            </div>
-          </a>
-        ) : (
-          <div class="flex-1 max-w-sm" />
-        )
-      }
-    </nav>
+    <PostNavigation {prev} {next} />
   </article>
 </BaseLayout>
 
