@@ -139,7 +139,7 @@ export const Search = () => {
         setOpen(val);
         if (!val) setQuery("");
       }}>
-        <DialogContent showCloseButton={false} className="w-[calc(100%-2rem)] sm:max-w-[700px] p-0 gap-0 overflow-hidden bg-card/40 backdrop-blur-md border-border/50 shadow-modern animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 rounded-2xl sm:top-[100px] sm:translate-y-0 sm:origin-top">
+        <DialogContent showCloseButton={false} className="w-[calc(100%-2rem)] sm:max-w-[700px] p-0 gap-0 overflow-hidden bg-card/40 backdrop-blur-md border-border/50 shadow-modern animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 rounded-2xl sm:top-[100px] sm:translate-y-0 sm:origin-top flex flex-col max-h-[85vh] sm:max-h-[800px]">
           <div className="relative group/input p-5 border-b border-border/50 bg-gradient-to-b from-transparent to-primary/5">
             <div className="absolute inset-y-0 left-9 flex items-center pointer-events-none">
               <SearchIcon className={cn(
@@ -180,7 +180,7 @@ export const Search = () => {
             </div>
           </div>
 
-          <ScrollArea className="h-[500px] w-full p-3">
+          <ScrollArea className="h-[320px] sm:h-[500px] w-full p-3">
             {!query && (
               <div className="py-20 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="w-20 h-20 bg-primary/5 rounded-full border border-primary/10 flex items-center justify-center mb-6 shadow-modern shadow-primary/5">
@@ -220,19 +220,20 @@ export const Search = () => {
             )}
 
             {results.length > 0 && (
-              <div ref={resultsContainerRef} className="grid gap-2 p-1 ring-offset-background">
+              <div ref={resultsContainerRef} className="flex flex-col gap-2 p-1 w-full overflow-x-hidden">
                 {results.map((result, index) => (
                   <a
                     key={result.url}
                     href={result.url}
                     className={cn(
-                      "group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 modern-hover modern-scale-lg",
+                      "group relative w-full h-24 sm:h-[112px] p-2 sm:p-4 rounded-2xl transition-all duration-300 modern-hover modern-scale-lg overflow-hidden",
+                      "grid grid-cols-[80px_minmax(0,1fr)] sm:grid-cols-[128px_minmax(0,1fr)] items-center gap-3 sm:gap-4",
                       selectedIndex === index
                         ? "bg-primary/[0.12] border-primary/40 shadow-lg shadow-primary/5"
                         : "bg-secondary/5 border-border/10 hover:bg-primary/[0.08] hover:border-primary/40"
                     )}
                   >
-                    <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-border/40 shadow-sm group-hover:shadow-md transition-all duration-500 group-hover:scale-[1.02]">
+                    <div className="relative h-20 w-20 sm:h-auto sm:aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-border/40 shadow-sm group-hover:shadow-md transition-all duration-500 group-hover:scale-[1.02]">
                       {result.meta.image ? (
                         <img
                           src={result.meta.image}
@@ -247,21 +248,21 @@ export const Search = () => {
                             : "from-purple-500/10 to-pink-500/10 text-purple-500/40 opacity-80"
                         )}>
                           {result.url.includes("/blog/") ? (
-                            <FileText className="h-8 w-8" />
+                            <FileText className="h-6 w-6 sm:h-8 sm:w-8" />
                           ) : (
-                            <Tag className="h-8 w-8" />
+                            <Tag className="h-6 w-6 sm:h-8 sm:w-8" />
                           )}
                         </div>
                       )}
                       <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-500" />
                     </div>
 
-                    <div className="flex-1 min-w-0 md:pr-16">
-                      <div className="flex items-center gap-2 mb-1.5">
+                    <div className="h-full w-full flex flex-col justify-center min-w-0 pr-8 sm:pr-12">
+                      <div className="flex items-center gap-2 mb-1 shrink-0">
                         <Badge
                           variant="outline"
                           className={cn(
-                            "text-[9px] uppercase tracking-tighter h-4 px-1.5 bg-background/50 border-border/60 font-bold transition-colors",
+                            "text-[8px] sm:text-[10px] uppercase tracking-tighter h-4 px-1.5 bg-background/50 border-border/60 font-bold transition-colors",
                             result.url.includes("/blog/")
                               ? "group-hover:border-blue-500/50 group-hover:text-blue-500"
                               : "group-hover:border-purple-500/50 group-hover:text-purple-500"
@@ -270,17 +271,17 @@ export const Search = () => {
                           {result.url.includes("/blog/") ? "Post" : "Etiqueta"}
                         </Badge>
                       </div>
-                      <h3 className="font-bold text-base text-foreground group-hover:text-primary transition-colors line-clamp-1 flex items-center gap-2">
+                      <h3 className="font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors truncate w-full shrink-0">
                         {result.meta.title}
                       </h3>
-                      <p
-                        className="text-xs text-muted-foreground line-clamp-2 mt-1.5 leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity"
+                      <div
+                        className="text-xs text-muted-foreground line-clamp-2 mt-1 leading-snug opacity-80 group-hover:opacity-100 transition-opacity break-words"
                         dangerouslySetInnerHTML={{ __html: result.excerpt }}
                       />
                     </div>
 
-                    <div className="absolute right-6 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 hidden md:block">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <div className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex items-center justify-center pointer-events-none">
+                      <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:translate-x-1 transition-transform">
                         <ChevronRight className="h-4 w-4" />
                       </div>
                     </div>
