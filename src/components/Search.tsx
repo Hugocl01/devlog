@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -140,7 +141,7 @@ export const Search = () => {
         if (!val) setQuery("");
       }}>
         <DialogContent showCloseButton={false} className="w-[calc(100%-2rem)] sm:max-w-[700px] p-0 gap-0 overflow-hidden bg-card/40 backdrop-blur-md border-border/50 shadow-modern animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 rounded-2xl sm:top-[100px] sm:translate-y-0 sm:origin-top flex flex-col max-h-[85vh] sm:max-h-[800px]">
-          <div className="relative group/input p-5 border-b border-border/50 bg-gradient-to-b from-transparent to-primary/5">
+          <DialogHeader className="relative group/input p-5 border-b border-border/50 bg-gradient-to-b from-transparent to-primary/5 space-y-0 text-left">
             <div className="absolute inset-y-0 left-9 flex items-center pointer-events-none">
               <SearchIcon className={cn(
                 "h-5 w-5 transition-colors duration-300",
@@ -178,7 +179,7 @@ export const Search = () => {
                 </button>
               )}
             </div>
-          </div>
+          </DialogHeader>
 
           <ScrollArea className="h-[320px] sm:h-[500px] w-full p-3">
             {!query && (
@@ -291,17 +292,20 @@ export const Search = () => {
             )}
           </ScrollArea>
 
-          <div className="px-5 py-4 border-t border-border/50 bg-secondary/20 backdrop-blur-md flex justify-between items-center text-[10px] text-foreground/70 dark:text-muted-foreground font-bold uppercase tracking-widest leading-none">
-            <div className="flex items-center gap-1.5 grayscale opacity-90 dark:opacity-70 hover:grayscale-0 hover:opacity-100 transition-all">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          <DialogFooter className="px-5 py-4 border-t border-border/50 bg-secondary/20 backdrop-blur-md flex-row justify-between sm:justify-between w-full items-center text-[10px] font-bold uppercase tracking-widest leading-none space-x-0 sm:space-x-0 space-y-0">
+            <div className="flex items-center gap-2 text-foreground/70 dark:text-muted-foreground/90 hover:text-foreground dark:hover:text-foreground transition-colors cursor-default">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary shadow-[0_0_6px_var(--color-primary)]"></span>
+              </span>
               Búsqueda de DevLog
             </div>
             <div className="flex items-center gap-4">
-              <span className="hidden md:flex flex items-center gap-1.5 text-foreground/60 dark:text-muted-foreground/60 hover:text-foreground/90 dark:hover:text-foreground transition-colors cursor-default">
+              <span className="hidden md:flex flex items-center gap-1.5 text-foreground/70 dark:text-muted-foreground/90 hover:text-foreground dark:hover:text-foreground transition-colors cursor-default">
                 <Kbd className="opacity-80">ESC</Kbd> Cerrar
               </span>
             </div>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
