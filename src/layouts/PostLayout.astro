@@ -4,6 +4,8 @@ import type { CollectionEntry } from "astro:content";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Link2, Check } from "@lucide/astro";
 import PostNavigation from "@/components/blog/PostNavigation.astro";
+import TOC from "@/components/blog/TOC.astro";
+import type { Heading } from "@/components/blog/TOC.astro";
 import { Image } from "astro:assets";
 
 import { tagUrl } from "@/utils/tag";
@@ -27,9 +29,10 @@ type PostLayoutProps = {
   prev?: CollectionEntry<"posts"> | null;
   next?: CollectionEntry<"posts"> | null;
   readingTime?: number;
+  headings?: Heading[];
 };
 
-const { id, title, description, date, author, tags, cover, prev, next, readingTime } =
+const { id, title, description, date, author, tags, cover, prev, next, readingTime, headings } =
   Astro.props as PostLayoutProps;
 
 const isoDate = date ? formatISODate(date) : undefined;
@@ -58,7 +61,8 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
       ...(coverImage && { "image": new URL(coverImage, Astro.site).toString() }),
     })} />
   </Fragment>
-  <article class="max-w-4xl mx-auto px-4 py-20 sm:py-24" data-pagefind-body>
+  <div class="max-w-7xl mx-auto flex flex-col xl:flex-row xl:gap-12 justify-center items-start">
+    <article class="flex-1 w-full max-w-4xl lg:max-w-3xl mx-auto px-4 py-20 sm:py-24" data-pagefind-body>
     {
       cover && (
         <figure class="mb-12 max-h-[400px] overflow-hidden rounded-xl">
@@ -137,7 +141,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
     </header>
 
     <div
-      class="max-w-3xl mx-auto prose prose-lg sm:prose-base dark:prose-invert prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-a:text-blue-600 hover:prose-a:underline reveal stagger-4"
+      class="max-w-3xl mx-auto prose prose-lg sm:prose-base dark:prose-invert prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-headings:scroll-mt-28 prose-a:text-blue-600 hover:prose-a:underline reveal stagger-4"
     >
       <slot />
     </div>
@@ -177,7 +181,14 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
     </div>
 
     <PostNavigation {prev} {next} />
-  </article>
+    </article>
+
+    {headings && headings.length > 0 && (
+      <aside class="hidden xl:block w-64 shrink-0 sticky top-24 self-start max-h-[calc(100vh-6rem)] overflow-y-auto py-20 scrollbar-hide">
+        <TOC headings={headings} />
+      </aside>
+    )}
+  </div>
 </BaseLayout>
 
 <script>

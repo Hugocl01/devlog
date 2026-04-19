@@ -1,0 +1,96 @@
+---
+export type Heading = {
+  depth: number;
+  slug: string;
+  text: string;
+};
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+if (toc.length === 0) return null;
+---
+
+<nav class="toc-container text-sm">
+  <h3 class="font-semibold text-foreground mb-4 select-none">En este artículo</h3>
+  <ul class="space-y-3 relative border-l border-border/50 pl-4">
+    {
+      toc.map((heading) => (
+        <li class={heading.depth === 3 ? "ml-3" : ""}>
+          <a
+            href={`#${heading.slug}`}
+            class={`toc-link block hover:text-foreground transition-colors duration-200 line-clamp-2 leading-tight ${heading.depth === 3 ? 'text-xs text-muted-foreground/80' : 'text-muted-foreground'}`}
+            data-target={heading.slug}
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  const setupTOC = () => {
+    const observerOptions = {
+      root: null,
+      rootMargin: "-100px 0px -80% 0px",
+      threshold: 1.0,
+    };
+
+    const tocLinks = document.querySelectorAll<HTMLAnchorElement>(".toc-link");
+    if (tocLinks.length === 0) return;
+
+    let activeId = tocLinks[0].getAttribute("data-target");
+
+    const updateActiveLink = (id: string | null) => {
+      if (!id) return;
+      tocLinks.forEach((link) => {
+        if (link.getAttribute("data-target") === id) {
+          link.classList.add("text-primary", "font-medium");
+          link.classList.remove("text-muted-foreground", "text-muted-foreground/80");
+        } else {
+          link.classList.remove("text-primary", "font-medium");
+          // Re-añadir color apagado dependiendo de la profundidad
+          const isH3 = link.classList.contains("text-xs");
+          if (isH3) {
+            link.classList.add("text-muted-foreground/80");
+          } else {
+            link.classList.add("text-muted-foreground");
+          }
+        }
+      });
+    };
+
+    const headingObserver = new IntersectionObserver((entries) => {
+      // Necesitamos procesar las entradas asegurando orden correcto cuando hay saltos
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          activeId = entry.target.id;
+          updateActiveLink(activeId);
+        }
+      });
+    }, observerOptions);
+
+    tocLinks.forEach((link) => {
+      const id = link.getAttribute("data-target");
+      if (id) {
+        const heading = document.getElementById(id);
+        if (heading) headingObserver.observe(heading);
+      }
+    });
+
+    if (window.location.hash) {
+      updateActiveLink(window.location.hash.slice(1));
+    } else {
+      updateActiveLink(activeId);
+    }
+  };
+
+  setupTOC();
+  document.addEventListener("astro:page-load", setupTOC);
+</script>

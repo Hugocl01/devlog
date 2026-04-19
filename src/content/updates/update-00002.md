@@ -1,9 +1,9 @@
 ---
 title: "Búsqueda Instantánea y Estética Moderna: El siguiente nivel de DevLog"
 description: "Cómo hemos transformado la búsqueda en DevLog utilizando Pagefind para obtener resultados instantáneos y una interfaz moderna y actual."
-date: 2026-04-16
+date: 2026-04-18
 author: "Hugo Cayón Laso"
-type: "improvement"
+type: "feature"
 ---
 
 ## Innovación en la búsqueda: El salto a Pagefind

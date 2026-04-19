@@ -3,7 +3,7 @@ title: "Novedades en el blog: Astro 6, Tailwind 4 y mucho más"
 description: "Descubre las últimas actualizaciones del blog: migración a Astro 6, implementación de Tailwind CSS 4 y mejoras en la experiencia de usuario."
 date: 2026-03-29
 author: "Hugo Cayón Laso"
-type: "feature"
+type: "improvement"
 ---
 
 ## ¡El blog se renueva! Novedades: Astro 6, Tailwind 4 y mucho más
