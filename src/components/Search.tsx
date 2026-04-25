@@ -149,7 +149,7 @@ export const Search = () => {
               )} />
             </div>
             <Input
-              placeholder="Explora artículos, guías y más..."
+              placeholder="Busca artículos, etiquetas y contenido en el blog"
               className="w-full h-12 pl-12 pr-12 text-lg bg-secondary/30 hover:bg-secondary/50 focus:bg-secondary/50 border border-border/60 focus:border-primary/50 rounded-full outline-none transition-all duration-300 focus:ring-4 focus:ring-primary/5 hover:shadow-lg hover:shadow-primary/5 focus:shadow-lg focus:shadow-primary/5"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
