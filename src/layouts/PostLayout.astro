@@ -63,6 +63,16 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
   </Fragment>
   <div class="max-w-7xl mx-auto flex flex-col xl:flex-row xl:gap-12 justify-center items-start">
     <article class="flex-1 w-full max-w-4xl lg:max-w-3xl mx-auto px-4 py-20 sm:py-24" data-pagefind-body>
+      <nav aria-label="Breadcrumb" class="mb-8 reveal">
+        <ol class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <li><a href="/" class="hover:text-foreground transition-colors">Inicio</a></li>
+          <li><ChevronRight class="h-4 w-4" /></li>
+          <li><a href="/blog" class="hover:text-foreground transition-colors">Blog</a></li>
+          <li><ChevronRight class="h-4 w-4" /></li>
+          <li class="text-foreground font-medium truncate max-w-[200px] sm:max-w-[400px]" aria-current="page">{title}</li>
+        </ol>
+      </nav>
+
     {
       cover && (
         <figure class="mb-12 max-h-[400px] overflow-hidden rounded-xl">

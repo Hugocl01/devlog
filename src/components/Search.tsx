@@ -5,6 +5,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogFooter,
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -141,6 +143,10 @@ export const Search = () => {
         if (!val) setQuery("");
       }}>
         <DialogContent showCloseButton={false} className="w-[calc(100%-2rem)] sm:max-w-[700px] p-0 gap-0 overflow-hidden bg-card/40 backdrop-blur-md border-border/50 shadow-modern animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 rounded-2xl sm:top-[100px] sm:translate-y-0 sm:origin-top flex flex-col max-h-[85vh] sm:max-h-[800px]">
+          <DialogTitle className="sr-only">Buscador de DevLog</DialogTitle>
+          <DialogDescription className="sr-only">
+            Busca artículos, etiquetas y contenido en el blog.
+          </DialogDescription>
           <DialogHeader className="relative group/input p-5 border-b border-border/50 bg-gradient-to-b from-transparent to-primary/5 space-y-0 text-left">
             <div className="absolute inset-y-0 left-9 flex items-center pointer-events-none">
               <SearchIcon className={cn(
