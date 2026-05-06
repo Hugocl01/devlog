@@ -40,23 +40,3 @@ Este es solo el comienzo. Mi objetivo es seguir compartiendo contenido sobre des
 ---
 
 **¿Qué te parecen estos cambios?** Si tienes alguna sugerencia o has encontrado algún detalle que mejorar, ¡no dudes en contactarme!
-
-¡Gracias por leer!
----
-title: "Lanzamiento del nuevo blog"
-description: "Se ha lanzado oficialmente la nueva versión de DevLog con diseño mejorado y más contenido."
-date: 2026-04-01
-author: "Hugo Cayón"
-type: "feature"
----
-
-Nos complace anunciar el lanzamiento oficial de la nueva versión de **DevLog**. Con esta actualización, hemos introducido un diseño completamente renovado, mejor navegación y una experiencia de usuario más intuitiva.
-
-## Nuevas características
-
-- **Diseño mejorado**: Interfaz moderna con mejor contraste y legibilidad
-- **Búsqueda mejorada**: Busca artículos por título, descripción y etiquetas
-- **Mejor rendimiento**: Optimización de imágenes y carga de contenido
-- **Temas oscuro y claro**: Cambia entre temas según tu preferencia
-
-Agradecemos tu paciencia durante el desarrollo y esperamos que disfrutes de esta nueva versión tanto como nosotros disfrutamos creándola.
