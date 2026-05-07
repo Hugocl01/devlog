@@ -208,7 +208,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
     </article>
 
     {headings && headings.length > 0 && (
-      <aside class="hidden xl:block w-64 shrink-0 sticky top-24 self-start max-h-[calc(100vh-6rem)] overflow-y-auto py-20 scrollbar-hide">
+      <aside class="hidden xl:block w-64 shrink-0 sticky top-24 self-start max-h-[calc(100vh-6rem)] overflow-y-auto py-20 [scrollbar-width:thin] [scrollbar-color:oklch(from_var(--primary)_l_c_h_/_0.2)_transparent]">
         <TOC headings={headings} />
       </aside>
     )}
