@@ -18,11 +18,12 @@ const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 <BlogLayout title="Etiquetas">
   <div class="container mx-auto max-w-6xl px-4">
     <header class="py-16 text-center md:py-20">
-      <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
+      <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl reveal">
         Todas las Etiquetas
       </h1>
-      <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-        Navega por todas las etiquetas del blog y descubre contenido relacionado.
+      <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground reveal stagger-1">
+        Explora {tags.length} etiquetas y navega por todos los temas del blog para descubrir
+        contenido relacionado.
       </p>
     </header>
 
