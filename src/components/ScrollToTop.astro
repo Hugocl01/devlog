@@ -4,7 +4,8 @@ import { ArrowUp } from "@lucide/astro";
 
 <button
   id="scroll-to-top"
-  class="fixed bottom-8 right-8 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 backdrop-blur-md shadow-sm transition-all duration-500 scale-0 opacity-0 modern-hover modern-scale-sm hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 group"
+  class="fixed bottom-8 right-8 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 backdrop-blur-md shadow-sm scale-0 opacity-0 active:scale-95 hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 group"
+  style="transition: opacity 0.5s var(--ease-modern), transform 0.5s var(--ease-modern), background-color 0.3s var(--ease-modern), color 0.3s var(--ease-modern), border-color 0.3s var(--ease-modern);"
   aria-label="Volver arriba"
 >
   <ArrowUp class="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1" />
@@ -25,7 +26,7 @@ import { ArrowUp } from "@lucide/astro";
         }
       };
 
-      window.addEventListener("scroll", handleScroll);
+      window.addEventListener("scroll", handleScroll, { passive: true });
 
       scrollBtn.addEventListener("click", () => {
         window.scrollTo({
@@ -34,11 +35,10 @@ import { ArrowUp } from "@lucide/astro";
         });
       });
 
-      // Run once on init
       handleScroll();
     }
   }
 
-  // Initialize on page load and after every navigation
+  initScrollToTop();
   document.addEventListener("astro:page-load", initScrollToTop);
 </script>
