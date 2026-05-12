@@ -4,7 +4,6 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
 import react from '@astrojs/react';
-import sitemap from '@astrojs/sitemap';
 
 import pagefind from 'astro-pagefind';
 
@@ -16,7 +15,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  integrations: [react(), sitemap(), pagefind()],
+  integrations: [react(), pagefind()],
   markdown: {
     shikiConfig: {
       theme: "github-dark",

@@ -11,4 +11,4 @@ Allow: /
 Crawl-delay: 1
 
 # Sitemap for better indexing
-Sitemap: https://hugocl01-devlog.netlify.app/sitemap-index.xml
+Sitemap: https://hugocl01-devlog.netlify.app/sitemap.xml

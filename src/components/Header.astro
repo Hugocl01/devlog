@@ -1,7 +1,7 @@
 ---
 import { ChevronsLeftRightEllipsis } from "@lucide/astro";
 import HeaderMenu from "./nav/HeaderMenu";
-import { ThemeToggle } from "./ThemeToggle";
+import ThemeToggle from "./ThemeToggle.astro";
 import { Search } from "./Search";
 
 const navigation = [
@@ -22,10 +22,10 @@ const navigation = [
 
     <div class="flex items-center gap-2 sm:gap-4">
       <div class="flex items-center">
-        <Search client:load />
+        <Search client:idle />
       </div>
       <HeaderMenu items={navigation} client:load />
-      <ThemeToggle client:load />
+      <ThemeToggle />
     </div>
   </nav>
 </header>
