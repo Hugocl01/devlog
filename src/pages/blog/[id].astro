@@ -7,17 +7,33 @@ export async function getStaticPaths() {
   const posts = (await getCollection("posts"))
     .filter((post) => !post.data.draft)
     .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
-  return posts.map((post, index) => ({
-    params: { id: post.id },
-    props: {
-      post,
-      prev: posts[index - 1] ?? null,
-      next: posts[index + 1] ?? null,
-    },
-  }));
+
+  return posts.map((post, index) => {
+    const tags = post.data.tags ?? [];
+    const relatedPosts = posts
+      .filter((p) => p.id !== post.id)
+      .map((p) => ({
+        post: p,
+        shared: (p.data.tags ?? []).filter((t) => tags.includes(t)).length,
+      }))
+      .filter(({ shared }) => shared > 0)
+      .sort((a, b) => b.shared - a.shared)
+      .slice(0, 3)
+      .map(({ post }) => post);
+
+    return {
+      params: { id: post.id },
+      props: {
+        post,
+        prev: posts[index - 1] ?? null,
+        next: posts[index + 1] ?? null,
+        relatedPosts,
+      },
+    };
+  });
 }
 
-const { post, prev, next } = Astro.props;
+const { post, prev, next, relatedPosts } = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
@@ -31,6 +47,7 @@ const { Content, headings } = await render(post);
   description={post.data.description}
   prev={prev}
   next={next}
+  relatedPosts={relatedPosts}
   readingTime={post.body ? calculateReadingTime(post.body) : undefined}
   headings={headings}
 >

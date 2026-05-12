@@ -18,6 +18,7 @@ import {
 
 import { tagUrl } from "@/utils/tag";
 import { formatDate, isoDate as formatISODate } from "@/utils/date";
+import RelatedPosts from "@/components/blog/RelatedPosts.astro";
 
 type Cover =
   | string
@@ -38,9 +39,10 @@ type PostLayoutProps = {
   next?: CollectionEntry<"posts"> | null;
   readingTime?: number;
   headings?: Heading[];
+  relatedPosts?: CollectionEntry<"posts">[];
 };
 
-const { id, title, description, date, author, tags, cover, prev, next, readingTime, headings } =
+const { id, title, description, date, author, tags, cover, prev, next, readingTime, headings, relatedPosts } =
   Astro.props as PostLayoutProps;
 
 const isoDate = date ? formatISODate(date) : undefined;
@@ -210,6 +212,9 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
     </div>
 
     <PostNavigation {prev} {next} />
+    {relatedPosts && relatedPosts.length > 0 && (
+      <RelatedPosts posts={relatedPosts} />
+    )}
     </article>
 
     {headings && headings.length > 0 && (
