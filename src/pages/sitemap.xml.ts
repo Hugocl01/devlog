@@ -37,6 +37,7 @@ export async function GET({ site }: { site: URL }) {
     entry({ url: base("/"), priority: "1.0", changefreq: "weekly", lastmod: latestPost ? formatDate(latestPost) : undefined }),
     entry({ url: base("/blog/"), priority: "0.9", changefreq: "weekly", lastmod: latestPost ? formatDate(latestPost) : undefined }),
     entry({ url: base("/about/"), priority: "0.6", changefreq: "monthly" }),
+    entry({ url: base("/contact/"), priority: "0.5", changefreq: "yearly" }),
     entry({ url: base("/tags/"), priority: "0.6", changefreq: "monthly" }),
     entry({ url: base("/updates/"), priority: "0.6", changefreq: "monthly" }),
     ...posts.map((p) =>

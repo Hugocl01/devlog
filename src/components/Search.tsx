@@ -41,6 +41,8 @@ export const Search = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const pagefindRef = useRef<any>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
+  const listboxId = "search-results-listbox";
+  const getOptionId = (index: number) => `search-option-${index}`;
 
   useEffect(() => {
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -172,6 +174,11 @@ export const Search = () => {
                 }
               }}
               autoFocus
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={results.length > 0}
+              aria-controls={listboxId}
+              aria-activedescendant={selectedIndex >= 0 ? getOptionId(selectedIndex) : undefined}
             />
             <div className="absolute inset-y-0 right-9 flex items-center gap-2">
               {isLoading && <Loader2 className="h-5 w-5 animate-spin text-primary/60" />}
@@ -226,12 +233,27 @@ export const Search = () => {
               </div>
             )}
 
+            <div
+              aria-live="polite"
+              aria-atomic="true"
+              className="sr-only"
+            >
+              {query && !isLoading && (
+                results.length > 0
+                  ? `${results.length} resultado${results.length === 1 ? "" : "s"} encontrado${results.length === 1 ? "" : "s"}`
+                  : "Sin resultados"
+              )}
+            </div>
+
             {results.length > 0 && (
-              <div ref={resultsContainerRef} className="flex flex-col gap-2 p-1 w-full overflow-x-hidden">
+              <div ref={resultsContainerRef} role="listbox" id={listboxId} aria-label="Resultados de búsqueda" className="flex flex-col gap-2 p-1 w-full overflow-x-hidden">
                 {results.map((result, index) => (
                   <a
                     key={result.url}
+                    id={getOptionId(index)}
                     href={result.url}
+                    role="option"
+                    aria-selected={selectedIndex === index}
                     className={cn(
                       "group relative w-full h-24 sm:h-[112px] p-2 sm:p-4 rounded-2xl transition-all duration-300 modern-hover modern-scale-lg overflow-hidden",
                       "grid grid-cols-[80px_minmax(0,1fr)] sm:grid-cols-[128px_minmax(0,1fr)] items-center gap-3 sm:gap-4",

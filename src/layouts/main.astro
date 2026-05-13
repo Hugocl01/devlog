@@ -5,7 +5,14 @@ import Footer from "../components/Footer.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
 import { ClientRouter } from "astro:transitions";
 
-const { title, description, image = "/og-image.png", type = "website", author } = Astro.props;
+const {
+  title,
+  description: rawDescription,
+  image = "/og-image.png",
+  type = "website",
+  author,
+} = Astro.props;
+const description = rawDescription ?? "DevLog — Artículos sobre desarrollo web, tecnología y proyectos.";
 const imageUrl = new URL(image, Astro.site).toString();
 ---
 
@@ -27,6 +34,7 @@ const imageUrl = new URL(image, Astro.site).toString();
     <meta property="og:type" content={type} />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={title} />

@@ -5,7 +5,6 @@ import {
     NavigationMenuList,
     NavigationMenuItem,
     NavigationMenuLink,
-    navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { Button } from "@/components/ui/button"
 import {
@@ -41,7 +40,7 @@ export default function HeaderMenu({ items }: HeaderMenuProps) {
                                         "group flex items-center px-4 py-1.5 text-sm font-medium text-muted-foreground/80 border border-transparent rounded-full hover:bg-secondary/30 hover:text-foreground modern-hover modern-scale-sm"
                                     )}
                                 >
-                                    <a href={item.href} aria-label={item.name}>{item.name}</a>
+                                    <a href={item.href}>{item.name}</a>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
                         ))}
