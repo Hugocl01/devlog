@@ -14,32 +14,39 @@ import { Kbd } from "@/components/ui/kbd";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
+interface PagefindData {
+  url: string;
+  excerpt: string;
+  filters: Record<string, string[]>;
+  meta: {
+    title: string;
+    image?: string;
+  };
+  sub_results: { title: string; url: string; excerpt: string }[];
+}
+
 interface PagefindResult {
   id: string;
-  data: () => Promise<{
-    url: string;
-    excerpt: string;
-    filters: Record<string, any>;
-    meta: {
-      title: string;
-      image?: string;
-    };
-    sub_results: any[];
-  }>;
+  data: () => Promise<PagefindData>;
 }
 
 interface SearchResponse {
   results: PagefindResult[];
 }
 
+interface Pagefind {
+  search: (query: string) => Promise<SearchResponse>;
+  init: () => Promise<void>;
+}
+
 export const Search = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<PagefindData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isMac, setIsMac] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const pagefindRef = useRef<any>(null);
+  const pagefindRef = useRef<Pagefind | null>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const listboxId = "search-results-listbox";
   const getOptionId = (index: number) => `search-option-${index}`;
@@ -77,7 +84,7 @@ export const Search = () => {
     try {
       const prefix = "/";
       const pagefindPath = `${prefix}pagefind/pagefind.js`;
-      pagefindRef.current = await import(/* @vite-ignore */ pagefindPath);
+      pagefindRef.current = await import(/* @vite-ignore */ pagefindPath) as Pagefind;
       await pagefindRef.current.init();
     } catch (e) {
       console.error("Failed to load pagefind", e);
@@ -174,6 +181,7 @@ export const Search = () => {
                 }
               }}
               autoFocus
+              aria-label="Buscar en el blog"
               role="combobox"
               aria-autocomplete="list"
               aria-expanded={results.length > 0}

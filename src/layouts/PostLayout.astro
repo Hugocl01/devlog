@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/main.astro";
 import type { CollectionEntry } from "astro:content";
+import type { ImageMetadata } from "astro";
 import { Badge } from "@/components/ui/badge";
 import { Link2, Check } from "@lucide/astro";
 import PostNavigation from "@/components/blog/PostNavigation.astro";
@@ -20,12 +21,15 @@ import { tagUrl } from "@/utils/tag";
 import { formatDate, isoDate as formatISODate } from "@/utils/date";
 import RelatedPosts from "@/components/blog/RelatedPosts.astro";
 
-type Cover =
-  | string
-  | {
-      src: string;
-      caption?: string;
-    };
+type CoverObject = {
+  src: ImageMetadata;
+  caption?: string;
+};
+type Cover = string | ImageMetadata | CoverObject;
+
+function isCoverObject(c: Exclude<Cover, string>): c is CoverObject {
+  return !("format" in c);
+}
 
 type PostLayoutProps = {
   id?: string;
@@ -47,14 +51,31 @@ const { id, title, description, date, author, tags, cover, prev, next, readingTi
 
 const isoDate = date ? formatISODate(date) : undefined;
 const formattedDate = date ? formatDate(date) : "Fecha desconocida";
-const coverImage = typeof cover === "string" ? cover : cover?.src;
+
+const imageSrc: string | ImageMetadata | undefined = !cover
+  ? undefined
+  : typeof cover === "string"
+  ? cover
+  : isCoverObject(cover)
+  ? cover.src
+  : cover;
+
+const coverCaption = cover && typeof cover !== "string" && isCoverObject(cover)
+  ? cover.caption
+  : undefined;
+
+const ogImage: string | undefined = !imageSrc
+  ? undefined
+  : typeof imageSrc === "string"
+  ? imageSrc
+  : imageSrc.src;
 ---
 
 <BaseLayout
   title={title}
   description={description}
   type="article"
-  image={coverImage}
+  image={ogImage}
   author={author}
 >
   <Fragment slot="head">
@@ -69,7 +90,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
       "datePublished": isoDate,
       "url": Astro.url.toString(),
       ...(author && { "author": { "@type": "Person", "name": author } }),
-      ...(coverImage && { "image": new URL(coverImage, Astro.site).toString() }),
+      ...(ogImage && { "image": new URL(ogImage, Astro.site).toString() }),
     })} />
   </Fragment>
   <div class="max-w-7xl mx-auto flex flex-col xl:flex-row xl:gap-12 justify-center items-start">
@@ -91,11 +112,11 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
       </Breadcrumb>
 
     {
-      cover && (
+      imageSrc && (
         <figure class="mb-12 max-h-[400px] overflow-hidden rounded-xl">
-          {typeof cover === "string" ? (
+          {typeof imageSrc === "string" ? (
             <Image
-              src={cover}
+              src={imageSrc}
               alt={`Imagen de portada del post: ${title}`}
               width={1200}
               height={630}
@@ -107,7 +128,7 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
             />
           ) : (
             <Image
-              src={cover.src as any}
+              src={imageSrc}
               alt={`Imagen de portada del post: ${title}`}
               width={1200}
               height={630}
@@ -118,10 +139,9 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
               data-pagefind-meta="image[src]"
             />
           )}
-
-          {typeof cover !== "string" && cover.caption && (
+          {coverCaption && (
             <figcaption class="mt-2 text-center text-sm text-muted-foreground">
-              {cover.caption}
+              {coverCaption}
             </figcaption>
           )}
         </figure>
@@ -267,7 +287,9 @@ const coverImage = typeof cover === "string" ? cover : cover?.src;
 
       // Botón de copiar estético (adaptado al fondo siempre oscuro del bloque de código)
       const button = document.createElement("button");
-      button.setAttribute("aria-label", "Copiar código");
+      const codeEl = pre.querySelector("code");
+      const lang = codeEl?.className.match(/language-(\w+)/)?.[1];
+      button.setAttribute("aria-label", lang ? `Copiar código ${lang}` : "Copiar código");
       button.className = "absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-md border border-white/10 bg-black/20 backdrop-blur-md text-zinc-400 opacity-100 sm:opacity-0 transition-all duration-300 hover:bg-black/40 hover:text-zinc-100 sm:group-hover:opacity-100";
 
       const copyIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;

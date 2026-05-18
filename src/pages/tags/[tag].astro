@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 
   return [...tags].map((tag) => ({
     params: {
-      tag: tagUrl(tag).replace("/tags/", "").replace(/\//g, ""), // extrae solo el slug
+      tag: tagUrl(tag),
     },
     props: { originalTag: tag },
   }));
@@ -25,9 +25,7 @@ const { originalTag } = Astro.props;
 const posts = (await getCollection("posts"))
   .filter(
     (post) =>
-      post.data.tags?.some(
-        (t) => tagUrl(t).replace("/tags/", "").replace(/\//g, "") === tagUrl(originalTag),
-      ) && !post.data.draft,
+      post.data.tags?.some((t) => tagUrl(t) === tagUrl(originalTag)) && !post.data.draft,
   )
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
