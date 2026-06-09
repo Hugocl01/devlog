@@ -1,0 +1,40 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import UsersTable from "@/components/admin/UsersTable";
+import { prisma } from "@/lib/prisma";
+
+const [users, roles] = await Promise.all([
+  prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatar: true,
+      roleId: true,
+      emailVerified: true,
+      banned: true,
+      bannedAt: true,
+      createdAt: true,
+      role: { select: { name: true } },
+      _count: { select: { comments: true, reactions: true, sessions: true } },
+    },
+  }),
+  prisma.role.findMany({ orderBy: { id: "asc" }, select: { id: true, name: true } }),
+]);
+
+const currentUserId = Astro.locals.user!.id;
+---
+
+<AdminLayout title="Usuarios">
+  <p class="text-sm text-muted-foreground mb-4">
+    {users.length} {users.length === 1 ? "usuario registrado" : "usuarios registrados"}
+  </p>
+  <UsersTable
+    users={JSON.parse(JSON.stringify(users))}
+    roles={roles}
+    currentUserId={currentUserId}
+    client:load
+  />
+</AdminLayout>

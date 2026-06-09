@@ -1,0 +1,43 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import ContentCalendar from "@/components/admin/ContentCalendar";
+import { prisma } from "@/lib/prisma";
+
+const [dbPosts, dbUpdates] = await Promise.all([
+  prisma.post.findMany({
+    select: { slug: true, title: true, publishedAt: true, draft: true },
+    orderBy: { publishedAt: "desc" },
+  }),
+  prisma.update.findMany({
+    select: { slug: true, title: true, publishedAt: true, draft: true, type: { select: { name: true } } },
+    orderBy: { publishedAt: "desc" },
+  }),
+]);
+
+const now = new Date();
+
+const items = [
+  ...dbPosts.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    date: (p.publishedAt ?? p.draft ? new Date().toISOString() : new Date().toISOString()),
+    draft: p.draft,
+    scheduledAt: !p.draft && p.publishedAt && p.publishedAt > now ? p.publishedAt.toISOString() : null,
+    type: "post" as const,
+  })),
+  ...dbUpdates.map((u) => ({
+    slug: u.slug,
+    title: u.title,
+    date: (u.publishedAt ?? new Date()).toISOString(),
+    draft: u.draft,
+    scheduledAt: !u.draft && u.publishedAt && u.publishedAt > now ? u.publishedAt.toISOString() : null,
+    type: "update" as const,
+    updateType: u.type?.name ?? null,
+  })),
+];
+---
+
+<AdminLayout title="Calendario de contenido">
+  <ContentCalendar items={JSON.parse(JSON.stringify(items))} client:load />
+</AdminLayout>

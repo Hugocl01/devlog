@@ -201,6 +201,38 @@
   code {
     @apply bg-gray-200 dark:bg-gray-700 rounded px-1.5 py-0.5 font-mono text-sm;
   }
+
+  .styled-checkbox {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    border-radius: 4px;
+    border: 1px solid var(--input);
+    background-color: transparent;
+    box-shadow: var(--shadow-xs);
+    cursor: pointer;
+    outline: none;
+    transition: box-shadow 0.15s ease;
+  }
+
+  .dark .styled-checkbox {
+    background-color: color-mix(in oklab, var(--input) 30%, transparent);
+  }
+
+  .styled-checkbox:focus-visible {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+  }
+
+  .styled-checkbox:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 12px 12px;
+  }
 }
 
 @layer utilities {

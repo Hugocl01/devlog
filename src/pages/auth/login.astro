@@ -1,0 +1,245 @@
+---
+export const prerender = false;
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { LogIn, Eye, EyeOff } from "@lucide/astro";
+---
+
+<AuthLayout
+  title="Iniciar sesión"
+  description="Accede a tu cuenta de DevLog para comentar y reaccionar a los artículos."
+>
+  <div class="w-full max-w-md reveal">
+    <!-- Card -->
+    <div class="bg-card border border-border/60 rounded-2xl shadow-sm p-8">
+
+      <!-- Header -->
+      <div class="flex flex-col items-center text-center mb-8">
+        <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 border border-primary/20 mb-4">
+          <LogIn class="h-6 w-6 text-primary" />
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight">Bienvenido de nuevo</h1>
+        <p class="mt-1.5 text-sm text-muted-foreground">
+          Inicia sesión para comentar y reaccionar a los posts
+        </p>
+      </div>
+
+      <!-- Banner de estado (reset exitoso / token inválido) -->
+      <div id="status-banner" class="hidden mb-5 rounded-xl px-4 py-3 text-sm text-center"></div>
+
+      <!-- Form -->
+      <form class="space-y-5" novalidate>
+
+        <!-- Email -->
+        <div class="space-y-1.5">
+          <label for="email" class="text-sm font-medium">
+            Correo electrónico
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            placeholder="tu@email.com"
+            required
+            class="dark:bg-input/30 border-input h-10 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="password" class="text-sm font-medium">
+              Contraseña
+            </label>
+            <a
+              href="/auth/forgot-password"
+              class="text-xs text-muted-foreground hover:text-primary transition-colors duration-200"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+          <div class="relative">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="••••••••"
+              required
+              class="dark:bg-input/30 border-input h-10 w-full rounded-md border bg-transparent px-3 py-1 pr-10 text-sm shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+            />
+            <button
+              type="button"
+              id="toggle-password"
+              aria-label="Mostrar u ocultar contraseña"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              <Eye id="icon-show" class="h-4 w-4" />
+              <EyeOff id="icon-hide" class="h-4 w-4 hidden" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember me -->
+        <div class="flex items-center gap-2">
+          <input
+            id="remember"
+            name="remember"
+            type="checkbox"
+            class="styled-checkbox"
+          />
+          <label for="remember" class="text-sm text-muted-foreground cursor-pointer select-none">
+            Recordarme durante 30 días
+          </label>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="w-full h-11 inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground text-sm font-medium modern-hover modern-scale-sm hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all"
+        >
+          <LogIn class="h-4 w-4" />
+          Iniciar sesión
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="relative flex items-center gap-3 my-6 text-xs text-muted-foreground">
+        <div class="h-px flex-1 bg-border"></div>
+        <span class="uppercase tracking-wider">o continúa con</span>
+        <div class="h-px flex-1 bg-border"></div>
+      </div>
+
+      <!-- OAuth — GitHub -->
+      <a
+        href="/api/auth/github"
+        class="w-full h-10 inline-flex items-center justify-center gap-2.5 rounded-full border border-border/60 bg-secondary/30 text-sm font-medium text-muted-foreground modern-hover hover:bg-secondary/60 hover:text-foreground hover:border-primary/40 transition-all duration-150"
+      >
+        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+        </svg>
+        Continuar con GitHub
+      </a>
+
+      <!-- Register link -->
+      <p class="mt-6 text-center text-sm text-muted-foreground">
+        ¿No tienes cuenta?{" "}
+        <a href="/auth/register" class="font-medium text-foreground hover:text-primary transition-colors duration-200 underline-offset-4 hover:underline">
+          Regístrate gratis
+        </a>
+      </p>
+    </div>
+
+    <!-- Back to blog -->
+    <p class="mt-4 text-center text-sm text-muted-foreground">
+      <a href="/blog" class="hover:text-foreground transition-colors duration-200">
+        ← Volver al blog sin iniciar sesión
+      </a>
+    </p>
+  </div>
+</AuthLayout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    // Banner de estado según parámetros de URL
+    const params = new URLSearchParams(window.location.search);
+    const banner = document.getElementById("status-banner");
+    const OAUTH_ERRORS: Record<string, string> = {
+      "oauth_state":    "Error de seguridad en el inicio de sesión. Inténtalo de nuevo.",
+      "oauth_token":    "No se pudo obtener acceso a GitHub. Inténtalo de nuevo.",
+      "oauth_no_email": "Tu cuenta de GitHub no tiene un email verificado.",
+      "oauth_config":   "El inicio de sesión con GitHub no está configurado.",
+      "oauth_error":    "Error al iniciar sesión con GitHub. Inténtalo de nuevo.",
+      "banned":         "Esta cuenta ha sido suspendida.",
+    };
+
+    if (banner) {
+      const successClass = "mb-5 rounded-xl px-4 py-3 text-sm text-center bg-green-500/10 border border-green-500/30 text-green-700 dark:text-green-400";
+      const errorClass   = "mb-5 rounded-xl px-4 py-3 text-sm text-center bg-destructive/10 border border-destructive/30 text-destructive";
+
+      if (params.get("reset") === "success") {
+        banner.textContent = "Contraseña actualizada. Ya puedes iniciar sesión.";
+        banner.className = successClass;
+      } else if (params.get("error") === "invalid-token") {
+        banner.textContent = "El enlace de verificación no es válido o ya fue usado.";
+        banner.className = errorClass;
+      } else if (params.get("error") === "server-error") {
+        banner.textContent = "Error al verificar el correo. Inténtalo de nuevo.";
+        banner.className = errorClass;
+      } else {
+        const oauthMsg = OAUTH_ERRORS[params.get("error") ?? ""];
+        if (oauthMsg) {
+          banner.textContent = oauthMsg;
+          banner.className = errorClass;
+        }
+      }
+    }
+
+    // Show/hide password
+    const toggle = document.getElementById("toggle-password");
+    const input = document.getElementById("password") as HTMLInputElement;
+    const iconShow = document.getElementById("icon-show");
+    const iconHide = document.getElementById("icon-hide");
+
+    toggle?.addEventListener("click", () => {
+      const isPassword = input.type === "password";
+      input.type = isPassword ? "text" : "password";
+      iconShow?.classList.toggle("hidden", isPassword);
+      iconHide?.classList.toggle("hidden", !isPassword);
+    });
+
+    // Form submission
+    const form = document.querySelector("form") as HTMLFormElement;
+    if (!form) return;
+
+    const submitBtn = form.querySelector("button[type=submit]") as HTMLButtonElement;
+    const errorBox = document.createElement("p");
+    errorBox.className = "text-sm text-destructive text-center hidden";
+    form.prepend(errorBox);
+
+    function showError(msg: string) {
+      errorBox.textContent = msg;
+      errorBox.classList.remove("hidden");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = (form.querySelector("#email") as HTMLInputElement).value;
+      const password = (form.querySelector("#password") as HTMLInputElement).value;
+      const remember = (form.querySelector("#remember") as HTMLInputElement).checked;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Iniciando sesión...";
+      errorBox.classList.add("hidden");
+
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, remember }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          if (data.code === "EMAIL_NOT_VERIFIED") {
+            window.location.href = `/auth/verify-email?email=${encodeURIComponent(email)}`;
+          } else if (data.code === "OAUTH_ONLY") {
+            showError("Esta cuenta usa GitHub para iniciar sesión. Usa el botón de GitHub.");
+          } else {
+            showError(data.error ?? "Error al iniciar sesión");
+          }
+          return;
+        }
+
+        window.location.href = "/blog";
+      } catch {
+        showError("Error de conexión. Inténtalo de nuevo.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Iniciar sesión";
+      }
+    });
+  });
+</script>

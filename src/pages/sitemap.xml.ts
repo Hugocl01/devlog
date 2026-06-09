@@ -1,5 +1,7 @@
-import { getCollection } from "astro:content";
+import { prisma } from "@/lib/prisma";
 import { tagUrl } from "@/utils/tag";
+
+export const prerender = false;
 
 const formatDate = (date: Date) => date.toISOString().split("T")[0];
 
@@ -20,17 +22,21 @@ const entry = ({
   </url>`;
 
 export async function GET({ site }: { site: URL }) {
-  const posts = (await getCollection("posts"))
-    .filter((p) => !p.data.draft)
-    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  const [posts, updates, tags] = await Promise.all([
+    prisma.post.findMany({
+      where: { draft: false, publishedAt: { lte: new Date() } },
+      orderBy: { publishedAt: "desc" },
+      select: { slug: true, publishedAt: true },
+    }),
+    prisma.update.findMany({
+      where: { draft: false, publishedAt: { lte: new Date() } },
+      orderBy: { publishedAt: "desc" },
+      select: { slug: true, publishedAt: true },
+    }),
+    prisma.tag.findMany({ select: { name: true } }),
+  ]);
 
-  const updates = (await getCollection("updates"))
-    .filter((u) => !u.data.draft)
-    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-  const tags = [...new Set(posts.flatMap((p) => p.data.tags ?? []))];
-  const latestPost = posts[0]?.data.date;
-
+  const latestPost = posts[0]?.publishedAt;
   const base = (path: string) => new URL(path, site).toString();
 
   const urls = [
@@ -40,14 +46,17 @@ export async function GET({ site }: { site: URL }) {
     entry({ url: base("/contact/"), priority: "0.5", changefreq: "yearly" }),
     entry({ url: base("/tags/"), priority: "0.6", changefreq: "monthly" }),
     entry({ url: base("/updates/"), priority: "0.6", changefreq: "monthly" }),
+    entry({ url: base("/privacy/"), priority: "0.3", changefreq: "yearly" }),
+    entry({ url: base("/terms/"), priority: "0.3", changefreq: "yearly" }),
+    entry({ url: base("/legal-notice/"), priority: "0.3", changefreq: "yearly" }),
     ...posts.map((p) =>
-      entry({ url: base(`/blog/${p.id}/`), priority: "0.8", changefreq: "monthly", lastmod: formatDate(p.data.date) })
+      entry({ url: base(`/blog/${p.slug}/`), priority: "0.8", changefreq: "monthly", lastmod: p.publishedAt ? formatDate(p.publishedAt) : undefined })
     ),
     ...updates.map((u) =>
-      entry({ url: base(`/updates/${u.id}/`), priority: "0.6", changefreq: "monthly", lastmod: formatDate(u.data.date) })
+      entry({ url: base(`/updates/${u.slug}/`), priority: "0.6", changefreq: "monthly", lastmod: u.publishedAt ? formatDate(u.publishedAt) : undefined })
     ),
     ...tags.map((tag) =>
-      entry({ url: base(`/tags/${tagUrl(tag)}/`), priority: "0.6", changefreq: "monthly" })
+      entry({ url: base(`/tags/${tagUrl(tag.name)}/`), priority: "0.6", changefreq: "monthly" })
     ),
   ];
 

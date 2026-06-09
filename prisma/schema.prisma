@@ -1,0 +1,359 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ROLES
+// Tabla en lugar de enum para poder añadir roles
+// en el futuro sin tocar el esquema
+// ─────────────────────────────────────────────
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique // "USER", "ADMIN"
+  description String?
+
+  createdAt DateTime @default(now())
+
+  users User[]
+
+  @@map("roles")
+}
+
+// ─────────────────────────────────────────────
+// USUARIOS & AUTH
+// ─────────────────────────────────────────────
+
+model User {
+  id    String @id @default(cuid())
+  name  String
+  email String @unique
+
+  // Auth
+  password               String?   // null para cuentas OAuth (GitHub)
+  githubId               String?   @unique
+  emailVerified          Boolean   @default(false)
+  emailVerificationToken String?   @unique
+  passwordResetToken     String?   @unique
+  passwordResetExpiresAt DateTime?
+
+  // Cambio de email pendiente
+  emailChangePending   String?
+  emailChangeToken     String?   @unique
+  emailChangeExpiresAt DateTime?
+
+  // Perfil
+  avatar String?
+  bio    String?
+
+  // Moderación
+  banned   Boolean   @default(false)
+  bannedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Rol por defecto: USER (id=1)
+  roleId Int  @default(1)
+  role   Role @relation(fields: [roleId], references: [id])
+
+  // Relaciones
+  sessions  Session[]
+  reactions Reaction[]
+  comments  Comment[]
+  posts     Post[]
+  updates   Update[]
+  media     Media[]
+
+  @@index([roleId])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+// ─────────────────────────────────────────────
+// BLOG — POSTS
+// ─────────────────────────────────────────────
+
+model Post {
+  id          Int     @id @default(autoincrement())
+  slug        String  @unique
+  title       String
+  description String
+  content     String
+  coverImage  String?
+  draft       Boolean @default(true)
+  readingTime Int?
+
+  // SEO
+  metaTitle   String? // Override del <title> para SEO
+  canonical   String? // URL canónica si difiere de la URL del post
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  // Relaciones
+  tags      PostTag[]
+  views     PostView[]
+  reactions Reaction[]
+  comments  Comment[]
+
+  @@index([slug])
+  @@index([draft, publishedAt])
+  @@index([authorId])
+  @@map("posts")
+}
+
+model Tag {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  slug  String  @unique
+  color String? // Color HEX para la UI, ej: "#3b82f6"
+
+  createdAt DateTime @default(now())
+
+  posts PostTag[]
+
+  @@map("tags")
+}
+
+// Tabla intermedia Post <-> Tag (muchos a muchos)
+model PostTag {
+  postId Int
+  tagId  Int
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@map("post_tags")
+}
+
+// ─────────────────────────────────────────────
+// BLOG — UPDATES
+// Registro de cambios y novedades del proyecto.
+// Tipos: feature, bugfix, improvement, general
+// ─────────────────────────────────────────────
+
+model UpdateType {
+  id    Int    @id @default(autoincrement())
+  name  String @unique // "feature", "bugfix", "improvement", "general"
+  label String // "Nueva función", "Corrección de error", "Mejora", "General"
+  color String? // Color HEX para la UI, ej: "#22c55e"
+
+  createdAt DateTime @default(now())
+
+  updates Update[]
+
+  @@map("update_types")
+}
+
+model Update {
+  id          Int     @id @default(autoincrement())
+  slug        String  @unique
+  title       String
+  description String
+  content     String
+  draft       Boolean @default(true)
+  readingTime Int?
+
+  // SEO
+  metaTitle   String?
+  canonical   String?
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  typeId Int
+  type   UpdateType @relation(fields: [typeId], references: [id])
+
+  views UpdateView[]
+
+  @@index([slug])
+  @@index([draft, publishedAt])
+  @@index([typeId])
+  @@index([authorId])
+  @@map("updates")
+}
+
+// ─────────────────────────────────────────────
+// ANALÍTICAS
+// ─────────────────────────────────────────────
+
+model PostView {
+  id        Int      @id @default(autoincrement())
+  ipHash    String? // IP hasheada — nunca se guarda la IP real
+  userAgent String?
+  country   String?
+  viewedAt  DateTime @default(now())
+
+  postId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([viewedAt])
+  @@map("post_views")
+}
+
+model UpdateView {
+  id        Int      @id @default(autoincrement())
+  ipHash    String?
+  userAgent String?
+  viewedAt  DateTime @default(now())
+
+  updateId Int
+  update   Update @relation(fields: [updateId], references: [id], onDelete: Cascade)
+
+  @@index([updateId])
+  @@index([viewedAt])
+  @@map("update_views")
+}
+
+// ─────────────────────────────────────────────
+// INTERACCIÓN — REACCIONES
+// Tabla en lugar de enum para poder añadir
+// nuevos tipos de reacción sin tocar el esquema
+// ─────────────────────────────────────────────
+
+model ReactionType {
+  id    Int    @id @default(autoincrement())
+  name  String @unique // "LIKE", "LOVE", "FIRE", "CLAP", "WOW"
+  emoji String // "👍", "❤️", "🔥", "👏", "😮"
+  label String // "Me gusta", "Me encanta", "En llamas", "Aplauso", "Wow"
+
+  createdAt DateTime @default(now())
+
+  reactions Reaction[]
+
+  @@map("reaction_types")
+}
+
+model Reaction {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  postId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  typeId Int
+  type   ReactionType @relation(fields: [typeId], references: [id])
+
+  // Un usuario solo puede reaccionar una vez con cada tipo por post
+  userId String?
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([postId, userId, typeId])
+  @@index([postId])
+  @@map("reactions")
+}
+
+// ─────────────────────────────────────────────
+// MEDIOS
+// ─────────────────────────────────────────────
+
+model Media {
+  id           Int      @id @default(autoincrement())
+  filename     String   @unique
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+
+  uploadedById String?
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([uploadedById])
+  @@map("media")
+}
+
+// ─────────────────────────────────────────────
+// CONFIGURACIÓN DEL SITIO
+// ─────────────────────────────────────────────
+
+model SiteSetting {
+  key         String   @id
+  value       String
+  label       String
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+// ─────────────────────────────────────────────
+// LOG DE AUDITORÍA
+// ─────────────────────────────────────────────
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    String?
+  userEmail String?
+  action    String   // "CREATE", "UPDATE", "DELETE", "PUBLISH", "UNPUBLISH"
+  entity    String   // "post", "update", "user", "tag", "comment", "media", "setting"
+  entityId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ─────────────────────────────────────────────
+// INTERACCIÓN — COMENTARIOS
+// ─────────────────────────────────────────────
+
+model Comment {
+  id      String  @id @default(cuid())
+  content String
+  deleted Boolean @default(false) // Borrado suave para no romper hilos de respuestas
+  banned  Boolean @default(false) // Oculto públicamente por moderación, visible en admin
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  postId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Respuestas anidadas (un nivel de profundidad)
+  parentId String?
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([userId])
+  @@index([parentId])
+  @@map("comments")
+}

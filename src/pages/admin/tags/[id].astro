@@ -1,0 +1,39 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import TagDetailView from "@/components/admin/TagDetailView";
+import { prisma } from "@/lib/prisma";
+
+const { id } = Astro.params;
+const tagId = parseInt(id ?? "");
+if (isNaN(tagId)) return Astro.redirect("/admin/tags");
+
+const tag = await prisma.tag.findUnique({
+  where: { id: tagId },
+  select: {
+    id: true,
+    name: true,
+    slug: true,
+    color: true,
+    posts: {
+      orderBy: { post: { publishedAt: "desc" } },
+      select: {
+        post: {
+          select: {
+            slug: true,
+            title: true,
+            publishedAt: true,
+            draft: true,
+          },
+        },
+      },
+    },
+  },
+});
+
+if (!tag) return Astro.redirect("/admin/tags");
+---
+
+<AdminLayout title={`Etiqueta: ${tag.name}`}>
+  <TagDetailView tag={JSON.parse(JSON.stringify(tag))} client:load />
+</AdminLayout>

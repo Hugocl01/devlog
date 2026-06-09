@@ -1,0 +1,56 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import UpdatesTable, { type AdminUpdate } from "@/components/admin/UpdatesTable";
+import { prisma } from "@/lib/prisma";
+
+const dbUpdates = await prisma.update.findMany({
+  orderBy: { publishedAt: "desc" },
+  select: {
+    slug: true,
+    title: true,
+    description: true,
+    publishedAt: true,
+    draft: true,
+    author: { select: { name: true } },
+    type: { select: { name: true } },
+    _count: { select: { views: true } },
+  },
+});
+
+const updates: AdminUpdate[] = dbUpdates.map((u) => ({
+  slug: u.slug,
+  title: u.title,
+  description: u.description,
+  date: (u.publishedAt ?? new Date()).toISOString(),
+  author: u.author?.name ?? null,
+  type: u.type.name as AdminUpdate["type"],
+  draft: u.draft,
+  views: u._count.views,
+  scheduledAt: !u.draft && u.publishedAt && u.publishedAt > new Date()
+    ? u.publishedAt.toISOString()
+    : null,
+}));
+
+const now2 = new Date();
+const publishedCount = updates.filter((u) => !u.draft && (!u.scheduledAt || new Date(u.scheduledAt) <= now2)).length;
+const scheduledCount = updates.filter((u) => !u.draft && u.scheduledAt && new Date(u.scheduledAt) > now2).length;
+const draftCount = updates.filter((u) => u.draft).length;
+---
+
+<AdminLayout title="Updates">
+  <div class="flex items-center justify-between mb-4">
+    <p class="text-sm text-muted-foreground">
+      {publishedCount} publicado{publishedCount !== 1 ? "s" : ""}
+      {scheduledCount > 0 && <span> · {scheduledCount} programado{scheduledCount !== 1 ? "s" : ""}</span>}
+      {draftCount > 0 && <span> · {draftCount} borrador{draftCount !== 1 ? "es" : ""}</span>}
+    </p>
+    <a
+      href="/admin/updates/new"
+      class="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+    >
+      + Nuevo update
+    </a>
+  </div>
+  <UpdatesTable updates={updates} client:load />
+</AdminLayout>

@@ -3,17 +3,23 @@ import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
+import CookieBanner from "../components/CookieBanner.astro";
 import { ClientRouter } from "astro:transitions";
+import { Toaster } from "sonner";
 
 const {
   title,
+  metaTitle,
   description: rawDescription,
   image = "/og-image.png",
   type = "website",
   author,
+  canonical: canonicalOverride,
 } = Astro.props;
 const description = rawDescription ?? "DevLog — Artículos sobre desarrollo web, tecnología y proyectos.";
 const imageUrl = new URL(image, Astro.site).toString();
+const pageTitle = metaTitle ?? title;
+const canonicalUrl = canonicalOverride ? new URL(canonicalOverride, Astro.site).toString() : Astro.url.toString();
 ---
 
 <html lang="es" class="scroll-smooth">
@@ -26,24 +32,24 @@ const imageUrl = new URL(image, Astro.site).toString();
     {author && <meta name="author" content={author} />}
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
-    <link rel="canonical" href={Astro.url} />
+    <link rel="canonical" href={canonicalUrl} />
 
     <!-- Open Graph -->
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={type} />
-    <meta property="og:url" content={Astro.url} />
+    <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={imageUrl} />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={title} />
+    <meta property="og:image:alt" content={pageTitle} />
     <meta property="og:locale" content="es_ES" />
     <meta property="og:site_name" content="DevLog" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
 
@@ -55,7 +61,7 @@ const imageUrl = new URL(image, Astro.site).toString();
     <!-- RSS Feed Discovery -->
     <link rel="alternate" type="application/rss+xml" title="DevLog RSS Feed" href="/rss.xml" />
 
-    <title>{title === 'DevLog' ? title : `${title} | DevLog`}</title>
+    <title>{pageTitle === 'DevLog' ? pageTitle : `${pageTitle} | DevLog`}</title>
 
     <script is:inline>
       const getThemePreference = () => {
@@ -89,5 +95,24 @@ const imageUrl = new URL(image, Astro.site).toString();
 
     <Footer />
     <ScrollToTop />
+    <CookieBanner />
+    <Toaster
+      client:only="react"
+      richColors
+      position="bottom-right"
+      toastOptions={{ duration: 3500 }}
+    />
+    <script is:inline>
+      (function syncSonnerTheme() {
+        const update = () => {
+          const isDark = document.documentElement.classList.contains("dark");
+          const el = document.querySelector("[data-sonner-toaster]");
+          if (el) el.setAttribute("data-theme", isDark ? "dark" : "light");
+        };
+        const obs = new MutationObserver(update);
+        obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        document.addEventListener("astro:page-load", update);
+      })();
+    </script>
   </body>
 </html>

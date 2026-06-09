@@ -1,0 +1,50 @@
+import type { APIRoute } from "astro";
+import { prisma } from "@/lib/prisma";
+import { verifyPassword, hashPassword, isStrongPassword } from "@/lib/auth";
+
+export const prerender = false;
+
+const json = (data: object, status = 200) =>
+  new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+
+export const POST: APIRoute = async ({ locals, request }) => {
+  if (!locals.user) return json({ error: "No autorizado" }, 401);
+
+  try {
+    const { currentPassword, newPassword } = await request.json();
+
+    if (!currentPassword || !newPassword) {
+      return json({ error: "Todos los campos son obligatorios" }, 400);
+    }
+
+    if (!isStrongPassword(newPassword)) {
+      return json(
+        { error: "La nueva contraseña debe tener al menos 8 caracteres, una mayúscula y un número" },
+        400
+      );
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: locals.user.id } });
+    if (!user) return json({ error: "Usuario no encontrado" }, 404);
+
+    if (!user.password) {
+      return json({ error: "Esta cuenta usa GitHub para iniciar sesión. No tienes contraseña configurada." }, 400);
+    }
+
+    const valid = await verifyPassword(currentPassword, user.password);
+    if (!valid) return json({ error: "La contraseña actual es incorrecta" }, 400);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: await hashPassword(newPassword) },
+    });
+
+    return json({ ok: true });
+  } catch (err) {
+    console.error("[api/profile/password POST]", err);
+    return json({ error: "Error interno del servidor" }, 500);
+  }
+};

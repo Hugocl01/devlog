@@ -1,0 +1,111 @@
+# ══════════════════════════════════════════════════════
+# PLANTILLA DE CONFIGURACIÓN NGINX — DevLog
+#
+# 1. Copia este archivo: cp devlog.conf.example devlog.conf
+# 2. Sustituye tudominio.com por tu dominio real
+# 3. Colócalo en /etc/nginx/sites-available/devlog
+# 4. Actívalo: ln -s /etc/nginx/sites-available/devlog /etc/nginx/sites-enabled/
+# 5. Verifica: nginx -t
+# 6. Recarga: systemctl reload nginx
+# 7. Tras obtener el certificado SSL con Certbot,
+#    este archivo será modificado automáticamente para añadir HTTPS.
+#
+# El archivo real (nginx/devlog.conf) está en .gitignore
+# porque puede contener rutas o configuraciones específicas del servidor.
+# ══════════════════════════════════════════════════════
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    # Cambia por tu dominio real
+    server_name tudominio.com www.tudominio.com;
+
+    # Certbot añadirá aquí el redireccionamiento HTTP → HTTPS automáticamente
+
+    # ─── Proxy hacia la aplicación Node.js ──────
+    location / {
+        proxy_pass http://127.0.0.1:4321;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        "upgrade";
+
+        # Tamaño máximo para subida de archivos (ajusta si usas imágenes grandes)
+        client_max_body_size 20M;
+
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout    60s;
+        proxy_read_timeout    60s;
+    }
+
+    # ─── Cache agresiva para assets de Astro ────
+    # Astro genera nombres con hash — son inmutables entre builds
+    location /_astro/ {
+        proxy_pass http://127.0.0.1:4321;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # ─── Archivos subidos (media) ────────────────
+    location /uploads/ {
+        proxy_pass http://127.0.0.1:4321;
+        expires 30d;
+        add_header Cache-Control "public";
+        access_log off;
+    }
+
+    # ─── Protección del panel de administración ──
+    # Descomenta y añade tu IP pública para restringir el acceso a /admin.
+    # Útil si el blog es público pero quieres que solo tú puedas administrarlo.
+    #
+    # location /admin {
+    #     allow TU_IP_PUBLICA;   # ej: 85.120.45.200
+    #     deny  all;
+    #     proxy_pass http://127.0.0.1:4321;
+    #     proxy_set_header Host              $host;
+    #     proxy_set_header X-Real-IP         $remote_addr;
+    #     proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    # }
+
+    # ─── Rate limiting en rutas de autenticación ─
+    # Requiere definir la zona en el bloque http{} de nginx.conf:
+    #   limit_req_zone $binary_remote_addr zone=auth:10m rate=5r/m;
+    #
+    # location /api/auth/ {
+    #     limit_req zone=auth burst=10 nodelay;
+    #     limit_req_status 429;
+    #     proxy_pass http://127.0.0.1:4321;
+    #     proxy_set_header Host            $host;
+    #     proxy_set_header X-Real-IP       $remote_addr;
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    # }
+
+    # ─── Compresión gzip ─────────────────────────
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/javascript
+        application/javascript
+        application/json
+        application/xml
+        image/svg+xml;
+    gzip_min_length 1024;
+}
+
+# ──────────────────────────────────────────────────────
+# Certbot añadirá automáticamente un segundo bloque server{}
+# para HTTPS (puerto 443) con el certificado SSL al ejecutar:
+#   certbot --nginx -d tudominio.com -d www.tudominio.com
+# ──────────────────────────────────────────────────────

@@ -1,12 +1,47 @@
 ---
-import { getCollection } from "astro:content";
+export const prerender = false;
 import BlogLayout from "@/layouts/BlogLayout.astro";
 import UpdateCard from "@/components/blog/UpdateCard.astro";
-import { calculateReadingTime } from "@/utils/readingTime";
+import Pagination from "@/components/blog/Pagination.astro";
+import { prisma } from "@/lib/prisma";
 
-const updates = (await getCollection("updates"))
-  .filter((update) => !update.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const PAGE_SIZE = 10;
+const page = Math.max(1, parseInt(Astro.url.searchParams.get("page") ?? "1", 10) || 1);
+
+const publishedFilter = { draft: false, publishedAt: { lte: new Date() } };
+
+const [total, dbUpdates] = await Promise.all([
+  prisma.update.count({ where: publishedFilter }),
+  prisma.update.findMany({
+    where: publishedFilter,
+    orderBy: { publishedAt: "desc" },
+    skip: (page - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
+    select: {
+      slug: true,
+      title: true,
+      description: true,
+      author: { select: { name: true } },
+      publishedAt: true,
+      readingTime: true,
+      type: { select: { name: true } },
+    },
+  }),
+]);
+
+const totalPages = Math.ceil(total / PAGE_SIZE);
+
+if (page > totalPages && totalPages > 0) return Astro.redirect("/updates");
+
+const updates = dbUpdates.map((u) => ({
+  id: u.slug,
+  title: u.title,
+  description: u.description,
+  date: u.publishedAt ?? new Date(),
+  author: u.author?.name ?? undefined,
+  type: u.type.name as "feature" | "bugfix" | "improvement" | "general",
+  readingTime: u.readingTime ?? undefined,
+}));
 ---
 
 <BlogLayout
@@ -20,25 +55,27 @@ const updates = (await getCollection("updates"))
       </h1>
       <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground reveal stagger-1">
         Mantente informado sobre las nuevas características, mejoras y correcciones de DevLog.
+        {totalPages > 1 && <span>Página {page} de {totalPages}.</span>}
       </p>
     </header>
 
-    <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-1 lg:grid-cols-1">
+    <section class="grid grid-cols-1 gap-8 pb-4 md:grid-cols-1 lg:grid-cols-1">
       {
-        updates.map(({ id, data, body }, index) => (
+        updates.map((u, index) => (
           <UpdateCard
-            id={id}
-            title={data.title}
-            description={data.description}
-            date={data.date}
-            type={data.type}
-            author={data.author}
-            readingTime={body ? calculateReadingTime(body) : undefined}
+            id={u.id}
+            title={u.title}
+            description={u.description}
+            date={u.date}
+            type={u.type}
+            author={u.author}
+            readingTime={u.readingTime}
             class={`stagger-${(index % 5) + 1}`}
           />
         ))
       }
     </section>
+
+    <Pagination currentPage={page} totalPages={totalPages} baseUrl="/updates" />
   </div>
 </BlogLayout>
-

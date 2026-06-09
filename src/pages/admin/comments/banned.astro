@@ -1,0 +1,35 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import BannedCommentsTable from "@/components/admin/BannedCommentsTable";
+import { prisma } from "@/lib/prisma";
+
+const comments = await prisma.comment.findMany({
+  where: { deleted: false, banned: true },
+  orderBy: { createdAt: "desc" },
+  select: {
+    id: true,
+    content: true,
+    createdAt: true,
+    parentId: true,
+    post: { select: { slug: true, title: true } },
+    user: { select: { id: true, name: true, avatar: true } },
+    parent: { select: { content: true, user: { select: { name: true } } } },
+  },
+});
+---
+
+<AdminLayout title="Comentarios baneados">
+  <div class="mb-4 flex items-center justify-between">
+    <p class="text-sm text-muted-foreground">
+      {comments.length} comentario{comments.length !== 1 ? "s" : ""} oculto{comments.length !== 1 ? "s" : ""} del blog
+    </p>
+    <a
+      href="/admin/comments"
+      class="text-xs text-muted-foreground hover:text-foreground transition-colors"
+    >
+      ← Volver a todos los comentarios
+    </a>
+  </div>
+  <BannedCommentsTable comments={JSON.parse(JSON.stringify(comments))} client:load />
+</AdminLayout>

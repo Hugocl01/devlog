@@ -1,13 +1,14 @@
 ---
 import type { ImageMetadata } from "astro";
+import type { TagWithColor } from "@/types/tag";
 
 interface Props {
   id: string;
   title: string;
   description: string;
   date: Date;
-  tags: string[];
-  cover?: ImageMetadata;
+  tags: TagWithColor[];
+  cover?: string | ImageMetadata;
   readingTime?: number;
   class?: string;
 }
@@ -42,14 +43,25 @@ const publishedDate = isoDate(date);
   {
     cover && (
       <div class="relative w-full aspect-video overflow-hidden">
-        <Image
-          src={cover}
-          alt={title}
-          width={400}
-          height={300}
-          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-          transition:name={`img-${id}`}
-        />
+        {typeof cover === "string" ? (
+          <img
+            src={cover}
+            alt={title}
+            width={400}
+            height={300}
+            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            transition:name={`img-${id}`}
+          />
+        ) : (
+          <Image
+            src={cover}
+            alt={title}
+            width={400}
+            height={300}
+            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            transition:name={`img-${id}`}
+          />
+        )}
       </div>
     )
   }
@@ -78,12 +90,21 @@ const publishedDate = isoDate(date);
         {
           tags?.map((tag) => (
             <a
-              href={`/tags/${tagUrl(tag)}`}
+              href={`/tags/${tagUrl(tag.name)}`}
               class="relative z-20 hover:opacity-80 transition-all duration-300 hover:scale-105 active:scale-95"
             >
-              <Badge variant="secondary" className="bg-primary/5 text-primary/70 border-primary/10 hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                {tag}
-              </Badge>
+              {tag.color ? (
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-all duration-300"
+                  style={`background-color:${tag.color}20;border-color:${tag.color}50;color:${tag.color}`}
+                >
+                  {tag.name}
+                </span>
+              ) : (
+                <Badge variant="secondary" className="bg-primary/5 text-primary/70 border-primary/10 hover:bg-primary/10 hover:text-primary transition-all duration-300">
+                  {tag.name}
+                </Badge>
+              )}
             </a>
           ))
         }

@@ -1,0 +1,75 @@
+---
+// Shown once per browser until the user accepts. Stored in localStorage.
+---
+
+<div
+  id="cookie-banner"
+  class="fixed bottom-0 left-0 right-0 z-50 border-t border-border/60 bg-card/95 backdrop-blur-md shadow-lg"
+  style="display:none"
+  role="region"
+  aria-label="Aviso de privacidad y cookies"
+>
+  <div
+    class="container mx-auto max-w-6xl px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4"
+  >
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-medium text-foreground mb-0.5">
+        Privacidad y cookies
+      </p>
+      <p class="text-xs text-muted-foreground leading-relaxed">
+        Usamos una <strong class="text-foreground/80">cookie de sesión esencial</strong> si
+        inicias sesión, y registramos visitas mediante una{" "}
+        <strong class="text-foreground/80">firma anónima</strong> (sin almacenar tu IP real)
+        para analíticas internas. No hay publicidad ni rastreo de terceros.
+        <a
+          href="/privacy"
+          class="underline underline-offset-2 hover:text-foreground transition-colors ml-1"
+        >
+          Política de privacidad
+        </a>
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <a
+        href="/privacy"
+        class="inline-flex h-9 items-center justify-center rounded-full border border-border/60 bg-secondary/30 px-5 text-xs sm:text-sm font-medium text-muted-foreground modern-hover modern-scale-sm hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        Más información
+      </a>
+      <button
+        id="cookie-accept"
+        type="button"
+        class="inline-flex h-9 items-center justify-center rounded-full bg-primary px-5 text-xs sm:text-sm font-medium text-primary-foreground modern-hover modern-scale-sm hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      >
+        Entendido
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var KEY = "devlog-privacy-accepted";
+
+    function init() {
+      var banner = document.getElementById("cookie-banner");
+      var btn = document.getElementById("cookie-accept");
+      if (!banner) return;
+
+      if (!localStorage.getItem(KEY)) {
+        banner.style.display = "";
+      }
+
+      if (btn) {
+        btn.addEventListener("click", function () {
+          localStorage.setItem(KEY, "1");
+          banner.style.display = "none";
+        });
+      }
+    }
+
+    init();
+    document.addEventListener("astro:page-load", init);
+  })();
+</script>

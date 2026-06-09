@@ -1,0 +1,47 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import CommentsTable from "@/components/admin/CommentsTable";
+import { prisma } from "@/lib/prisma";
+
+const postParam = Astro.url.searchParams.get("post") ?? undefined;
+
+const comments = await prisma.comment.findMany({
+  where: { deleted: false },
+  orderBy: { createdAt: "desc" },
+  take: 200,
+  select: {
+    id: true,
+    content: true,
+    createdAt: true,
+    parentId: true,
+    banned: true,
+    post: { select: { slug: true, title: true } },
+    user: { select: { id: true, name: true, avatar: true } },
+    parent: { select: { content: true, user: { select: { name: true } } } },
+  },
+});
+
+const bannedCount = await prisma.comment.count({ where: { deleted: false, banned: true } });
+---
+
+<AdminLayout title="Comentarios">
+  <div class="mb-4 flex items-center justify-between">
+    <p class="text-sm text-muted-foreground">
+      {comments.length} {comments.length === 1 ? "comentario" : "comentarios"} en total
+    </p>
+    {bannedCount > 0 && (
+      <a
+        href="/admin/comments/banned"
+        class="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1.5 text-xs font-medium text-orange-600 dark:text-orange-400 hover:bg-orange-500/20 transition-colors"
+      >
+        {bannedCount} baneado{bannedCount !== 1 ? "s" : ""}
+      </a>
+    )}
+  </div>
+  <CommentsTable
+    comments={JSON.parse(JSON.stringify(comments))}
+    initialPostFilter={postParam}
+    client:load
+  />
+</AdminLayout>

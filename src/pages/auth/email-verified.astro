@@ -1,0 +1,66 @@
+---
+export const prerender = false;
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { CheckCircle2, LogIn, ArrowRight } from "@lucide/astro";
+---
+
+<AuthLayout
+  title="Cuenta verificada"
+  description="Tu cuenta de DevLog ha sido verificada correctamente."
+>
+  <div class="w-full max-w-md reveal">
+    <!-- Card -->
+    <div class="bg-card border border-border/60 rounded-2xl shadow-sm p-8 text-center">
+
+      <!-- Success icon with animation -->
+      <div class="flex justify-center mb-6">
+        <div class="relative flex h-20 w-20 items-center justify-center">
+          <div class="absolute h-full w-full rounded-full bg-green-500/10 animate-[scale-in_0.5s_ease-out_forwards]"></div>
+          <span class="relative flex h-20 w-20 items-center justify-center rounded-full bg-green-500/15 border border-green-500/30">
+            <CheckCircle2 class="h-10 w-10 text-green-500" />
+          </span>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-2xl font-bold tracking-tight mb-2 reveal stagger-1">¡Cuenta verificada!</h1>
+      <p class="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed reveal stagger-2">
+        Tu correo electrónico ha sido confirmado correctamente. Ya puedes iniciar sesión y participar en la comunidad.
+      </p>
+
+      <!-- What you can do -->
+      <div class="mt-8 rounded-xl bg-secondary/30 border border-border/40 p-5 text-left space-y-3 reveal stagger-3">
+        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Ahora puedes</p>
+        {[
+          { icon: "💬", text: "Comentar en los artículos" },
+          { icon: "❤️", text: "Reaccionar a los posts" },
+          { icon: "🔔", text: "Seguir la actividad del blog" },
+        ].map(({ icon, text }) => (
+          <div class="flex items-center gap-3">
+            <span class="text-base">{icon}</span>
+            <p class="text-sm text-muted-foreground">{text}</p>
+          </div>
+        ))}
+      </div>
+
+      <!-- CTA buttons -->
+      <div class="mt-8 flex flex-col gap-3 reveal stagger-4">
+        <a
+          href="/auth/login"
+          class="w-full h-11 inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground text-sm font-medium modern-hover modern-scale-sm hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all"
+        >
+          <LogIn class="h-4 w-4" />
+          Iniciar sesión
+        </a>
+
+        <a
+          href="/blog"
+          class="w-full h-10 inline-flex items-center justify-center gap-2 rounded-full border border-border/60 bg-secondary/30 text-sm font-medium text-muted-foreground modern-hover modern-scale-sm hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 transition-all"
+        >
+          Ir al blog
+          <ArrowRight class="h-3.5 w-3.5" />
+        </a>
+      </div>
+    </div>
+  </div>
+</AuthLayout>

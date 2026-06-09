@@ -1,37 +1,72 @@
 ---
-import { getCollection, render } from "astro:content";
+export const prerender = false;
 import UpdateLayout from "@/layouts/UpdateLayout.astro";
+import { prisma } from "@/lib/prisma";
+import { renderMarkdown } from "@/lib/markdown";
 import { calculateReadingTime } from "@/utils/readingTime";
+import { registerUpdateView } from "@/lib/views";
 
-export async function getStaticPaths() {
-  const updates = (await getCollection("updates"))
-    .filter((update) => !update.data.draft)
-    .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
-  return updates.map((update, index) => ({
-    params: { id: update.id },
-    props: {
-      update,
-      prev: updates[index - 1] ?? null,
-      next: updates[index + 1] ?? null,
-    },
-  }));
-}
+const { id } = Astro.params;
 
-const { update, prev, next } = Astro.props;
-const { Content } = await render(update);
-const readingTime = update.body ? calculateReadingTime(update.body) : 0;
+const update = await prisma.update.findUnique({
+  where: { slug: id },
+  select: {
+    id: true,
+    slug: true,
+    title: true,
+    description: true,
+    content: true,
+    author: { select: { name: true } },
+    publishedAt: true,
+    draft: true,
+    readingTime: true,
+    metaTitle: true,
+    canonical: true,
+    type: { select: { name: true } },
+  },
+});
+
+if (!update || update.draft) return Astro.redirect("/404");
+if (update.publishedAt && update.publishedAt > new Date()) return Astro.redirect("/404");
+
+const views = await registerUpdateView(update.id, Astro.request).catch(() => 0);
+
+const now = new Date();
+const publishedFilter = { draft: false, publishedAt: { lte: now } } as const;
+
+// Prev / next: dos queries de 1 fila en lugar de traer todos los updates
+const [prevUpdate, nextUpdate] = await Promise.all([
+  prisma.update.findFirst({
+    where: { ...publishedFilter, publishedAt: { lt: update.publishedAt ?? now } },
+    orderBy: { publishedAt: "desc" },
+    select: { slug: true, title: true },
+  }),
+  prisma.update.findFirst({
+    where: { ...publishedFilter, publishedAt: { gt: update.publishedAt ?? now } },
+    orderBy: { publishedAt: "asc" },
+    select: { slug: true, title: true },
+  }),
+]);
+const prev = prevUpdate ? { id: prevUpdate.slug, title: prevUpdate.title } : null;
+const next = nextUpdate ? { id: nextUpdate.slug, title: nextUpdate.title } : null;
+
+const contentHtml = renderMarkdown(update.content);
+const readingTime = update.readingTime ?? calculateReadingTime(update.content);
 ---
 
 <UpdateLayout
-  id={update.id}
-  title={update.data.title}
-  description={update.data.description}
-  date={update.data.date}
-  author={update.data.author}
-  type={update.data.type}
+  id={update.slug}
+  title={update.title}
+  metaTitle={update.metaTitle ?? undefined}
+  description={update.description}
+  date={update.publishedAt ?? new Date()}
+  author={update.author?.name ?? undefined}
+  type={update.type.name as "feature" | "bugfix" | "improvement" | "general"}
   prev={prev}
   next={next}
   readingTime={readingTime}
+  views={views}
+  canonical={update.canonical ?? undefined}
 >
-  <Content />
+  <Fragment set:html={contentHtml} />
 </UpdateLayout>

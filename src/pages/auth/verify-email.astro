@@ -1,0 +1,139 @@
+---
+export const prerender = false;
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { Mail, RefreshCw, ArrowLeft } from "@lucide/astro";
+---
+
+<AuthLayout
+  title="Verifica tu correo"
+  description="Hemos enviado un enlace de verificación a tu correo electrónico."
+>
+  <div class="w-full max-w-md reveal">
+    <!-- Card -->
+    <div class="bg-card border border-border/60 rounded-2xl shadow-sm p-8 text-center">
+
+      <!-- Animated icon -->
+      <div class="flex justify-center mb-6">
+        <div class="relative flex h-20 w-20 items-center justify-center">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/20 duration-1000"></span>
+          <span class="relative flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border border-primary/20">
+            <Mail class="h-9 w-9 text-primary" />
+          </span>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-2xl font-bold tracking-tight mb-2">Revisa tu bandeja de entrada</h1>
+      <p class="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
+        Hemos enviado un enlace de verificación a tu correo. Haz clic en él para activar tu cuenta.
+      </p>
+
+      <!-- Email placeholder -->
+      <div class="mt-5 inline-flex items-center gap-2 rounded-full bg-secondary/40 border border-border/40 px-4 py-2">
+        <Mail class="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        <span class="text-sm font-medium" id="user-email">tu@email.com</span>
+      </div>
+
+      <!-- Steps -->
+      <div class="mt-8 text-left space-y-3">
+        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Qué hacer ahora</p>
+        {[
+          "Abre tu aplicación de correo electrónico",
+          "Busca un email de DevLog (revisa también spam)",
+          "Haz clic en el enlace de verificación",
+          "¡Listo! Ya puedes iniciar sesión",
+        ].map((step, i) => (
+          <div class="flex items-start gap-3">
+            <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-secondary border border-border text-xs font-medium text-muted-foreground">
+              {i + 1}
+            </span>
+            <p class="text-sm text-muted-foreground leading-snug">{step}</p>
+          </div>
+        ))}
+      </div>
+
+      <!-- Divider -->
+      <div class="my-6 h-px bg-border/60"></div>
+
+      <!-- Resend -->
+      <p class="text-sm text-muted-foreground mb-3">¿No has recibido el correo?</p>
+      <button
+        type="button"
+        id="resend-btn"
+        class="inline-flex items-center gap-2 rounded-full border border-border/60 bg-secondary/30 px-6 h-10 text-sm font-medium text-muted-foreground modern-hover modern-scale-sm hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 transition-all"
+      >
+        <RefreshCw class="h-3.5 w-3.5" id="resend-icon" />
+        Reenviar correo de verificación
+      </button>
+
+      <p id="resend-feedback" class="mt-2.5 text-xs text-muted-foreground hidden">
+        Correo reenviado. Espera unos segundos antes de volver a intentarlo.
+      </p>
+
+      <!-- Back -->
+      <div class="mt-6">
+        <a
+          href="/auth/login"
+          class="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+        >
+          <ArrowLeft class="h-3.5 w-3.5" />
+          Volver al inicio de sesión
+        </a>
+      </div>
+    </div>
+  </div>
+</AuthLayout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get("email") ?? sessionStorage.getItem("pending-email") ?? "tu@email.com";
+    const emailEl = document.getElementById("user-email");
+    if (emailEl) emailEl.textContent = email;
+
+    const resendBtn = document.getElementById("resend-btn") as HTMLButtonElement;
+    const resendIcon = document.getElementById("resend-icon");
+    const feedback = document.getElementById("resend-feedback") as HTMLParagraphElement;
+
+    resendBtn?.addEventListener("click", async () => {
+      if (resendBtn.disabled) return;
+
+      resendBtn.disabled = true;
+      resendIcon?.classList.add("animate-spin");
+      feedback.classList.add("hidden");
+
+      try {
+        const res = await fetch("/api/auth/resend-verification", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          feedback.textContent = data.error ?? "Error al reenviar el correo";
+          feedback.classList.remove("hidden", "text-muted-foreground");
+          feedback.classList.add("text-destructive");
+          resendBtn.disabled = false;
+          return;
+        }
+
+        feedback.textContent = "Correo reenviado. Revisa también tu carpeta de spam.";
+        feedback.classList.remove("hidden", "text-destructive");
+        feedback.classList.add("text-muted-foreground");
+
+        // Cooldown de 60s antes de poder reenviar de nuevo
+        setTimeout(() => {
+          resendBtn.disabled = false;
+        }, 60_000);
+      } catch {
+        feedback.textContent = "Error de conexión. Inténtalo de nuevo.";
+        feedback.classList.remove("hidden");
+        resendBtn.disabled = false;
+      } finally {
+        resendIcon?.classList.remove("animate-spin");
+      }
+    });
+  });
+</script>

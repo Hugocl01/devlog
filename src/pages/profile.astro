@@ -1,0 +1,20 @@
+---
+export const prerender = false;
+import BaseLayout from "@/layouts/main.astro";
+import ProfileForm from "@/components/profile/ProfileForm";
+import { prisma } from "@/lib/prisma";
+
+const sessionUser = Astro.locals.user;
+if (!sessionUser) return Astro.redirect("/auth/login");
+
+const user = await prisma.user.findUnique({
+  where: { id: sessionUser.id },
+  select: { id: true, name: true, email: true, avatar: true, bio: true, roleId: true, emailChangePending: true },
+});
+
+if (!user) return Astro.redirect("/auth/login");
+---
+
+<BaseLayout title="Mi perfil" description="Gestiona tu información personal y contraseña.">
+  <ProfileForm user={user} client:load />
+</BaseLayout>

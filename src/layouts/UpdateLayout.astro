@@ -1,23 +1,27 @@
 ---
 import BaseLayout from "@/layouts/main.astro";
-import type { CollectionEntry } from "astro:content";
 import { Link2, Check } from "@lucide/astro";
 import { formatDate, isoDate as formatISODate } from "@/utils/date";
 import UpdateNavigation from "@/components/blog/UpdateNavigation.astro";
 
+type NavEntry = { id: string; title: string };
+
 type UpdateLayoutProps = {
   id?: string;
   title: string;
+  metaTitle?: string;
   description?: string;
   date: string | Date;
   author?: string;
   type?: "feature" | "bugfix" | "improvement" | "general";
-  prev?: CollectionEntry<"updates"> | null;
-  next?: CollectionEntry<"updates"> | null;
+  prev?: NavEntry | null;
+  next?: NavEntry | null;
   readingTime?: number;
+  views?: number;
+  canonical?: string;
 };
 
-const { id, title, description, date, author, type = "general", prev, next, readingTime } =
+const { id, title, metaTitle, description, date, author, type = "general", prev, next, readingTime, views, canonical } =
   Astro.props as UpdateLayoutProps;
 
 const isoDate = date ? formatISODate(date) : undefined;
@@ -40,8 +44,10 @@ const typeLabels = {
 
 <BaseLayout
   title={title}
+  metaTitle={metaTitle}
   description={description}
   type="article"
+  canonical={canonical}
 >
   <Fragment slot="head">
     {isoDate && <meta property="article:published_time" content={isoDate} />}
@@ -56,7 +62,7 @@ const typeLabels = {
       ...(author && { "author": { "@type": "Person", "name": author } }),
     })} />
   </Fragment>
-  <article class="max-w-4xl mx-auto px-4 py-20 sm:py-24">
+  <article class="max-w-4xl mx-auto px-4 py-20 sm:py-24" data-article>
     <header
       class="max-w-3xl mx-auto mb-12 pb-6 border-b border-gray-200/50 dark:border-gray-700/50 reveal"
     >
@@ -75,6 +81,7 @@ const typeLabels = {
           <time class="tabular-nums text-sm text-muted-foreground" datetime={isoDate}>
             {formattedDate}
             {readingTime && ` • ${readingTime} min`}
+            {views !== undefined && ` • ${views.toLocaleString("es-ES")} visita${views !== 1 ? "s" : ""}`}
           </time>
         </div>
 
@@ -158,8 +165,8 @@ const typeLabels = {
           copyIconCheck?.classList.add("hidden");
           copyIconLink?.classList.remove("hidden");
         }, 2000);
-      } catch (err) {
-        console.error("Error al copiar:", err);
+      } catch {
+        // clipboard failure — no action needed
       }
     }
   });

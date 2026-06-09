@@ -1,0 +1,344 @@
+---
+export const prerender = false;
+import BaseLayout from "@/layouts/main.astro";
+---
+
+<BaseLayout
+  title="Política de Privacidad"
+  description="Política de privacidad de DevLog: qué datos recogemos, para qué los usamos, durante cuánto tiempo los guardamos y cómo puedes ejercer tus derechos."
+>
+  <section class="max-w-5xl mx-auto py-16 px-4">
+    <header class="text-center mb-16">
+      <h1 class="text-5xl sm:text-6xl font-extrabold tracking-tight mb-4 text-foreground">
+        Política de Privacidad
+      </h1>
+      <p class="text-lg text-muted-foreground">
+        Información sobre el tratamiento de datos personales en DevLog, conforme al Reglamento
+        General de Protección de Datos (RGPD) y la LOPDGDD.
+      </p>
+      <p class="text-sm mt-2 text-muted-foreground">Última actualización: 7 de junio de 2026</p>
+    </header>
+
+    <div
+      class="max-w-3xl mx-auto flex flex-col gap-8 prose prose-lg dark:prose-invert [&_h2]:font-bold [&_h3]:font-semibold [&_h3]:text-base [&_h3]:mt-4"
+    >
+
+      <!-- 1. RESPONSABLE -->
+      <div>
+        <h2>1. Responsable del tratamiento</h2>
+        <p>
+          El responsable del tratamiento de los datos personales recogidos a través de este sitio
+          web es:
+        </p>
+        <ul>
+          <li><strong>Identidad:</strong> Hugo Cayón Laso</li>
+          <li><strong>Carácter:</strong> Persona física, blog personal sin actividad comercial</li>
+          <li>
+            <strong>Correo electrónico:</strong>{" "}
+            <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a>
+          </li>
+          <li><strong>País:</strong> España</li>
+        </ul>
+        <p>
+          Esta política es complementaria al{" "}
+          <a href="/legal-notice">Aviso Legal</a> y a los{" "}
+          <a href="/terms">Términos y Condiciones</a> del sitio.
+        </p>
+      </div>
+
+      <!-- 2. DATOS QUE RECOGEMOS -->
+      <div>
+        <h2>2. Datos que recogemos y por qué</h2>
+        <p>
+          DevLog recoge únicamente los datos estrictamente necesarios para cada finalidad.
+          No se realizan perfiles de usuario ni se ceden datos a terceros.
+        </p>
+
+        <h3>2.1 Analíticas de visitas (usuarios no registrados)</h3>
+        <p>
+          Cuando visitas un artículo o una actualización del blog, se registra una
+          <strong>firma anónima</strong> compuesta por:
+        </p>
+        <ul>
+          <li>
+            Una <strong>huella hash</strong> (SHA-256) derivada de tu dirección IP, la fecha del
+            día y el identificador del contenido. La IP real <strong>nunca se almacena</strong>.
+          </li>
+          <li>El <strong>user-agent</strong> del navegador (tipo y versión del navegador).</li>
+          <li>La <strong>fecha y hora</strong> de la visita.</li>
+        </ul>
+        <p>
+          Esta información se usa exclusivamente para contar visitas únicas diarias por contenido y
+          mostrar estadísticas internas en el panel de administración. El hash no permite identificar
+          a una misma persona entre días distintos.
+        </p>
+        <p>
+          <strong>Base jurídica:</strong> interés legítimo (art. 6.1.f RGPD) — analíticas internas
+          básicas y anonimizadas, sin cesión a terceros ni publicidad.
+        </p>
+
+        <h3>2.2 Cuentas de usuario</h3>
+        <p>
+          Si te registras en DevLog, recopilamos los siguientes datos:
+        </p>
+        <ul>
+          <li>
+            <strong>Nombre y correo electrónico</strong> — para identificarte y enviarte
+            comunicaciones relacionadas con tu cuenta (verificación, restablecimiento de contraseña).
+          </li>
+          <li>
+            <strong>Contraseña</strong> — almacenada exclusivamente como hash bcrypt. Nunca se
+            guarda en texto plano ni podemos conocerla.
+          </li>
+          <li>
+            <strong>Fecha de registro</strong> y último acceso.
+          </li>
+          <li>
+            <strong>Avatar y biografía</strong> (opcionales) — si decides añadirlos en tu perfil.
+          </li>
+        </ul>
+        <p>
+          Si te registras mediante <strong>GitHub OAuth</strong>, recibimos tu nombre de usuario,
+          correo electrónico público y el identificador de GitHub. No accedemos a tus repositorios
+          ni a ningún otro dato de tu cuenta de GitHub.
+        </p>
+        <p>
+          <strong>Base jurídica:</strong> ejecución de contrato / prestación del servicio
+          (art. 6.1.b RGPD).
+        </p>
+
+        <h3>2.3 Comentarios y reacciones</h3>
+        <p>
+          Los comentarios que publicas y las reacciones que añades quedan asociados a tu cuenta de
+          usuario. Su contenido es visible públicamente en el blog. Puedes solicitar su eliminación
+          en cualquier momento (ver sección 6).
+        </p>
+        <p>
+          <strong>Base jurídica:</strong> ejecución de contrato (art. 6.1.b RGPD) — el servicio de
+          comunidad implica la publicación de dicho contenido.
+        </p>
+
+        <h3>2.4 Formulario de contacto</h3>
+        <p>
+          Si utilizas el formulario de contacto del sitio, los datos que nos envíes (nombre, correo
+          electrónico y mensaje) se usan únicamente para responder a tu consulta. No se almacenan
+          en la base de datos del sitio ni se usan para ninguna otra finalidad.
+        </p>
+        <p>
+          <strong>Base jurídica:</strong> consentimiento del interesado (art. 6.1.a RGPD).
+        </p>
+      </div>
+
+      <!-- 3. COOKIES -->
+      <div>
+        <h2>3. Cookies</h2>
+        <p>
+          DevLog utiliza <strong>una única cookie propia, estrictamente necesaria</strong> para el
+          funcionamiento del servicio de cuentas:
+        </p>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Finalidad</th>
+                <th>Duración</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>devlog_session</code></td>
+                <td>Esencial</td>
+                <td>
+                  Mantiene la sesión iniciada. Es <code>HttpOnly</code> (JavaScript no puede
+                  leerla), <code>Secure</code> (solo HTTPS) y <code>SameSite=Lax</code>
+                  (protección CSRF).
+                </td>
+                <td>30 días (o hasta cerrar sesión)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Esta cookie se crea <strong>solo si inicias sesión</strong>. Los visitantes que no se
+          registran ni inician sesión <strong>no reciben ninguna cookie</strong>.
+        </p>
+        <p>
+          DevLog <strong>no utiliza cookies de terceros</strong>, no integra Google Analytics,
+          Meta Pixel, ni ninguna otra herramienta de rastreo externo. No hay publicidad.
+        </p>
+      </div>
+
+      <!-- 4. DESTINATARIOS -->
+      <div>
+        <h2>4. Destinatarios y transferencias internacionales</h2>
+        <p>
+          Los datos recogidos <strong>no se ceden a terceros</strong> salvo obligación legal.
+        </p>
+        <p>
+          El sitio se aloja en infraestructura propia ubicada en España. No se realizan
+          transferencias internacionales de datos fuera del Espacio Económico Europeo.
+        </p>
+      </div>
+
+      <!-- 5. CONSERVACIÓN -->
+      <div>
+        <h2>5. Plazos de conservación</h2>
+        <ul>
+          <li>
+            <strong>Registros de visitas (analíticas):</strong> 12 meses desde la fecha del
+            registro, tras los cuales se eliminan automáticamente.
+          </li>
+          <li>
+            <strong>Sesiones de usuario:</strong> 30 días o hasta que cierres sesión, lo que
+            ocurra antes.
+          </li>
+          <li>
+            <strong>Cuentas de usuario:</strong> mientras la cuenta esté activa. Si solicitas la
+            baja, los datos de cuenta se eliminan en un plazo máximo de 30 días. Los comentarios
+            publicados pueden mantenerse de forma anonimizada para preservar la coherencia de los
+            hilos.
+          </li>
+          <li>
+            <strong>Mensajes de contacto:</strong> no se almacenan en la base de datos; permanecen
+            en el buzón de correo mientras sean necesarios para gestionar la consulta.
+          </li>
+        </ul>
+      </div>
+
+      <!-- 6. DERECHOS -->
+      <div>
+        <h2>6. Tus derechos</h2>
+        <p>
+          Conforme al RGPD y la LOPDGDD, tienes derecho a:
+        </p>
+        <ul>
+          <li>
+            <strong>Acceso:</strong> conocer qué datos personales tratamos sobre ti.
+          </li>
+          <li>
+            <strong>Rectificación:</strong> corregir datos inexactos o incompletos.
+          </li>
+          <li>
+            <strong>Supresión («derecho al olvido»):</strong> solicitar la eliminación de tus datos
+            cuando ya no sean necesarios o retires el consentimiento.
+          </li>
+          <li>
+            <strong>Portabilidad:</strong> recibir tus datos en un formato estructurado y de uso
+            común.
+          </li>
+          <li>
+            <strong>Limitación del tratamiento:</strong> solicitar que suspendamos el uso de tus
+            datos en determinadas circunstancias.
+          </li>
+          <li>
+            <strong>Oposición:</strong> oponerte al tratamiento basado en interés legítimo
+            (p. ej., el registro de visitas anónimas).
+          </li>
+          <li>
+            <strong>Retirada del consentimiento:</strong> cuando el tratamiento se base en tu
+            consentimiento, puedes retirarlo en cualquier momento sin que ello afecte a la licitud
+            del tratamiento anterior.
+          </li>
+        </ul>
+      </div>
+
+      <!-- 7. CÓMO EJERCER TUS DERECHOS -->
+      <div>
+        <h2>7. Cómo ejercer tus derechos</h2>
+        <p>
+          Puedes ejercer cualquiera de los derechos anteriores enviando un correo electrónico a{" "}
+          <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a> con el asunto
+          <em>«Derechos RGPD»</em> e indicando el derecho que deseas ejercer.
+        </p>
+        <p>
+          Para las solicitudes de supresión o portabilidad de datos de cuenta, también puedes
+          gestionarlo directamente desde la sección <strong>Mi perfil</strong> del sitio, donde
+          tienes la opción de eliminar tu cuenta y todos los datos asociados.
+        </p>
+        <p>
+          Responderemos en el plazo máximo de <strong>un mes</strong> desde la recepción de la
+          solicitud (plazo ampliable a tres meses en casos complejos, con comunicación previa).
+        </p>
+      </div>
+
+      <!-- 8. AUTORIDAD DE CONTROL -->
+      <div>
+        <h2>8. Autoridad de control</h2>
+        <p>
+          Si consideras que el tratamiento de tus datos no se ajusta a la normativa vigente, tienes
+          derecho a presentar una reclamación ante la{" "}
+          <strong>Agencia Española de Protección de Datos (AEPD)</strong>:
+        </p>
+        <ul>
+          <li>
+            <strong>Web:</strong>{" "}
+            <a
+              href="https://www.aepd.es"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              www.aepd.es
+            </a>
+          </li>
+          <li><strong>Dirección:</strong> C/ Jorge Juan, 6, 28001 Madrid</li>
+        </ul>
+        <p>
+          Te animamos a contactar primero con nosotros para resolver cualquier duda o incidencia.
+        </p>
+      </div>
+
+      <!-- 9. CAMBIOS -->
+      <div>
+        <h2>9. Cambios en esta política</h2>
+        <p>
+          Podemos actualizar esta política para reflejar cambios en el sitio o en la normativa
+          aplicable. La fecha de «última actualización» al inicio del documento indica cuándo se
+          realizó la última revisión. Te recomendamos consultar esta página periódicamente.
+        </p>
+        <p>
+          Si los cambios afectasen de manera significativa al tratamiento de los datos de usuarios
+          registrados, lo comunicaremos mediante un aviso en el sitio o por correo electrónico.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Restablecer aviso -->
+    <div class="max-w-3xl mx-auto mt-12 pt-8 border-t border-border/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium text-foreground">Aviso de privacidad</p>
+        <p class="text-xs text-muted-foreground mt-0.5">
+          ¿Quieres volver a ver el aviso informativo? Puedes restablecerlo aquí.
+        </p>
+      </div>
+      <button
+        id="reset-privacy-notice"
+        type="button"
+        class="inline-flex h-9 items-center justify-center rounded-full border border-border/60 bg-secondary/30 px-5 text-sm font-medium text-muted-foreground modern-hover modern-scale-sm hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
+      >
+        Restablecer aviso
+      </button>
+    </div>
+
+  </section>
+</BaseLayout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const btn = document.getElementById("reset-privacy-notice");
+    btn?.addEventListener("click", () => {
+      localStorage.removeItem("devlog-privacy-accepted");
+      // Force the banner to reappear immediately
+      const banner = document.getElementById("cookie-banner");
+      if (banner) banner.style.display = "";
+      btn.textContent = "Aviso restablecido";
+      btn.setAttribute("disabled", "");
+      setTimeout(() => {
+        btn.textContent = "Restablecer aviso";
+        btn.removeAttribute("disabled");
+      }, 2000);
+    });
+  });
+</script>

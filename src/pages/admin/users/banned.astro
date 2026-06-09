@@ -1,0 +1,35 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import BannedUsersTable from "@/components/admin/BannedUsersTable";
+import { prisma } from "@/lib/prisma";
+
+const users = await prisma.user.findMany({
+  where: { banned: true },
+  orderBy: { bannedAt: "desc" },
+  select: {
+    id: true,
+    name: true,
+    email: true,
+    avatar: true,
+    roleId: true,
+    banned: true,
+    bannedAt: true,
+    createdAt: true,
+    role: { select: { name: true } },
+    _count: { select: { comments: true } },
+  },
+});
+---
+
+<AdminLayout title="Usuarios baneados">
+  <div class="mb-4 flex items-center justify-between">
+    <p class="text-sm text-muted-foreground">
+      {users.length} usuario{users.length !== 1 ? "s" : ""} con acceso suspendido
+    </p>
+    <a href="/admin/users" class="text-xs text-muted-foreground hover:text-foreground transition-colors">
+      ← Volver a todos los usuarios
+    </a>
+  </div>
+  <BannedUsersTable users={JSON.parse(JSON.stringify(users))} client:load />
+</AdminLayout>

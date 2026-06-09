@@ -1,55 +1,101 @@
 ---
-import { getCollection, render } from "astro:content";
+export const prerender = false;
 import PostLayout from "@/layouts/PostLayout.astro";
+import { prisma } from "@/lib/prisma";
+import { renderMarkdown, parseHeadings } from "@/lib/markdown";
 import { calculateReadingTime } from "@/utils/readingTime";
+import { registerView } from "@/lib/views";
 
-export async function getStaticPaths() {
-  const posts = (await getCollection("posts"))
-    .filter((post) => !post.data.draft)
-    .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+const { id } = Astro.params;
 
-  return posts.map((post, index) => {
-    const tags = post.data.tags ?? [];
-    const relatedPosts = posts
-      .filter((p) => p.id !== post.id)
-      .map((p) => ({
-        post: p,
-        shared: (p.data.tags ?? []).filter((t) => tags.includes(t)).length,
-      }))
-      .filter(({ shared }) => shared > 0)
-      .sort((a, b) => b.shared - a.shared)
-      .slice(0, 3)
-      .map(({ post }) => post);
+const post = await prisma.post.findUnique({
+  where: { slug: id },
+  select: {
+    id: true,
+    slug: true,
+    title: true,
+    description: true,
+    content: true,
+    author: { select: { name: true } },
+    publishedAt: true,
+    draft: true,
+    coverImage: true,
+    readingTime: true,
+    metaTitle: true,
+    canonical: true,
+    tags: { select: { tag: { select: { name: true, color: true } } } },
+  },
+});
 
-    return {
-      params: { id: post.id },
-      props: {
-        post,
-        prev: posts[index - 1] ?? null,
-        next: posts[index + 1] ?? null,
-        relatedPosts,
+if (!post || post.draft) return Astro.redirect("/404");
+if (post.publishedAt && post.publishedAt > new Date()) return Astro.redirect("/404");
+
+// Registrar visita (deduplicada por IP hash + día)
+const views = await registerView(post.id, Astro.request).catch(() => 0);
+
+const now = new Date();
+const publishedFilter = { draft: false, publishedAt: { lte: now } } as const;
+
+// Prev / next: dos queries de 1 fila en lugar de traer todos los posts
+const [prevPost, nextPost] = await Promise.all([
+  prisma.post.findFirst({
+    where: { ...publishedFilter, publishedAt: { lt: post.publishedAt ?? now } },
+    orderBy: { publishedAt: "desc" },
+    select: { slug: true, title: true },
+  }),
+  prisma.post.findFirst({
+    where: { ...publishedFilter, publishedAt: { gt: post.publishedAt ?? now } },
+    orderBy: { publishedAt: "asc" },
+    select: { slug: true, title: true },
+  }),
+]);
+const prev = prevPost ? { id: prevPost.slug, title: prevPost.title } : null;
+const next = nextPost ? { id: nextPost.slug, title: nextPost.title } : null;
+
+// Related posts (share at least one tag)
+const tagNames = post.tags.map((t) => t.tag.name);
+const relatedDb = tagNames.length > 0
+  ? await prisma.post.findMany({
+      where: {
+        ...publishedFilter,
+        slug: { not: id },
+        tags: { some: { tag: { name: { in: tagNames } } } },
       },
-    };
-  });
-}
+      select: { slug: true, title: true, publishedAt: true, readingTime: true, tags: { select: { tag: { select: { name: true, color: true } } } } },
+      take: 3,
+      orderBy: { publishedAt: "desc" },
+    })
+  : [];
 
-const { post, prev, next, relatedPosts } = Astro.props;
-const { Content, headings } = await render(post);
+const relatedPosts = relatedDb.map((p) => ({
+  id: p.slug,
+  title: p.title,
+  date: p.publishedAt ?? new Date(),
+  tags: p.tags.map((t) => ({ name: t.tag.name, color: t.tag.color })),
+  readingTime: p.readingTime ?? undefined,
+}));
+
+const contentHtml = renderMarkdown(post.content);
+const headings = parseHeadings(post.content);
+const readingTime = post.readingTime ?? calculateReadingTime(post.content);
 ---
 
 <PostLayout
-  id={post.id}
-  title={post.data.title}
-  date={post.data.date}
-  author={post.data.author}
-  tags={post.data.tags}
-  cover={post.data.cover}
-  description={post.data.description}
+  id={post.slug}
+  title={post.title}
+  metaTitle={post.metaTitle ?? undefined}
+  description={post.description}
+  date={post.publishedAt ?? new Date()}
+  author={post.author?.name ?? undefined}
+  tags={post.tags.map((t) => ({ name: t.tag.name, color: t.tag.color }))}
+  cover={post.coverImage ?? undefined}
   prev={prev}
   next={next}
   relatedPosts={relatedPosts}
-  readingTime={post.body ? calculateReadingTime(post.body) : undefined}
+  readingTime={readingTime}
+  views={views}
   headings={headings}
+  canonical={post.canonical ?? undefined}
 >
-  <Content />
+  <Fragment set:html={contentHtml} />
 </PostLayout>

@@ -1,71 +1,98 @@
 ---
-import { getCollection } from "astro:content";
+export const prerender = false;
 import BlogLayout from "@/layouts/BlogLayout.astro";
 import PostCard from "@/components/blog/PostCard.astro";
-import { calculateReadingTime } from "@/utils/readingTime";
-
+import { prisma } from "@/lib/prisma";
 import { tagUrl } from "@/utils/tag";
 
-export async function getStaticPaths() {
-  const posts = await getCollection("posts");
-  const tags = new Set<string>();
+const { tag: tagParam } = Astro.params;
 
-  posts.forEach((post) => post.data.tags?.forEach((tag) => tags.add(tag)));
+// Find all tags and match by slug
+const allTags = await prisma.tag.findMany({ select: { name: true, slug: true } });
+const matched = allTags.find((t) => tagUrl(t.name) === tagParam || t.slug === tagParam);
 
-  return [...tags].map((tag) => ({
-    params: {
-      tag: tagUrl(tag),
-    },
-    props: { originalTag: tag },
-  }));
-}
+if (!matched) return Astro.redirect("/tags");
 
-const { originalTag } = Astro.props;
+const dbPosts = await prisma.post.findMany({
+  where: {
+    draft: false,
+    publishedAt: { lte: new Date() },
+    tags: { some: { tag: { name: matched.name } } },
+  },
+  orderBy: { publishedAt: "desc" },
+  select: {
+    slug: true,
+    title: true,
+    description: true,
+    publishedAt: true,
+    coverImage: true,
+    readingTime: true,
+    tags: { select: { tag: { select: { name: true, color: true } } } },
+  },
+});
 
-const posts = (await getCollection("posts"))
-  .filter(
-    (post) =>
-      post.data.tags?.some((t) => tagUrl(t) === tagUrl(originalTag)) && !post.data.draft,
-  )
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const posts = dbPosts.map((p) => ({
+  id: p.slug,
+  title: p.title,
+  description: p.description,
+  date: p.publishedAt ?? new Date(),
+  tags: p.tags.map((t) => ({ name: t.tag.name, color: t.tag.color })),
+  cover: p.coverImage ?? undefined,
+  readingTime: p.readingTime ?? undefined,
+}));
 ---
 
 <BlogLayout
-  title={`${originalTag} — Etiqueta`}
+  title={`${matched.name} — Etiqueta`}
   description={posts.length > 0
-    ? `${posts.length} artículo${posts.length === 1 ? "" : "s"} sobre ${originalTag} en DevLog.`
-    : `No hay artículos sobre ${originalTag} todavía.`}
+    ? `${posts.length} artículo${posts.length === 1 ? "" : "s"} sobre ${matched.name} en DevLog.`
+    : `No hay artículos sobre ${matched.name} todavía.`}
 >
   <div class="container mx-auto max-w-6xl px-4">
     <header class="py-16 text-center md:py-20">
       <h1 class="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
-        <span data-pagefind-ignore>Etiqueta:</span> <span data-pagefind-body>{originalTag}</span>
+        Etiqueta: {matched.name}
       </h1>
 
       <p class="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
         {
-          posts.length === 0
-            ? `No hay artículos con esta etiqueta.`
-            : `Explora ${posts.length} artículos relacionados con "${originalTag}".`
+          posts.length > 0 && `Explora ${posts.length} artículo${posts.length === 1 ? "" : "s"} relacionado${posts.length === 1 ? "" : "s"} con "${matched.name}".`
         }
       </p>
     </header>
 
-    {
-      posts.length > 0 && (
-        <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-1 lg:grid-cols-1">
-          {posts.map(({ id, data, body }) => (
-            <PostCard
-              id={id}
-              title={data.title}
-              description={data.description}
-              date={data.date}
-              tags={data.tags ?? []}
-              readingTime={body ? calculateReadingTime(body) : undefined}
-            />
-          ))}
-        </section>
-      )
-    }
+    {posts.length === 0 ? (
+      <div class="flex flex-col items-center justify-center py-12 pb-32 text-center gap-6">
+        <div class="rounded-full bg-secondary/40 border border-dashed border-border p-8">
+          <svg class="h-10 w-10 text-muted-foreground/40" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-muted-foreground mb-4">No hay posts con esta etiqueta todavía.</p>
+          <a
+            href="/blog"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-secondary/30 px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-colors duration-150"
+          >
+            ← Ver todos los posts
+          </a>
+        </div>
+      </div>
+    ) : (
+      <section class="grid grid-cols-1 gap-8 pb-20 md:grid-cols-1 lg:grid-cols-1">
+        {posts.map(({ id, title, description, date, tags, cover, readingTime }) => (
+          <PostCard
+            id={id}
+            title={title}
+            description={description}
+            date={date}
+            tags={tags}
+            cover={cover}
+            readingTime={readingTime}
+          />
+        ))}
+      </section>
+    )}
   </div>
 </BlogLayout>

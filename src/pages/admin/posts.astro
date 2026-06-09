@@ -1,0 +1,60 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import PostsTable, { type AdminPost } from "@/components/admin/PostsTable";
+import { prisma } from "@/lib/prisma";
+
+const dbPosts = await prisma.post.findMany({
+  orderBy: { publishedAt: "desc" },
+  select: {
+    slug: true,
+    title: true,
+    description: true,
+    publishedAt: true,
+    draft: true,
+    readingTime: true,
+    author: { select: { name: true } },
+    tags: { select: { tag: { select: { name: true, color: true } } } },
+    publishedAt: true,
+    _count: { select: { comments: true, reactions: true, views: true } },
+  },
+});
+
+const posts: AdminPost[] = dbPosts.map((p) => ({
+  slug: p.slug,
+  title: p.title,
+  description: p.description,
+  date: (p.publishedAt ?? new Date()).toISOString(),
+  author: p.author?.name ?? null,
+  tags: p.tags.map((t) => t.tag.name),
+  draft: p.draft,
+  comments: p._count.comments,
+  reactions: p._count.reactions,
+  views: p._count.views,
+  scheduledAt: !p.draft && p.publishedAt && p.publishedAt > new Date()
+    ? p.publishedAt.toISOString()
+    : null,
+}));
+
+const now2 = new Date();
+const publishedCount = posts.filter((p) => !p.draft && (!p.scheduledAt || new Date(p.scheduledAt) <= now2)).length;
+const scheduledCount = posts.filter((p) => !p.draft && p.scheduledAt && new Date(p.scheduledAt) > now2).length;
+const draftCount = posts.filter((p) => p.draft).length;
+---
+
+<AdminLayout title="Posts">
+  <div class="flex items-center justify-between mb-4">
+    <p class="text-sm text-muted-foreground">
+      {publishedCount} publicado{publishedCount !== 1 ? "s" : ""}
+      {scheduledCount > 0 && <span> · {scheduledCount} programado{scheduledCount !== 1 ? "s" : ""}</span>}
+      {draftCount > 0 && <span> · {draftCount} borrador{draftCount !== 1 ? "es" : ""}</span>}
+    </p>
+    <a
+      href="/admin/posts/new"
+      class="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+    >
+      + Nuevo post
+    </a>
+  </div>
+  <PostsTable posts={posts} client:load />
+</AdminLayout>

@@ -1,0 +1,48 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import PostCommentsView from "@/components/admin/PostCommentsView";
+import { prisma } from "@/lib/prisma";
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/admin/posts");
+
+const post = await prisma.post.findUnique({
+  where: { slug },
+  select: {
+    slug: true,
+    title: true,
+    comments: {
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        parentId: true,
+        banned: true,
+        deleted: true,
+        user: { select: { id: true, name: true, avatar: true } },
+        parent: {
+          select: {
+            content: true,
+            deleted: true,
+            user: { select: { name: true } },
+          },
+        },
+      },
+    },
+  },
+});
+
+if (!post) return Astro.redirect("/admin/posts");
+
+const { comments, ...postInfo } = post;
+---
+
+<AdminLayout title={`Comentarios: ${post.title}`}>
+  <PostCommentsView
+    post={JSON.parse(JSON.stringify(postInfo))}
+    initialComments={JSON.parse(JSON.stringify(comments))}
+    client:load
+  />
+</AdminLayout>

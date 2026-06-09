@@ -1,0 +1,32 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import ProfileEditor from "@/components/admin/ProfileEditor";
+import { prisma } from "@/lib/prisma";
+
+const userId = Astro.locals.user?.id;
+if (!userId) return Astro.redirect("/auth/login");
+
+const dbUser = await prisma.user.findUnique({
+  where: { id: userId },
+  select: {
+    id: true,
+    name: true,
+    email: true,
+    bio: true,
+    avatar: true,
+    password: true,
+    createdAt: true,
+    role: { select: { name: true } },
+  },
+});
+
+if (!dbUser) return Astro.redirect("/auth/login");
+
+const { password, ...rest } = dbUser;
+const user = { ...rest, hasPassword: password !== null };
+---
+
+<AdminLayout title="Mi perfil">
+  <ProfileEditor user={JSON.parse(JSON.stringify(user))} client:load />
+</AdminLayout>

@@ -1,14 +1,27 @@
 ---
-import { getCollection } from "astro:content";
+export const prerender = false;
 import BlogLayout from "@/layouts/BlogLayout.astro";
 import PostCard from "@/components/blog/PostCard.astro";
-import { calculateReadingTime } from "@/utils/readingTime";
+import { prisma } from "@/lib/prisma";
 
-const allPosts = (await getCollection("posts"))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const dbPosts = await prisma.post.findMany({
+  where: { draft: false, publishedAt: { lte: new Date() } },
+  orderBy: { publishedAt: "desc" },
+  take: 3,
+  select: {
+    slug: true, title: true, description: true, publishedAt: true,
+    coverImage: true, readingTime: true,
+    tags: { select: { tag: { select: { name: true, color: true } } } },
+  },
+});
 
-const featuredPosts = allPosts.slice(0, 3);
+const featuredPosts = dbPosts.map((p) => ({
+  id: p.slug, title: p.title, description: p.description,
+  date: p.publishedAt ?? new Date(),
+  tags: p.tags.map((t) => ({ name: t.tag.name, color: t.tag.color })),
+  cover: p.coverImage ?? undefined,
+  readingTime: p.readingTime ?? undefined,
+}));
 ---
 
 <BlogLayout
@@ -61,11 +74,12 @@ const featuredPosts = allPosts.slice(0, 3);
           featuredPosts.map((post, index) => (
             <PostCard
               id={post.id}
-              title={post.data.title}
-              description={post.data.description}
-              date={post.data.date}
-              tags={post.data.tags ?? []}
-              readingTime={post.body ? calculateReadingTime(post.body) : undefined}
+              title={post.title}
+              description={post.description}
+              date={post.date}
+              tags={post.tags}
+              cover={post.cover}
+              readingTime={post.readingTime}
               class={`stagger-${(index % 5) + 1}`}
             />
           ))

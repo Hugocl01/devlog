@@ -1,0 +1,38 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import PostReactionsView from "@/components/admin/PostReactionsView";
+import { prisma } from "@/lib/prisma";
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/admin/posts");
+
+const post = await prisma.post.findUnique({
+  where: { slug },
+  select: {
+    slug: true,
+    title: true,
+    reactions: {
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        createdAt: true,
+        user: { select: { id: true, name: true, avatar: true } },
+        type: { select: { id: true, emoji: true, label: true } },
+      },
+    },
+  },
+});
+
+if (!post) return Astro.redirect("/admin/posts");
+
+const { reactions, ...postInfo } = post;
+---
+
+<AdminLayout title={`Reacciones: ${post.title}`}>
+  <PostReactionsView
+    post={JSON.parse(JSON.stringify(postInfo))}
+    reactions={JSON.parse(JSON.stringify(reactions))}
+    client:load
+  />
+</AdminLayout>

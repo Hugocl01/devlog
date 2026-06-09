@@ -1,0 +1,147 @@
+---
+import "../styles/global.css";
+import ThemeToggle from "@/components/ThemeToggle.astro";
+import { ClientRouter } from "astro:transitions";
+import { ChevronsLeftRightEllipsis, ShieldCheck, MessageSquare, FileText, Zap, Tag, CalendarDays, Image, Settings, ClipboardList, Smile, UserX, MessageSquareOff } from "@lucide/astro";
+import { Toaster } from "sonner";
+import AdminSearch from "@/components/admin/AdminSearch";
+import AdminUserMenu from "@/components/admin/AdminUserMenu";
+import AdminSidebar from "@/components/admin/AdminSidebar";
+
+const { title } = Astro.props;
+
+const currentPath = Astro.url.pathname;
+
+const adminUser = {
+  name: Astro.locals.user?.name ?? "",
+  email: Astro.locals.user?.email ?? "",
+  avatar: Astro.locals.user?.avatar ?? null,
+};
+
+// icon field must match a key in AdminSidebar's ICON_MAP
+const navLinks = [
+  { href: "/admin",                  label: "Dashboard",             icon: "LayoutDashboard"  },
+  { href: "/admin/users",            label: "Usuarios",              icon: "Users"            },
+  { href: "/admin/users/banned",     label: "Usuarios baneados",     icon: "UserX"            },
+  { href: "/admin/posts",            label: "Posts",                 icon: "FileText"         },
+  { href: "/admin/updates",          label: "Updates",               icon: "Zap"              },
+  { href: "/admin/tags",             label: "Etiquetas",             icon: "Tag"              },
+  { href: "/admin/comments",         label: "Comentarios",           icon: "MessageSquare"    },
+  { href: "/admin/comments/banned",  label: "Comentarios baneados",  icon: "MessageSquareOff" },
+  { href: "/admin/reaction-types",   label: "Reacciones",            icon: "Smile"            },
+  { href: "/admin/media",            label: "Medios",                icon: "Image"            },
+  { href: "/admin/calendar",         label: "Calendario",            icon: "CalendarDays"     },
+  { href: "/admin/audit",            label: "Auditoría",             icon: "ClipboardList"    },
+  { href: "/admin/settings",         label: "Ajustes",               icon: "Settings"         },
+];
+
+// Mobile nav still uses @lucide/astro icons directly
+const mobileNavLinks = [
+  { href: "/admin",                 label: "Dashboard",            Icon: "LayoutDashboard" as const  },
+  { href: "/admin/users",           label: "Usuarios",             Icon: "Users" as const            },
+  { href: "/admin/posts",           label: "Posts",                Icon: "FileText" as const         },
+  { href: "/admin/updates",         label: "Updates",              Icon: "Zap" as const              },
+  { href: "/admin/tags",            label: "Etiquetas",            Icon: "Tag" as const              },
+  { href: "/admin/comments",        label: "Comentarios",          Icon: "MessageSquare" as const    },
+  { href: "/admin/media",           label: "Medios",               Icon: "Image" as const            },
+  { href: "/admin/settings",        label: "Ajustes",              Icon: "Settings" as const         },
+];
+---
+
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>{title} · Admin | DevLog</title>
+
+    <script is:inline>
+      const getThemePreference = () => {
+        if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+          return localStorage.getItem("theme");
+        }
+        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      };
+      const isDark = getThemePreference() === "dark";
+      document.documentElement.classList[isDark ? "add" : "remove"]("dark");
+      document.addEventListener("astro:after-swap", () => {
+        const isDark = getThemePreference() === "dark";
+        document.documentElement.classList[isDark ? "add" : "remove"]("dark");
+      });
+    </script>
+
+    <ClientRouter />
+  </head>
+
+  <body class="min-h-screen bg-background text-foreground antialiased font-sans">
+
+    <!-- Top bar -->
+    <header class="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
+      <div class="flex h-16 items-center justify-between px-4 gap-2 sm:gap-4">
+        <a href="/admin" class="flex items-center gap-2 text-lg font-bold shrink-0" aria-label="Panel de administración">
+          <ChevronsLeftRightEllipsis />
+          <span>DevLog</span>
+          <span class="inline-flex items-center gap-1 rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+            <ShieldCheck class="h-3 w-3" />
+            Admin
+          </span>
+        </a>
+        <div class="flex items-center gap-2 sm:gap-4">
+          <AdminSearch client:load />
+          <AdminUserMenu user={adminUser} client:load />
+          <ThemeToggle />
+        </div>
+      </div>
+    </header>
+
+    <div class="flex">
+      <!-- Sidebar colapsable (desktop) -->
+      <AdminSidebar links={navLinks} currentPath={currentPath} client:load />
+
+      <div class="flex-1 min-w-0">
+        <!-- Mobile nav tabs (solo los principales) -->
+        <nav class="lg:hidden flex border-b border-border/50 px-4 gap-1 overflow-x-auto">
+          {mobileNavLinks.map(({ href, label }) => (
+            <a
+              href={href}
+              class={`flex items-center gap-1.5 px-3 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                currentPath === href || (href !== "/admin" && currentPath.startsWith(href))
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+
+        <!-- Page content -->
+        <main class="p-4 sm:p-6 lg:p-8 max-w-6xl">
+          <h1 class="text-2xl font-bold mb-6">{title}</h1>
+          <slot />
+        </main>
+      </div>
+    </div>
+
+    <Toaster
+      client:only="react"
+      richColors
+      position="bottom-right"
+      toastOptions={{ duration: 3500 }}
+    />
+    <script is:inline>
+      (function syncSonnerTheme() {
+        const update = () => {
+          const isDark = document.documentElement.classList.contains("dark");
+          const el = document.querySelector("[data-sonner-toaster]");
+          if (el) el.setAttribute("data-theme", isDark ? "dark" : "light");
+        };
+        const obs = new MutationObserver(update);
+        obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        document.addEventListener("astro:page-load", update);
+      })();
+    </script>
+  </body>
+</html>

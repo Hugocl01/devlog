@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "@/layouts/main.astro";
-import type { CollectionEntry } from "astro:content";
 import type { ImageMetadata } from "astro";
+import type { TagWithColor } from "@/types/tag";
 import { Badge } from "@/components/ui/badge";
 import { Link2, Check } from "@lucide/astro";
 import PostNavigation from "@/components/blog/PostNavigation.astro";
@@ -20,6 +20,8 @@ import {
 import { tagUrl } from "@/utils/tag";
 import { formatDate, isoDate as formatISODate } from "@/utils/date";
 import RelatedPosts from "@/components/blog/RelatedPosts.astro";
+import ReactionsBar from "@/components/blog/ReactionsBar";
+import CommentsSection from "@/components/blog/CommentsSection";
 
 type CoverObject = {
   src: ImageMetadata;
@@ -31,22 +33,28 @@ function isCoverObject(c: Exclude<Cover, string>): c is CoverObject {
   return !("format" in c);
 }
 
+type NavEntry = { id: string; title: string };
+type RelatedPost = { id: string; title: string; date: Date; tags: TagWithColor[]; readingTime?: number };
+
 type PostLayoutProps = {
   id?: string;
   title: string;
+  metaTitle?: string;
   description?: string;
   date: string | Date;
   author?: string;
-  tags?: string[];
+  tags?: TagWithColor[];
   cover?: Cover;
-  prev?: CollectionEntry<"posts"> | null;
-  next?: CollectionEntry<"posts"> | null;
+  prev?: NavEntry | null;
+  next?: NavEntry | null;
   readingTime?: number;
   headings?: Heading[];
-  relatedPosts?: CollectionEntry<"posts">[];
+  relatedPosts?: RelatedPost[];
+  views?: number;
+  canonical?: string;
 };
 
-const { id, title, description, date, author, tags, cover, prev, next, readingTime, headings, relatedPosts } =
+const { id, title, metaTitle, description, date, author, tags, cover, prev, next, readingTime, headings, relatedPosts, views, canonical } =
   Astro.props as PostLayoutProps;
 
 const isoDate = date ? formatISODate(date) : undefined;
@@ -73,15 +81,17 @@ const ogImage: string | undefined = !imageSrc
 
 <BaseLayout
   title={title}
+  metaTitle={metaTitle}
   description={description}
   type="article"
   image={ogImage}
   author={author}
+  canonical={canonical}
 >
   <Fragment slot="head">
     {isoDate && <meta property="article:published_time" content={isoDate} />}
     {author && <meta property="article:author" content={author} />}
-    {(tags ?? []).length > 0 && <meta property="article:tag" content={(tags ?? []).join(",")} />}
+    {(tags ?? []).length > 0 && <meta property="article:tag" content={(tags ?? []).map(t => t.name).join(",")} />}
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "BlogPosting",
@@ -93,8 +103,19 @@ const ogImage: string | undefined = !imageSrc
       ...(ogImage && { "image": new URL(ogImage, Astro.site).toString() }),
     })} />
   </Fragment>
+  <!-- Barra de progreso de lectura -->
+  <div
+    id="reading-progress"
+    class="fixed top-0 left-0 z-50 h-0.75 w-0 bg-primary transition-none"
+    role="progressbar"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="0"
+    aria-hidden="true"
+  ></div>
+
   <div class="max-w-7xl mx-auto flex flex-col xl:flex-row xl:gap-12 justify-center items-start">
-    <article class="flex-1 w-full max-w-4xl lg:max-w-3xl mx-auto px-4 py-20 sm:py-24" data-pagefind-body>
+    <article class="flex-1 w-full max-w-4xl lg:max-w-3xl mx-auto px-4 py-20 sm:py-24" data-article>
       <Breadcrumb className="mb-8 reveal">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -106,7 +127,7 @@ const ogImage: string | undefined = !imageSrc
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage className="truncate max-w-[200px] sm:max-w-[400px]">{title}</BreadcrumbPage>
+            <BreadcrumbPage className="truncate max-w-[200px] sm:max-w-[400px]" title={title}>{title}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -124,7 +145,6 @@ const ogImage: string | undefined = !imageSrc
               loading="eager"
               fetchpriority="high"
               transition:name={`img-${id}`}
-              data-pagefind-meta="image[src]"
             />
           ) : (
             <Image
@@ -136,7 +156,6 @@ const ogImage: string | undefined = !imageSrc
               loading="eager"
               fetchpriority="high"
               transition:name={`img-${id}`}
-              data-pagefind-meta="image[src]"
             />
           )}
           {coverCaption && (
@@ -157,6 +176,7 @@ const ogImage: string | undefined = !imageSrc
         <time class="tabular-nums" datetime={isoDate}>
           Publicado el {formattedDate}
           {readingTime && ` • ${readingTime} min de lectura`}
+          {views !== undefined && ` • ${views.toLocaleString("es-ES")} visita${views !== 1 ? "s" : ""}`}
         </time>
 
         {
@@ -179,12 +199,21 @@ const ogImage: string | undefined = !imageSrc
         {
           (tags ?? []).map((tag) => (
             <a
-              href={`/tags/${tagUrl(tag)}`}
-              class="relative z-20 hover:opacity-80 transition-all duration-300 hover:scale-105 active:scale-95"
+              href={`/tags/${tagUrl(tag.name)}`}
+              class="relative z-20 hover:opacity-80 transition-all duration-150 hover:scale-105 active:scale-95"
             >
-              <Badge variant="secondary" className="bg-primary/5 text-primary/70 border-primary/10 hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                {tag}
-              </Badge>
+              {tag.color ? (
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-all duration-300"
+                  style={`background-color:${tag.color}20;border-color:${tag.color}50;color:${tag.color}`}
+                >
+                  {tag.name}
+                </span>
+              ) : (
+                <Badge variant="secondary" className="bg-primary/5 text-primary/70 border-primary/10 hover:bg-primary/10 hover:text-primary transition-all duration-300">
+                  {tag.name}
+                </Badge>
+              )}
             </a>
           ))
         }
@@ -206,7 +235,7 @@ const ogImage: string | undefined = !imageSrc
           href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(Astro.url.toString())}&title=${encodeURIComponent(title)}`}
           target="_blank"
           rel="noopener noreferrer"
-          class="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 active:scale-95 group"
+          class="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-150 active:scale-95 group"
           aria-label="Compartir en LinkedIn"
         >
           <svg
@@ -222,7 +251,7 @@ const ogImage: string | undefined = !imageSrc
         <button
           id="copy-link-btn"
           data-url={Astro.url.toString()}
-          class="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 active:scale-95 cursor-pointer group"
+          class="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary/30 border border-border/60 text-muted-foreground/80 hover:bg-secondary/50 hover:text-foreground hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-150 active:scale-95 cursor-pointer group"
           aria-label="Copiar enlace"
         >
           <Link2 class="h-4 w-4 transition-transform group-hover:scale-110" id="copy-icon-link" />
@@ -230,6 +259,9 @@ const ogImage: string | undefined = !imageSrc
         </button>
       </div>
     </div>
+
+    {id && <ReactionsBar postSlug={id} client:load />}
+    {id && <CommentsSection postSlug={id} client:load />}
 
     <PostNavigation {prev} {next} />
     {relatedPosts && relatedPosts.length > 0 && (
@@ -246,6 +278,8 @@ const ogImage: string | undefined = !imageSrc
 </BaseLayout>
 
 <script>
+  import { toast } from "sonner";
+
   const setupCopyBtn = () => {
     const copyBtn = document.getElementById("copy-link-btn");
     if (!copyBtn || copyBtn.dataset.listener) return;
@@ -266,8 +300,9 @@ const ogImage: string | undefined = !imageSrc
             iconCheck.classList.add("hidden");
           }, 2000);
         }
-      } catch (e) {
-        console.error("Error al copiar enlace:", e);
+        toast.success("¡Enlace copiado!", { duration: 2000 });
+      } catch {
+        toast.error("No se pudo copiar el enlace");
       }
     });
   };
@@ -305,8 +340,8 @@ const ogImage: string | undefined = !imageSrc
           await navigator.clipboard.writeText(codeElement.innerText);
           button.innerHTML = checkIcon;
           setTimeout(() => button.innerHTML = copyIcon, 2000);
-        } catch (e) {
-          console.error("Error al copiar:", e);
+        } catch {
+          // clipboard failure — no action needed
         }
       });
 
@@ -321,4 +356,30 @@ const ogImage: string | undefined = !imageSrc
 
   init();
   document.addEventListener("astro:page-load", init);
+</script>
+
+<script>
+  const setupReadingProgress = () => {
+    const bar = document.getElementById("reading-progress") as HTMLElement | null;
+    if (!bar) return;
+
+    const article = document.querySelector("[data-article]") as HTMLElement | null;
+    if (!article) return;
+
+    const update = () => {
+      const articleTop = article.getBoundingClientRect().top + window.scrollY;
+      const articleBottom = articleTop + article.offsetHeight;
+      const total = articleBottom - articleTop;
+      const progress = Math.min(Math.max((window.scrollY - articleTop + window.innerHeight * 0.1) / total, 0), 1);
+      const pct = Math.round(progress * 100);
+      bar.style.width = `${pct}%`;
+      bar.setAttribute("aria-valuenow", String(pct));
+    };
+
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+  };
+
+  setupReadingProgress();
+  document.addEventListener("astro:page-load", setupReadingProgress);
 </script>

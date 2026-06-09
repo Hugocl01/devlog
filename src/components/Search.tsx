@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Search as SearchIcon, Command, X, Loader2, FileText, ChevronRight, Tag } from "lucide-react";
+import { Search as SearchIcon, Command, X, Loader2, FileText, Zap, Tag, ChevronRight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,108 +14,43 @@ import { Kbd } from "@/components/ui/kbd";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
-interface PagefindData {
+interface SearchResult {
   url: string;
+  title: string;
   excerpt: string;
-  filters: Record<string, string[]>;
-  meta: {
-    title: string;
-    image?: string;
-  };
-  sub_results: { title: string; url: string; excerpt: string }[];
-}
-
-interface PagefindResult {
-  id: string;
-  data: () => Promise<PagefindData>;
-}
-
-interface SearchResponse {
-  results: PagefindResult[];
-}
-
-interface Pagefind {
-  search: (query: string) => Promise<SearchResponse>;
-  init: () => Promise<void>;
+  image?: string;
+  color?: string;
+  type: "post" | "update" | "tag";
 }
 
 export const Search = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<PagefindData[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isMac, setIsMac] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const pagefindRef = useRef<Pagefind | null>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const listboxId = "search-results-listbox";
   const getOptionId = (index: number) => `search-option-${index}`;
 
   useEffect(() => {
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    setIsMac(userAgent.includes('mac'));
+    setIsMac(window.navigator.userAgent.toLowerCase().includes("mac"));
 
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen((o) => !o);
       }
     };
-
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
 
   useEffect(() => {
-    if (open) {
-      loadPagefind();
-      setSelectedIndex(-1);
-    }
+    if (!open) return;
+    setSelectedIndex(-1);
   }, [open]);
-
-  const loadPagefind = async () => {
-    if (pagefindRef.current) return;
-
-    if (import.meta.env.DEV) {
-      console.warn("Pagefind search is not available in development mode.");
-      return;
-    }
-
-    try {
-      const prefix = "/";
-      const pagefindPath = `${prefix}pagefind/pagefind.js`;
-      pagefindRef.current = await import(/* @vite-ignore */ pagefindPath) as Pagefind;
-      await pagefindRef.current.init();
-    } catch (e) {
-      console.error("Failed to load pagefind", e);
-    }
-  };
-
-  useEffect(() => {
-    const search = async () => {
-      if (!query || !pagefindRef.current) {
-        setResults([]);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const searchResponse: SearchResponse = await pagefindRef.current.search(query);
-        const limitedResults = searchResponse.results.slice(0, 10);
-        const detailedResults = await Promise.all(
-          limitedResults.map((result) => result.data())
-        );
-        setResults(detailedResults);
-      } catch (e) {
-        console.error("Search failed", e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const timer = setTimeout(search, 200);
-    return () => clearTimeout(timer);
-  }, [query]);
 
   useEffect(() => {
     setSelectedIndex(-1);
@@ -123,15 +58,33 @@ export const Search = () => {
 
   useEffect(() => {
     if (selectedIndex >= 0 && resultsContainerRef.current) {
-      const selectedElement = resultsContainerRef.current.children[selectedIndex] as HTMLElement;
-      if (selectedElement) {
-        selectedElement.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-        });
-      }
+      const el = resultsContainerRef.current.children[selectedIndex] as HTMLElement;
+      el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [selectedIndex]);
+
+  // Búsqueda debounced contra la API
+  useEffect(() => {
+    if (!query || query.length < 2) {
+      setResults([]);
+      return;
+    }
+
+    setIsLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        setResults(data.results ?? []);
+      } catch {
+        setResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <>
@@ -147,34 +100,35 @@ export const Search = () => {
         </Kbd>
       </button>
 
-      <Dialog open={open} onOpenChange={(val) => {
-        setOpen(val);
-        if (!val) setQuery("");
-      }}>
-        <DialogContent showCloseButton={false} className="w-[calc(100%-2rem)] sm:max-w-[700px] p-0 gap-0 overflow-hidden bg-card/40 backdrop-blur-md border-border/50 shadow-modern animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 rounded-2xl sm:top-[100px] sm:translate-y-0 sm:origin-top flex flex-col max-h-[85vh] sm:max-h-[800px]">
+      <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) setQuery(""); }}>
+        <DialogContent
+          showCloseButton={false}
+          className="w-[calc(100%-2rem)] sm:max-w-175 p-0 gap-0 overflow-hidden bg-card/40 backdrop-blur-md border-border/50 shadow-modern animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 rounded-2xl sm:top-25 sm:translate-y-0 sm:origin-top flex flex-col max-h-[85vh] sm:max-h-200"
+        >
           <DialogTitle className="sr-only">Buscador de DevLog</DialogTitle>
           <DialogDescription className="sr-only">
-            Busca artículos, etiquetas y contenido en el blog.
+            Busca artículos, updates y contenido en el blog.
           </DialogDescription>
+
           <DialogHeader className="relative group/input p-5 border-b border-border/50 bg-gradient-to-b from-transparent to-primary/5 space-y-0 text-left">
             <div className="absolute inset-y-0 left-9 flex items-center pointer-events-none">
               <SearchIcon className={cn(
                 "h-5 w-5 transition-colors duration-300",
-                query ? "text-primary shadow-primary/20" : "text-muted-foreground/40"
+                query ? "text-primary" : "text-muted-foreground/40"
               )} />
             </div>
             <Input
-              placeholder="Busca artículos, etiquetas y contenido en el blog"
-              className="w-full h-12 pl-12 pr-12 text-lg bg-secondary/30 hover:bg-secondary/50 focus:bg-secondary/50 border border-border/60 focus:border-primary/50 rounded-full outline-none transition-all duration-300 focus:ring-4 focus:ring-primary/5 hover:shadow-lg hover:shadow-primary/5 focus:shadow-lg focus:shadow-primary/5"
+              placeholder="Busca artículos, updates y contenido..."
+              className="w-full h-12 pl-12 pr-12 text-lg bg-secondary/30 hover:bg-secondary/50 focus:bg-secondary/50 border border-border/60 focus:border-primary/50 rounded-full outline-none transition-all duration-300 focus:ring-4 focus:ring-primary/5 hover:shadow-lg hover:shadow-primary/5"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "ArrowDown") {
                   e.preventDefault();
-                  setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev));
+                  setSelectedIndex((p) => (p < results.length - 1 ? p + 1 : p));
                 } else if (e.key === "ArrowUp") {
                   e.preventDefault();
-                  setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+                  setSelectedIndex((p) => (p > 0 ? p - 1 : -1));
                 } else if (e.key === "Enter" && selectedIndex >= 0) {
                   e.preventDefault();
                   window.location.href = results[selectedIndex].url;
@@ -208,20 +162,14 @@ export const Search = () => {
                 <div className="w-20 h-20 bg-primary/5 rounded-full border border-primary/10 flex items-center justify-center mb-6 shadow-modern shadow-primary/5">
                   <SearchIcon className="h-10 w-10 text-primary/40" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground/90 dark:text-foreground/80 tracking-tight">Búsqueda Instantánea</h3>
+                <h3 className="text-xl font-bold text-foreground/90 tracking-tight">Búsqueda Instantánea</h3>
                 <p className="text-foreground/70 dark:text-muted-foreground mt-2 max-w-[300px] text-sm leading-relaxed">
                   Encuentra exactamente lo que buscas en milisegundos.
                 </p>
-                {import.meta.env.DEV && (
-                  <Badge variant="secondary" className="mt-6 px-3 py-1 bg-amber-500/10 text-amber-500 border-amber-500/20 rounded-full">
-                    Modo Desarrollo: Índice disponible tras compilar
-                  </Badge>
-                )}
-                <div className="hidden md:flex flex-wrap justify-center gap-6 mt-12 text-foreground/60 dark:text-muted-foreground/50 hover:text-foreground/90 dark:hover:text-muted-foreground transition-colors group/hints">
+                <div className="hidden md:flex flex-wrap justify-center gap-6 mt-12 text-foreground/60 dark:text-muted-foreground/50 hover:text-foreground/90 transition-colors group/hints">
                   <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest">
                     <div className="flex gap-1.5 opacity-80 group-hover/hints:opacity-100 transition-opacity">
-                      <Kbd>↑</Kbd>
-                      <Kbd>↓</Kbd>
+                      <Kbd>↑</Kbd><Kbd>↓</Kbd>
                     </div> Navegar
                   </div>
                   <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest">
@@ -231,30 +179,38 @@ export const Search = () => {
               </div>
             )}
 
-            {query && results.length === 0 && !isLoading && (
+            {query && query.length < 2 && (
+              <p className="py-20 text-center text-sm text-muted-foreground">
+                Escribe al menos 2 caracteres para buscar.
+              </p>
+            )}
+
+            {query && query.length >= 2 && results.length === 0 && !isLoading && (
               <div className="py-20 text-center animate-in fade-in zoom-in-95 duration-300">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/30 border border-border/60 text-foreground/40 dark:text-muted-foreground/60 mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/30 border border-border/60 text-foreground/40 mb-4">
                   <X className="h-8 w-8" />
                 </div>
-                <p className="text-lg font-bold text-foreground/80 dark:text-foreground/60 italic">Sin resultados para "{query}"</p>
-                <p className="text-sm text-foreground/70 dark:text-muted-foreground mt-1">Prueba con otros términos de búsqueda.</p>
+                <p className="text-lg font-bold text-foreground/80 italic">Sin resultados para "{query}"</p>
+                <p className="text-sm text-muted-foreground mt-1">Prueba con otros términos.</p>
               </div>
             )}
 
-            <div
-              aria-live="polite"
-              aria-atomic="true"
-              className="sr-only"
-            >
+            <div aria-live="polite" aria-atomic="true" className="sr-only">
               {query && !isLoading && (
                 results.length > 0
-                  ? `${results.length} resultado${results.length === 1 ? "" : "s"} encontrado${results.length === 1 ? "" : "s"}`
+                  ? `${results.length} resultado${results.length !== 1 ? "s" : ""} encontrado${results.length !== 1 ? "s" : ""}`
                   : "Sin resultados"
               )}
             </div>
 
             {results.length > 0 && (
-              <div ref={resultsContainerRef} role="listbox" id={listboxId} aria-label="Resultados de búsqueda" className="flex flex-col gap-2 p-1 w-full overflow-x-hidden">
+              <div
+                ref={resultsContainerRef}
+                role="listbox"
+                id={listboxId}
+                aria-label="Resultados de búsqueda"
+                className="flex flex-col gap-2 p-1 w-full overflow-x-hidden"
+              >
                 {results.map((result, index) => (
                   <a
                     key={result.url}
@@ -271,48 +227,62 @@ export const Search = () => {
                     )}
                   >
                     <div className="relative h-20 w-20 sm:h-auto sm:aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-border/40 shadow-sm group-hover:shadow-md transition-all duration-500 group-hover:scale-[1.02]">
-                      {result.meta.image ? (
+                      {result.image ? (
                         <img
-                          src={result.meta.image}
+                          src={result.image}
                           alt=""
                           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
+                      ) : result.type === "tag" ? (
+                        <div
+                          className="h-full w-full flex items-center justify-center"
+                          style={result.color
+                            ? { backgroundColor: `${result.color}20` }
+                            : undefined}
+                        >
+                          <Tag
+                            className="h-6 w-6 sm:h-8 sm:w-8"
+                            style={result.color ? { color: result.color } : undefined}
+                          />
+                        </div>
                       ) : (
                         <div className={cn(
                           "h-full w-full flex items-center justify-center bg-gradient-to-br transition-colors duration-500",
-                          result.url.includes("/blog/")
-                            ? "from-blue-500/10 to-indigo-500/10 text-blue-500/40 opacity-80"
-                            : "from-purple-500/10 to-pink-500/10 text-purple-500/40 opacity-80"
+                          result.type === "post"
+                            ? "from-blue-500/10 to-indigo-500/10 text-blue-500/40"
+                            : "from-purple-500/10 to-pink-500/10 text-purple-500/40"
                         )}>
-                          {result.url.includes("/blog/") ? (
-                            <FileText className="h-6 w-6 sm:h-8 sm:w-8" />
-                          ) : (
-                            <Tag className="h-6 w-6 sm:h-8 sm:w-8" />
-                          )}
+                          {result.type === "post"
+                            ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" />
+                            : <Zap className="h-6 w-6 sm:h-8 sm:w-8" />}
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-500" />
                     </div>
 
                     <div className="h-full w-full flex flex-col justify-center min-w-0 pr-8 sm:pr-12">
-                      <div className="flex items-center gap-2 mb-1 shrink-0">
+                      <div className="flex items-center gap-2 mb-1">
                         <Badge
                           variant="outline"
                           className={cn(
                             "text-[8px] sm:text-[10px] uppercase tracking-tighter h-4 px-1.5 bg-background/50 border-border/60 font-bold transition-colors",
-                            result.url.includes("/blog/")
+                            result.type === "post"
                               ? "group-hover:border-blue-500/50 group-hover:text-blue-500"
-                              : "group-hover:border-purple-500/50 group-hover:text-purple-500"
+                              : result.type === "update"
+                              ? "group-hover:border-purple-500/50 group-hover:text-purple-500"
+                              : "group-hover:border-emerald-500/50 group-hover:text-emerald-500"
                           )}
+                          style={result.type === "tag" && result.color
+                            ? { borderColor: `${result.color}50`, color: result.color }
+                            : undefined}
                         >
-                          {result.url.includes("/blog/") ? "Post" : "Etiqueta"}
+                          {result.type === "post" ? "Post" : result.type === "update" ? "Update" : "Etiqueta"}
                         </Badge>
                       </div>
-                      <h3 className="font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors truncate w-full shrink-0">
-                        {result.meta.title}
+                      <h3 className="font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors truncate">
+                        {result.title}
                       </h3>
                       <div
-                        className="text-xs text-foreground/70 dark:text-muted-foreground group-hover:text-foreground/90 dark:group-hover:text-muted-foreground/90 line-clamp-2 mt-1 leading-snug transition-colors break-words"
+                        className="text-xs text-foreground/70 dark:text-muted-foreground line-clamp-2 mt-1 leading-snug transition-colors wrap-break-word"
                         dangerouslySetInnerHTML={{ __html: result.excerpt }}
                       />
                     </div>
@@ -328,19 +298,17 @@ export const Search = () => {
             )}
           </ScrollArea>
 
-          <DialogFooter className="px-5 py-4 border-t border-border/50 bg-secondary/20 backdrop-blur-md flex-row justify-between sm:justify-between w-full items-center text-[10px] font-bold uppercase tracking-widest leading-none space-x-0 sm:space-x-0 space-y-0">
-            <div className="flex items-center gap-2 text-foreground/70 dark:text-muted-foreground/90 hover:text-foreground dark:hover:text-foreground transition-colors cursor-default">
+          <DialogFooter className="px-5 py-4 border-t border-border/50 bg-secondary/20 backdrop-blur-md flex-row justify-between sm:justify-between w-full items-center text-[10px] font-bold uppercase tracking-widest leading-none space-x-0 space-y-0">
+            <div className="flex items-center gap-2 text-foreground/70 dark:text-muted-foreground/90 hover:text-foreground transition-colors cursor-default">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary shadow-[0_0_6px_var(--color-primary)]"></span>
               </span>
               Búsqueda de DevLog
             </div>
-            <div className="flex items-center gap-4">
-              <span className="hidden md:flex flex items-center gap-1.5 text-foreground/70 dark:text-muted-foreground/90 hover:text-foreground dark:hover:text-foreground transition-colors cursor-default">
-                <Kbd className="opacity-80">ESC</Kbd> Cerrar
-              </span>
-            </div>
+            <span className="hidden md:flex items-center gap-1.5 text-foreground/70 dark:text-muted-foreground/90 cursor-default">
+              <Kbd className="opacity-80">ESC</Kbd> Cerrar
+            </span>
           </DialogFooter>
         </DialogContent>
       </Dialog>

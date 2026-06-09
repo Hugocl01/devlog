@@ -1,0 +1,31 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import SettingsEditor from "@/components/admin/SettingsEditor";
+import { prisma } from "@/lib/prisma";
+
+const DEFAULT_SETTINGS = [
+  { key: "site_name", label: "Nombre del sitio", description: "Título principal del blog", value: "DevLog" },
+  { key: "site_description", label: "Descripción", description: "Descripción corta del sitio para SEO", value: "" },
+  { key: "site_author", label: "Autor principal", description: "Nombre del autor por defecto", value: "" },
+  { key: "social_github", label: "GitHub", description: "URL de tu perfil de GitHub", value: "" },
+  { key: "social_twitter", label: "Twitter / X", description: "URL de tu perfil de Twitter", value: "" },
+  { key: "social_linkedin", label: "LinkedIn", description: "URL de tu perfil de LinkedIn", value: "" },
+  { key: "contact_email", label: "Email de contacto", description: "Email público de contacto", value: "" },
+];
+
+// Seed defaults if they don't exist
+for (const s of DEFAULT_SETTINGS) {
+  await prisma.siteSetting.upsert({
+    where: { key: s.key },
+    create: { key: s.key, value: s.value, label: s.label, description: s.description },
+    update: {},
+  });
+}
+
+const settings = await prisma.siteSetting.findMany({ orderBy: { key: "asc" } });
+---
+
+<AdminLayout title="Configuración del sitio">
+  <SettingsEditor initialSettings={JSON.parse(JSON.stringify(settings))} client:load />
+</AdminLayout>

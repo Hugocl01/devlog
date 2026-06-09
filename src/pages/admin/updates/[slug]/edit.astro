@@ -1,0 +1,56 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import UpdateEditor, { type UpdateEditorData } from "@/components/admin/UpdateEditor";
+import { prisma } from "@/lib/prisma";
+
+const { slug } = Astro.params;
+
+const [update, adminRole] = await Promise.all([
+  prisma.update.findUnique({
+    where: { slug },
+    select: {
+      slug: true,
+      title: true,
+      description: true,
+      content: true,
+      authorId: true,
+      draft: true,
+      publishedAt: true,
+      metaTitle: true,
+      canonical: true,
+      type: { select: { name: true } },
+    },
+  }),
+  prisma.role.findFirst({ where: { name: "ADMIN" } }),
+]);
+
+if (!update) return Astro.redirect("/admin/updates");
+
+const users = adminRole
+  ? await prisma.user.findMany({
+      where: { roleId: adminRole.id },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    })
+  : [];
+
+const initialData: UpdateEditorData = {
+  slug: update.slug,
+  title: update.title,
+  description: update.description,
+  content: update.content,
+  authorId: update.authorId ?? undefined,
+  type: update.type.name as UpdateEditorData["type"],
+  draft: update.draft,
+  scheduledAt: update.publishedAt && update.publishedAt > new Date()
+    ? update.publishedAt.toISOString()
+    : undefined,
+  metaTitle: update.metaTitle ?? undefined,
+  canonical: update.canonical ?? undefined,
+};
+---
+
+<AdminLayout title={`Editar: ${update.title}`}>
+  <UpdateEditor mode="edit" initialData={JSON.parse(JSON.stringify(initialData))} users={users} client:load />
+</AdminLayout>

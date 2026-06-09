@@ -1,0 +1,26 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import PostAnalyticsView from "@/components/admin/PostAnalyticsView";
+import { prisma } from "@/lib/prisma";
+
+const { slug } = Astro.params;
+
+const post = await prisma.post.findUnique({
+  where: { slug },
+  select: { title: true },
+});
+
+if (!post) return Astro.redirect("/admin/posts");
+---
+
+<AdminLayout title={`Analíticas · ${post.title}`}>
+  <div class="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+    <a href="/admin/posts" class="hover:text-foreground transition-colors">Posts</a>
+    <span>/</span>
+    <a href={`/admin/posts/${slug}/edit`} class="hover:text-foreground transition-colors truncate max-w-xs">{post.title}</a>
+    <span>/</span>
+    <span class="text-foreground">Analíticas</span>
+  </div>
+  <PostAnalyticsView slug={slug!} client:load />
+</AdminLayout>

@@ -1,0 +1,57 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import UserDetailView from "@/components/admin/UserDetailView";
+import { prisma } from "@/lib/prisma";
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect("/admin/users");
+
+const user = await prisma.user.findUnique({
+  where: { id },
+  select: {
+    id: true,
+    name: true,
+    email: true,
+    avatar: true,
+    bio: true,
+    roleId: true,
+    emailVerified: true,
+    createdAt: true,
+    role: { select: { name: true } },
+    comments: {
+      where: { deleted: false },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        parentId: true,
+        post: { select: { slug: true, title: true } },
+        parent: {
+          select: {
+            content: true,
+            user: { select: { name: true } },
+          },
+        },
+      },
+    },
+    reactions: {
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        createdAt: true,
+        post: { select: { slug: true, title: true } },
+        type: { select: { emoji: true, label: true } },
+      },
+    },
+    _count: { select: { sessions: true } },
+  },
+});
+
+if (!user) return Astro.redirect("/admin/users");
+---
+
+<AdminLayout title={`Usuario: ${user.name}`}>
+  <UserDetailView user={JSON.parse(JSON.stringify(user))} client:load />
+</AdminLayout>

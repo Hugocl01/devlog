@@ -1,0 +1,19 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import PostEditor from "@/components/admin/PostEditor";
+import { prisma } from "@/lib/prisma";
+
+const adminRole = await prisma.role.findFirst({ where: { name: "ADMIN" } });
+const users = adminRole
+  ? await prisma.user.findMany({
+      where: { roleId: adminRole.id },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    })
+  : [];
+---
+
+<AdminLayout title="Nuevo post">
+  <PostEditor mode="create" users={users} client:load />
+</AdminLayout>

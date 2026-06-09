@@ -1,0 +1,15 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import ReactionTypesTable from "@/components/admin/ReactionTypesTable";
+import { prisma } from "@/lib/prisma";
+
+const types = await prisma.reactionType.findMany({
+  orderBy: { id: "asc" },
+  include: { _count: { select: { reactions: true } } },
+});
+---
+
+<AdminLayout title="Tipos de reacción">
+  <ReactionTypesTable initialTypes={JSON.parse(JSON.stringify(types))} client:load />
+</AdminLayout>

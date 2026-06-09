@@ -1,0 +1,18 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import AuditLogTable from "@/components/admin/AuditLogTable";
+import { prisma } from "@/lib/prisma";
+
+const entries = await prisma.auditLog.findMany({
+  orderBy: { createdAt: "desc" },
+  take: 500,
+});
+---
+
+<AdminLayout title="Log de auditoría">
+  <p class="text-sm text-muted-foreground mb-4">
+    Últimos {entries.length} registros de actividad del panel.
+  </p>
+  <AuditLogTable entries={JSON.parse(JSON.stringify(entries))} client:load />
+</AdminLayout>

@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import BaseLayout from "@/layouts/main.astro";
 
 const socialLinks = [
@@ -17,36 +18,454 @@ const socialLinks = [
 
 <BaseLayout
   title="Aviso Legal"
-  description="Aviso legal de DevLog: información sobre el titular del sitio, datos de contacto y condiciones de uso conforme a la legislación española."
+  description="Aviso legal de DevLog: información sobre el titular, tratamiento de datos, propiedad intelectual y normativa aplicable conforme a la legislación española."
 >
-  <section class="mx-auto max-w-3xl py-16 px-4 prose dark:prose-invert">
-    <header class="mb-12 text-center">
-      <h1 class="text-5xl sm:text-6xl font-extrabold tracking-tight mb-4">Aviso legal</h1>
+  <section class="max-w-5xl mx-auto py-16 px-4">
+    <header class="text-center mb-16">
+      <h1 class="text-5xl sm:text-6xl font-extrabold tracking-tight mb-4 text-foreground">
+        Aviso Legal
+      </h1>
       <p class="text-lg text-muted-foreground">
-        Información sobre la titularidad y uso de este blog.
+        Información legal sobre la titularidad, tratamiento de datos y condiciones de uso de este
+        sitio.
       </p>
+      <p class="text-sm mt-2 text-muted-foreground">Última actualización: 23 de mayo de 2026</p>
     </header>
 
-    <p>
-      Este blog es propiedad de <strong>Hugo Cayón Laso</strong>. La información publicada tiene
-      fines únicamente informativos y personales. No se ofrece asesoramiento profesional ni se
-      garantiza la exactitud de los contenidos.
-    </p>
+    <div
+      class="max-w-3xl mx-auto flex flex-col gap-8 prose prose-lg dark:prose-invert [&_h2]:font-bold [&_h3]:font-semibold [&_h3]:text-base [&_h3]:mt-4"
+    >
 
-    <p>
-      Todos los textos, imágenes y materiales incluidos en este sitio están protegidos por derechos
-      de autor. Queda prohibida su reproducción, distribución o uso sin autorización expresa del
-      titular.
-    </p>
+      <!-- 1. DATOS DEL TITULAR -->
+      <div>
+        <h2>1. Datos del titular e información general</h2>
+        <p>
+          En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la
+          Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se facilitan los
+          siguientes datos identificativos:
+        </p>
+        <ul>
+          <li><strong>Titular:</strong> Hugo Cayón Laso</li>
+          <li><strong>Carácter:</strong> Persona física, actividad sin carácter comercial</li>
+          <li>
+            <strong>Correo electrónico de contacto:</strong>{" "}
+            <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a>
+          </li>
+          <li><strong>País:</strong> España</li>
+          <li>
+            <strong>Sitio web:</strong> DevLog — blog personal sobre desarrollo web y tecnología
+          </li>
+        </ul>
+        <p>
+          El titular no ejerce actividad económica o profesional a través de este sitio. DevLog es
+          un blog personal de carácter divulgativo y comunitario, sin fines lucrativos.
+        </p>
+      </div>
 
-    <p>
-      El acceso y uso de este blog implica la aceptación de que el autor no se hace responsable de
-      posibles errores, omisiones o daños derivados del uso de la información aquí publicada.
-    </p>
+      <!-- 2. OBJETO Y SERVICIOS -->
+      <div>
+        <h2>2. Objeto y servicios del sitio</h2>
+        <p>
+          DevLog es un blog personal que tiene por objeto la publicación de artículos y
+          actualizaciones sobre desarrollo web, tecnología y proyectos personales. El sitio
+          incorpora las siguientes funcionalidades:
+        </p>
+        <ul>
+          <li>
+            <strong>Contenido editorial:</strong> publicación de artículos (posts) y notas de
+            proyecto (updates), organizados por etiquetas y accesibles mediante RSS.
+          </li>
+          <li>
+            <strong>Cuentas de usuario:</strong> registro e inicio de sesión mediante correo
+            electrónico y contraseña, con verificación de dirección de correo y posibilidad de
+            recuperación de contraseña.
+          </li>
+          <li>
+            <strong>Comentarios:</strong> los usuarios registrados pueden publicar comentarios y
+            respuestas en los artículos.
+          </li>
+          <li>
+            <strong>Reacciones:</strong> los usuarios registrados pueden expresar reacciones
+            (me gusta, me encanta, fuego, aplauso y wow) en los artículos.
+          </li>
+          <li>
+            <strong>Perfil de usuario:</strong> los usuarios registrados pueden gestionar su nombre,
+            foto de perfil y descripción biográfica.
+          </li>
+          <li>
+            <strong>Analíticas de lectura:</strong> conteo de visitas por artículo mediante datos
+            anonimizados.
+          </li>
+          <li>
+            <strong>Panel de administración:</strong> para la gestión interna de contenidos,
+            usuarios, etiquetas y comentarios, accesible únicamente por administradores.
+          </li>
+        </ul>
+      </div>
 
-    <div class="mt-12 text-center not-prose">
-      <p class="mb-8 text-lg text-muted-foreground reveal">
-        Puedes contactarme a través de mis perfiles profesionales:
+      <!-- 3. PROTECCIÓN DE DATOS -->
+      <div>
+        <h2>3. Protección de datos personales</h2>
+        <p>
+          El titular trata datos personales de conformidad con el Reglamento (UE) 2016/679 del
+          Parlamento Europeo y del Consejo (RGPD) y la Ley Orgánica 3/2018, de 5 de diciembre, de
+          Protección de Datos Personales y garantía de los derechos digitales (LOPDGDD). La
+          información detallada sobre qué datos se recogen, con qué finalidad, durante cuánto tiempo
+          y cómo ejercer tus derechos se encuentra en la{" "}
+          <a href="/privacy">Política de Privacidad</a>.
+        </p>
+
+        <h3>3.1 Responsable del tratamiento</h3>
+        <p>
+          <strong>Hugo Cayón Laso</strong> —{" "}
+          <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a>
+        </p>
+
+        <h3>3.2 Datos tratados, finalidades y base legitimadora</h3>
+        <p>
+          Los datos personales recopilados se limitan a los estrictamente necesarios para cada
+          finalidad:
+        </p>
+
+        <div class="overflow-x-auto not-prose my-4">
+          <table
+            class="w-full text-sm border border-border/50 rounded-xl overflow-hidden"
+          >
+            <thead class="bg-secondary/40 text-foreground font-semibold">
+              <tr>
+                <th class="px-4 py-3 text-left">Datos</th>
+                <th class="px-4 py-3 text-left">Finalidad</th>
+                <th class="px-4 py-3 text-left">Base legitimadora</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border/40">
+              <tr class="bg-card/30">
+                <td class="px-4 py-3">Nombre, correo electrónico, contraseña (hash)</td>
+                <td class="px-4 py-3"
+                  >Creación y gestión de la cuenta de usuario; envío de correos de verificación y
+                  recuperación de contraseña</td
+                >
+                <td class="px-4 py-3"
+                  >Ejecución de la relación de servicio (art. 6.1.b RGPD)</td
+                >
+              </tr>
+              <tr class="bg-card/10">
+                <td class="px-4 py-3"
+                  >Token de sesión, dirección IP, navegador (user-agent), fecha y hora</td
+                >
+                <td class="px-4 py-3"
+                  >Autenticación y mantenimiento de sesiones activas; seguridad</td
+                >
+                <td class="px-4 py-3"
+                  >Ejecución de la relación de servicio (art. 6.1.b RGPD); interés legítimo en la
+                  seguridad del servicio (art. 6.1.f RGPD)</td
+                >
+              </tr>
+              <tr class="bg-card/30">
+                <td class="px-4 py-3">Avatar y biografía (opcionales)</td>
+                <td class="px-4 py-3">Personalización del perfil de usuario</td>
+                <td class="px-4 py-3">Consentimiento del usuario (art. 6.1.a RGPD)</td>
+              </tr>
+              <tr class="bg-card/10">
+                <td class="px-4 py-3"
+                  >Hash irreversible de IP, país de acceso, user-agent</td
+                >
+                <td class="px-4 py-3"
+                  >Estadísticas de lectura por artículo (conteo de visitas únicas aproximadas). Los
+                  datos se anonomizan de forma que no permiten identificar individualmente al
+                  visitante</td
+                >
+                <td class="px-4 py-3"
+                  >Interés legítimo del titular (art. 6.1.f RGPD). El uso de un hash irreversible
+                  impide la reidentificación</td
+                >
+              </tr>
+              <tr class="bg-card/30">
+                <td class="px-4 py-3">Contenido de comentarios y reacciones</td>
+                <td class="px-4 py-3"
+                  >Provisión de las funcionalidades de comunidad; moderación de contenido</td
+                >
+                <td class="px-4 py-3">Ejecución de la relación de servicio (art. 6.1.b RGPD)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Las contraseñas se almacenan exclusivamente en formato hash irreversible mediante un
+          algoritmo de hash seguro (bcrypt). Nunca se guardan ni se transmiten en texto plano.
+        </p>
+
+        <h3>3.3 Plazos de conservación</h3>
+        <ul>
+          <li>
+            <strong>Datos de cuenta (nombre, correo, contraseña):</strong> durante la vigencia de
+            la cuenta. Tras la eliminación de la cuenta, los datos identificativos se suprimen de
+            forma inmediata, salvo obligación legal de conservación.
+          </li>
+          <li>
+            <strong>Sesiones:</strong> hasta su fecha de expiración o hasta que el usuario las
+            revoque manualmente.
+          </li>
+          <li>
+            <strong>Registros técnicos de autenticación (IP, user-agent):</strong> se conservan
+            asociados a las sesiones activas. Se eliminan cuando la sesión expira o se revoca.
+          </li>
+          <li>
+            <strong>Analíticas de visitas (hash de IP, país):</strong> de forma indefinida como
+            datos estadísticos; al tratarse de un hash irreversible, no constituyen datos personales
+            en el sentido del RGPD una vez procesados.
+          </li>
+          <li>
+            <strong>Comentarios y reacciones:</strong> mientras la cuenta del usuario esté activa.
+            Tras la eliminación de la cuenta, los comentarios pueden conservarse en formato
+            anonimizado para preservar la coherencia de los hilos de conversación.
+          </li>
+        </ul>
+
+        <h3>3.4 Destinatarios y encargados del tratamiento</h3>
+        <p>
+          Los datos personales no se ceden a terceros con fines comerciales ni de marketing. El
+          acceso a los datos queda limitado a:
+        </p>
+        <ul>
+          <li>
+            <strong>Proveedor de alojamiento web (hosting):</strong> actúa como encargado del
+            tratamiento conforme a sus condiciones contractuales. Por razones técnicas, puede
+            registrar metadatos de red (IP de origen, marcas de tiempo) en sus logs de
+            infraestructura.
+          </li>
+          <li>
+            <strong>Proveedor de servicios de correo electrónico transaccional:</strong> utilizado
+            exclusivamente para el envío de correos de verificación de cuenta y recuperación de
+            contraseña. Actúa como encargado del tratamiento.
+          </li>
+          <li>
+            <strong>Autoridades competentes:</strong> en caso de obligación legal o requerimiento
+            judicial.
+          </li>
+        </ul>
+
+        <h3>3.5 Transferencias internacionales de datos</h3>
+        <p>
+          Los datos se almacenan en servidores ubicados dentro del Espacio Económico Europeo (EEE).
+          En el caso de que alguno de los proveedores indicados esté establecido fuera del EEE,
+          dicha transferencia se realizará únicamente a países con decisión de adecuación de la
+          Comisión Europea, o amparada en garantías adecuadas conforme al artículo 46 del RGPD
+          (cláusulas contractuales tipo).
+        </p>
+
+        <h3>3.6 Derechos de los interesados</h3>
+        <p>
+          Los usuarios tienen derecho a ejercer, en cualquier momento, los siguientes derechos
+          frente al responsable del tratamiento:
+        </p>
+        <ul>
+          <li>
+            <strong>Acceso (art. 15 RGPD):</strong> conocer qué datos personales se tratan y
+            obtener una copia de los mismos.
+          </li>
+          <li>
+            <strong>Rectificación (art. 16 RGPD):</strong> corregir datos inexactos o incompletos.
+            Los propios datos de perfil pueden modificarse directamente desde la sección de perfil
+            de usuario.
+          </li>
+          <li>
+            <strong>Supresión («derecho al olvido», art. 17 RGPD):</strong> solicitar la
+            eliminación de los datos personales cuando, entre otras circunstancias, ya no sean
+            necesarios para los fines que motivaron su recogida.
+          </li>
+          <li>
+            <strong>Limitación del tratamiento (art. 18 RGPD):</strong> solicitar la suspensión
+            del tratamiento en determinados supuestos.
+          </li>
+          <li>
+            <strong>Portabilidad (art. 20 RGPD):</strong> recibir los datos que ha facilitado en
+            un formato estructurado, de uso común y lectura mecánica.
+          </li>
+          <li>
+            <strong>Oposición (art. 21 RGPD):</strong> oponerse al tratamiento basado en interés
+            legítimo.
+          </li>
+        </ul>
+        <p>
+          Para ejercer cualquiera de estos derechos, dirígete al titular mediante correo electrónico
+          a <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a>, indicando el derecho que
+          deseas ejercer y adjuntando un documento que acredite tu identidad. El titular responderá
+          en el plazo máximo de un mes, prorrogable dos meses adicionales en casos de especial
+          complejidad.
+        </p>
+        <p>
+          Si consideras que el tratamiento de tus datos no es conforme a la normativa vigente,
+          tienes derecho a presentar una reclamación ante la{" "}
+          <strong>Agencia Española de Protección de Datos (AEPD)</strong>, autoridad de control
+          competente en España, a través de su sitio web{" "}
+          <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>.
+        </p>
+      </div>
+
+      <!-- 4. COOKIES -->
+      <div>
+        <h2>4. Política de cookies</h2>
+        <p>
+          El sitio web utiliza únicamente cookies técnicas estrictamente necesarias para el
+          funcionamiento del servicio, conforme al artículo 22.2 de la LSSI-CE y las directrices
+          de la AEPD sobre cookies:
+        </p>
+        <div class="overflow-x-auto not-prose my-4">
+          <table class="w-full text-sm border border-border/50 rounded-xl overflow-hidden">
+            <thead class="bg-secondary/40 text-foreground font-semibold">
+              <tr>
+                <th class="px-4 py-3 text-left">Cookie</th>
+                <th class="px-4 py-3 text-left">Finalidad</th>
+                <th class="px-4 py-3 text-left">Duración</th>
+                <th class="px-4 py-3 text-left">Tipo</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border/40">
+              <tr class="bg-card/30">
+                <td class="px-4 py-3 font-mono text-xs">session</td>
+                <td class="px-4 py-3"
+                  >Token de sesión que identifica al usuario autenticado y mantiene su sesión
+                  activa</td
+                >
+                <td class="px-4 py-3">Hasta cierre de sesión o expiración</td>
+                <td class="px-4 py-3">Técnica necesaria — propia</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          No se utilizan cookies de publicidad, analítica de terceros ni de seguimiento
+          comportamental. La preferencia de tema (claro/oscuro) se almacena en el
+          <code>localStorage</code> del navegador, que no es una cookie y no se transmite al
+          servidor.
+        </p>
+        <p>
+          Las cookies estrictamente necesarias no requieren el consentimiento del usuario conforme
+          a la normativa vigente, dado que son imprescindibles para la prestación del servicio
+          solicitado. El usuario puede configurar su navegador para rechazar o eliminar cookies, lo
+          que puede impedir el correcto funcionamiento del inicio de sesión.
+        </p>
+      </div>
+
+      <!-- 5. PROPIEDAD INTELECTUAL -->
+      <div>
+        <h2>5. Propiedad intelectual e industrial</h2>
+        <p>
+          Todos los contenidos del sitio web — incluyendo textos, artículos, imágenes propias,
+          logotipos, código de ejemplo y cualquier otro material publicado — son propiedad de
+          <strong>Hugo Cayón Laso</strong> o se utilizan bajo la correspondiente licencia o
+          autorización, estando protegidos por el Real Decreto Legislativo 1/1996, de 12 de abril,
+          por el que se aprueba el texto refundido de la Ley de Propiedad Intelectual, y por la
+          normativa europea e internacional de aplicación.
+        </p>
+        <ul>
+          <li>
+            Queda expresamente prohibida la reproducción total o parcial, distribución,
+            comunicación pública o transformación de los contenidos sin autorización previa y por
+            escrito del titular, salvo las excepciones legalmente previstas.
+          </li>
+          <li>
+            Se permite la cita de fragmentos de los artículos, siempre que se atribuya
+            correctamente la autoría y se incluya un enlace a la fuente original.
+          </li>
+          <li>
+            El código fuente de la plataforma técnica puede estar disponible bajo una licencia
+            open-source específica indicada en el repositorio de GitHub. Dicha licencia no abarca
+            los contenidos editoriales (artículos, imágenes propias).
+          </li>
+        </ul>
+      </div>
+
+      <!-- 6. RESPONSABILIDAD -->
+      <div>
+        <h2>6. Limitación de responsabilidad</h2>
+        <p>
+          El titular no asume responsabilidad alguna derivada de:
+        </p>
+        <ul>
+          <li>
+            Los errores u omisiones en los contenidos editoriales publicados, que tienen carácter
+            meramente informativo y divulgativo.
+          </li>
+          <li>
+            La falta de disponibilidad, continuidad o funcionamiento sin interrupciones del sitio
+            web por causas ajenas al control del titular (fallos de red, interrupciones del servidor,
+            ataques informáticos, etc.).
+          </li>
+          <li>
+            El contenido publicado por usuarios registrados en los comentarios, cuya
+            responsabilidad recae íntegramente en quien lo publica. El titular se reserva el derecho
+            de eliminar, sin previo aviso, cualquier comentario que infrinja la normativa vigente o
+            estas condiciones.
+          </li>
+          <li>
+            Los contenidos de sitios web externos enlazados desde el blog, sobre los que el titular
+            no ejerce control editorial ni técnico.
+          </li>
+          <li>
+            El uso que terceros realicen de la información publicada en el sitio.
+          </li>
+        </ul>
+      </div>
+
+      <!-- 7. MENORES -->
+      <div>
+        <h2>7. Menores de edad</h2>
+        <p>
+          De conformidad con el artículo 7 de la LOPDGDD, el tratamiento de datos personales de
+          menores de catorce (14) años requiere el consentimiento de los titulares de la patria
+          potestad o tutela. El registro en el sitio web está dirigido exclusivamente a personas
+          que hayan cumplido los 14 años. El titular no recaba deliberadamente datos de menores
+          de esa edad; si tuviera conocimiento de haberlo hecho de forma inadvertida, procederá
+          a suprimir dichos datos sin demora.
+        </p>
+      </div>
+
+      <!-- 8. LEGISLACIÓN -->
+      <div>
+        <h2>8. Legislación aplicable y jurisdicción</h2>
+        <p>
+          El presente Aviso Legal se rige íntegramente por la legislación española. La normativa
+          principal de referencia es la siguiente:
+        </p>
+        <ul>
+          <li>
+            <strong>Reglamento (UE) 2016/679 (RGPD)</strong> — relativo a la protección de las
+            personas físicas en lo que respecta al tratamiento de datos personales y a la libre
+            circulación de estos datos.
+          </li>
+          <li>
+            <strong>Ley Orgánica 3/2018, de 5 de diciembre (LOPDGDD)</strong> — de Protección de
+            Datos Personales y garantía de los derechos digitales.
+          </li>
+          <li>
+            <strong>Ley 34/2002, de 11 de julio (LSSI-CE)</strong> — de Servicios de la Sociedad
+            de la Información y de Comercio Electrónico.
+          </li>
+          <li>
+            <strong>Real Decreto Legislativo 1/1996 (LPI)</strong> — texto refundido de la Ley de
+            Propiedad Intelectual.
+          </li>
+        </ul>
+        <p>
+          Para cualquier controversia derivada del acceso o uso del sitio web, las partes se
+          someten, con renuncia expresa a cualquier otro fuero que pudiera corresponderles, a los
+          juzgados y tribunales competentes conforme a la legislación española.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="mt-16 text-center not-prose">
+      <p class="mb-8 text-lg text-muted-foreground">
+        ¿Tienes alguna consulta sobre privacidad o datos? Escríbeme a{" "}
+        <a
+          href="mailto:hugocayon@gmail.com"
+          class="text-primary hover:underline"
+        >hugocayon@gmail.com</a>{" "}
+        o contáctame a través de mis perfiles:
       </p>
       <div class="inline-flex gap-8 justify-center">
         {

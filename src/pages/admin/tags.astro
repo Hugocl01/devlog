@@ -1,0 +1,24 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import TagsTable from "@/components/admin/TagsTable";
+import { prisma } from "@/lib/prisma";
+
+const tags = await prisma.tag.findMany({
+  orderBy: { name: "asc" },
+  select: {
+    id: true,
+    name: true,
+    slug: true,
+    color: true,
+    _count: { select: { posts: true } },
+  },
+});
+---
+
+<AdminLayout title="Etiquetas">
+  <p class="text-sm text-muted-foreground mb-4">
+    {tags.length} etiqueta{tags.length !== 1 ? "s" : ""} en total
+  </p>
+  <TagsTable initialTags={JSON.parse(JSON.stringify(tags))} client:load />
+</AdminLayout>

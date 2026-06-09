@@ -1,25 +1,72 @@
 // @ts-check
 
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURACIÓN DE ASTRO
+//
+// Documentación oficial: https://docs.astro.build/en/reference/configuration-reference/
+//
+// Modelo de renderizado híbrido:
+//   - Por defecto todas las páginas son estáticas (pre-renderizadas en build).
+//   - Las rutas que añaden `export const prerender = false` se renderizan
+//     en el servidor en cada petición (SSR). Esto incluye:
+//       · Todos los endpoints de API  (/api/*)
+//       · El panel de administración  (/admin/*)
+//       · Las páginas de auth         (/auth/*)
+//       · El blog dinámico            (/blog, /tags/*)
+// ═══════════════════════════════════════════════════════════════
+
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
-
 import react from '@astrojs/react';
+import node from '@astrojs/node';
 
-import pagefind from 'astro-pagefind';
-
-// https://astro.build/config
 export default defineConfig({
-  site: "https://hugocl01-devlog.netlify.app/",
+  // URL canónica del sitio. Se usa para generar enlaces absolutos en el RSS,
+  // el sitemap y las meta tags de Open Graph.
+  // Lee SITE_URL del .env en tiempo de build. En el VPS, asegúrate de que
+  // el .env tenga SITE_URL=https://tudominio.com antes de ejecutar npm run build.
+  site: process.env.SITE_URL ?? "http://localhost:4321",
+
+  // "static" activa el modo híbrido: las páginas son estáticas por defecto
+  // y solo se renderizan en servidor las que declaran `prerender = false`.
+  // Otras opciones: "server" (todo SSR) | "static" (todo estático, sin SSR).
+  output: "static",
+
+  // Adaptador Node.js en modo standalone:
+  // Genera dist/server/entry.mjs, un servidor HTTP independiente que
+  // PM2 arranca con `node ./dist/server/entry.mjs`.
+  // Otros adaptadores disponibles: @astrojs/vercel, @astrojs/netlify, etc.
+  adapter: node({
+    mode: "standalone",
+  }),
+
+  // Prefetch de páginas al pasar el cursor por encima de los enlaces.
+  // Mejora la percepción de velocidad sin coste visible para el usuario.
   prefetch: true,
+
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      // Plugin oficial de Tailwind CSS v4 para Vite.
+      // Tailwind v4 no usa tailwind.config.js; la configuración va en
+      // src/styles/global.css mediante directivas @theme y @layer.
+      tailwindcss(),
+    ],
   },
 
-  integrations: [react(), pagefind()],
+  integrations: [
+    // Soporte de React para los componentes interactivos (islands).
+    // Solo los componentes con directiva client:* se hidratan en el navegador.
+    react(),
+  ],
+
   markdown: {
     shikiConfig: {
+      // Tema de resaltado de sintaxis para los bloques de código en Markdown.
+      // Ver temas disponibles: https://shiki.style/themes
       theme: "github-dark",
+
+      // Ajuste de línea automático en bloques de código largos.
       wrap: true,
-    }
-  }
+    },
+  },
 });

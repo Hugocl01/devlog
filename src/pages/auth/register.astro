@@ -1,0 +1,312 @@
+---
+export const prerender = false;
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { UserPlus, Eye, EyeOff } from "@lucide/astro";
+---
+
+<AuthLayout
+  title="Crear cuenta"
+  description="Regístrate en DevLog para comentar y reaccionar a los artículos."
+>
+  <div class="w-full max-w-md reveal">
+    <!-- Card -->
+    <div class="bg-card border border-border/60 rounded-2xl shadow-sm p-8">
+
+      <!-- Header -->
+      <div class="flex flex-col items-center text-center mb-8">
+        <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 border border-primary/20 mb-4">
+          <UserPlus class="h-6 w-6 text-primary" />
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight">Crea tu cuenta</h1>
+        <p class="mt-1.5 text-sm text-muted-foreground">
+          Únete para participar en la comunidad DevLog
+        </p>
+      </div>
+
+      <!-- Form -->
+      <form class="space-y-5" novalidate>
+
+        <!-- Name -->
+        <div class="space-y-1.5">
+          <label for="name" class="text-sm font-medium">Nombre</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            placeholder="Tu nombre"
+            required
+            class="dark:bg-input/30 border-input h-10 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="space-y-1.5">
+          <label for="email" class="text-sm font-medium">Correo electrónico</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            placeholder="tu@email.com"
+            required
+            class="dark:bg-input/30 border-input h-10 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="space-y-1.5">
+          <label for="password" class="text-sm font-medium">Contraseña</label>
+          <div class="relative">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              placeholder="Mínimo 8 caracteres"
+              required
+              class="dark:bg-input/30 border-input h-10 w-full rounded-md border bg-transparent px-3 py-1 pr-10 text-sm shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+            />
+            <button
+              type="button"
+              id="toggle-password"
+              aria-label="Mostrar u ocultar contraseña"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              <Eye id="icon-show" class="h-4 w-4" />
+              <EyeOff id="icon-hide" class="h-4 w-4 hidden" />
+            </button>
+          </div>
+
+          <!-- Password strength -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex gap-1" id="strength-bars">
+              <div class="h-1 flex-1 rounded-full bg-border transition-colors duration-300" data-bar="1"></div>
+              <div class="h-1 flex-1 rounded-full bg-border transition-colors duration-300" data-bar="2"></div>
+              <div class="h-1 flex-1 rounded-full bg-border transition-colors duration-300" data-bar="3"></div>
+              <div class="h-1 flex-1 rounded-full bg-border transition-colors duration-300" data-bar="4"></div>
+            </div>
+            <p id="strength-label" class="text-xs text-muted-foreground hidden"></p>
+          </div>
+        </div>
+
+        <!-- Confirm password -->
+        <div class="space-y-1.5">
+          <label for="confirm-password" class="text-sm font-medium">Confirmar contraseña</label>
+          <div class="relative">
+            <input
+              id="confirm-password"
+              name="confirm-password"
+              type="password"
+              autocomplete="new-password"
+              placeholder="Repite tu contraseña"
+              required
+              class="dark:bg-input/30 border-input h-10 w-full rounded-md border bg-transparent px-3 py-1 pr-10 text-sm shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+            />
+            <button
+              type="button"
+              id="toggle-confirm"
+              aria-label="Mostrar u ocultar confirmación"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              <Eye id="icon-show-confirm" class="h-4 w-4" />
+              <EyeOff id="icon-hide-confirm" class="h-4 w-4 hidden" />
+            </button>
+          </div>
+          <p id="match-error" class="text-xs text-destructive hidden">Las contraseñas no coinciden</p>
+        </div>
+
+        <!-- Terms -->
+        <div class="flex items-start gap-2.5">
+          <input
+            id="terms"
+            name="terms"
+            type="checkbox"
+            required
+            class="styled-checkbox mt-0.5"
+          />
+          <label for="terms" class="text-sm text-muted-foreground cursor-pointer select-none leading-snug">
+            Acepto los
+            <a href="/terms" class="text-foreground hover:text-primary transition-colors duration-200 underline-offset-4 hover:underline">términos de uso</a>
+            y la
+            <a href="/privacy" class="text-foreground hover:text-primary transition-colors duration-200 underline-offset-4 hover:underline">política de privacidad</a>
+          </label>
+        </div>
+
+        <!-- Age confirmation (LOPDGDD Art. 7 — mínimo 14 años) -->
+        <div class="flex items-start gap-2.5">
+          <input
+            id="age"
+            name="age"
+            type="checkbox"
+            required
+            class="styled-checkbox mt-0.5"
+          />
+          <label for="age" class="text-sm text-muted-foreground cursor-pointer select-none leading-snug">
+            Confirmo que tengo <span class="text-foreground font-medium">14 años o más</span>
+          </label>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="w-full h-11 inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground text-sm font-medium modern-hover modern-scale-sm hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all"
+        >
+          <UserPlus class="h-4 w-4" />
+          Crear cuenta
+        </button>
+      </form>
+
+      <!-- Login link -->
+      <p class="mt-6 text-center text-sm text-muted-foreground">
+        ¿Ya tienes cuenta?{" "}
+        <a href="/auth/login" class="font-medium text-foreground hover:text-primary transition-colors duration-200 underline-offset-4 hover:underline">
+          Inicia sesión
+        </a>
+      </p>
+    </div>
+
+    <!-- Back to blog -->
+    <p class="mt-4 text-center text-sm text-muted-foreground">
+      <a href="/blog" class="hover:text-foreground transition-colors duration-200">
+        ← Volver al blog sin registrarse
+      </a>
+    </p>
+  </div>
+</AuthLayout>
+
+<script>
+  const strengthLevels = [
+    { label: "Muy débil", colors: ["bg-destructive", "bg-border", "bg-border", "bg-border"] },
+    { label: "Débil", colors: ["bg-orange-500", "bg-orange-500", "bg-border", "bg-border"] },
+    { label: "Aceptable", colors: ["bg-yellow-500", "bg-yellow-500", "bg-yellow-500", "bg-border"] },
+    { label: "Fuerte", colors: ["bg-green-500", "bg-green-500", "bg-green-500", "bg-green-500"] },
+  ];
+
+  const getStrength = (pwd: string): number => {
+    if (pwd.length === 0) return -1;
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (pwd.length >= 12) score++;
+    if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd) && /[^A-Za-z0-9]/.test(pwd)) score++;
+    return Math.min(score, 3);
+  };
+
+  document.addEventListener("astro:page-load", () => {
+    // Show/hide password
+    const makeToggle = (btnId: string, inputId: string, showId: string, hideId: string) => {
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(inputId) as HTMLInputElement;
+      const show = document.getElementById(showId);
+      const hide = document.getElementById(hideId);
+      btn?.addEventListener("click", () => {
+        const isPass = input.type === "password";
+        input.type = isPass ? "text" : "password";
+        show?.classList.toggle("hidden", isPass);
+        hide?.classList.toggle("hidden", !isPass);
+      });
+    };
+
+    makeToggle("toggle-password", "password", "icon-show", "icon-hide");
+    makeToggle("toggle-confirm", "confirm-password", "icon-show-confirm", "icon-hide-confirm");
+
+    // Password strength
+    const passwordInput = document.getElementById("password") as HTMLInputElement;
+    const bars = document.querySelectorAll("[data-bar]");
+    const strengthLabel = document.getElementById("strength-label");
+
+    passwordInput?.addEventListener("input", () => {
+      const strength = getStrength(passwordInput.value);
+      if (strength === -1) {
+        bars.forEach(b => b.classList.remove("bg-destructive", "bg-orange-500", "bg-yellow-500", "bg-green-500"));
+        bars.forEach(b => b.classList.add("bg-border"));
+        if (strengthLabel) strengthLabel.classList.add("hidden");
+        return;
+      }
+      const level = strengthLevels[strength];
+      bars.forEach((b, i) => {
+        b.className = `h-1 flex-1 rounded-full transition-colors duration-300 ${level.colors[i]}`;
+      });
+      if (strengthLabel) {
+        strengthLabel.textContent = level.label;
+        strengthLabel.classList.remove("hidden");
+      }
+    });
+
+    // Confirm password match
+    const confirmInput = document.getElementById("confirm-password") as HTMLInputElement;
+    const matchError = document.getElementById("match-error");
+
+    confirmInput?.addEventListener("input", () => {
+      const mismatch = confirmInput.value.length > 0 && confirmInput.value !== passwordInput.value;
+      matchError?.classList.toggle("hidden", !mismatch);
+    });
+
+    // Form submission
+    const form = document.querySelector("form") as HTMLFormElement;
+    if (!form) return;
+
+    const submitBtn = form.querySelector("button[type=submit]") as HTMLButtonElement;
+    const errorBox = document.createElement("p");
+    errorBox.className = "text-sm text-destructive text-center hidden";
+    form.prepend(errorBox);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = (form.querySelector("#name") as HTMLInputElement).value;
+      const email = (form.querySelector("#email") as HTMLInputElement).value;
+      const password = passwordInput.value;
+      const confirm = confirmInput.value;
+      const terms = (form.querySelector("#terms") as HTMLInputElement).checked;
+      const age = (form.querySelector("#age") as HTMLInputElement).checked;
+
+      if (password !== confirm) {
+        errorBox.textContent = "Las contraseñas no coinciden";
+        errorBox.classList.remove("hidden");
+        return;
+      }
+
+      if (!terms) {
+        errorBox.textContent = "Debes aceptar los términos de uso";
+        errorBox.classList.remove("hidden");
+        return;
+      }
+
+      if (!age) {
+        errorBox.textContent = "Debes confirmar que tienes 14 años o más";
+        errorBox.classList.remove("hidden");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Creando cuenta...";
+      errorBox.classList.add("hidden");
+
+      try {
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorBox.textContent = data.error ?? "Error al crear la cuenta";
+          errorBox.classList.remove("hidden");
+          return;
+        }
+
+        window.location.href = `/auth/verify-email?email=${encodeURIComponent(email)}`;
+      } catch {
+        errorBox.textContent = "Error de conexión. Inténtalo de nuevo.";
+        errorBox.classList.remove("hidden");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Crear cuenta";
+      }
+    });
+  });
+</script>

@@ -1,11 +1,29 @@
 {
+  // Hereda la configuración estricta de Astro, que incluye:
+  //   - strict: true (noImplicitAny, strictNullChecks, etc.)
+  //   - moduleResolution: "bundler" (resolución de módulos moderna)
+  //   - target: "ESNext"
+  // Documentación: https://docs.astro.build/en/guides/typescript/
   "extends": "astro/tsconfigs/strict",
+
+  // Ficheros que TypeScript debe procesar.
+  // .astro/types.d.ts contiene los tipos generados por Astro (rutas, colecciones, etc.)
   "include": [".astro/types.d.ts", "**/*"],
+
+  // Excluye la carpeta de build — no necesita verificación de tipos.
   "exclude": ["dist"],
+
   "compilerOptions": {
+    // Transform JSX al formato de React 17+ (no necesita `import React`).
     "jsx": "react-jsx",
+
+    // Fuente del runtime JSX. Con "react" se importa automáticamente
+    // `jsx` y `jsxs` desde "react/jsx-runtime".
     "jsxImportSource": "react",
+
     "paths": {
+      // Alias de importación: `@/lib/auth` → `src/lib/auth`.
+      // Evita rutas relativas largas como `../../lib/auth`.
       "@/*": ["./src/*"]
     }
   }

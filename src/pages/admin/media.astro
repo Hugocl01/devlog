@@ -1,0 +1,24 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import MediaLibrary from "@/components/admin/MediaLibrary";
+import { prisma } from "@/lib/prisma";
+
+const media = await prisma.media.findMany({
+  orderBy: { createdAt: "desc" },
+  select: {
+    id: true,
+    filename: true,
+    originalName: true,
+    mimeType: true,
+    size: true,
+    url: true,
+    createdAt: true,
+    uploadedBy: { select: { name: true } },
+  },
+});
+---
+
+<AdminLayout title="Biblioteca de medios">
+  <MediaLibrary initialMedia={JSON.parse(JSON.stringify(media))} client:load />
+</AdminLayout>

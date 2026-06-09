@@ -5,7 +5,7 @@ interface Props {
   description: string;
   date: Date;
   type: "feature" | "bugfix" | "improvement" | "general";
-  author: string;
+  author?: string;
   readingTime?: number;
   class?: string;
 }
@@ -71,7 +71,7 @@ const publishedDate = isoDate(date);
     <time datetime={publishedDate} class="mb-4 block text-sm text-muted-foreground">
       {formattedDate}
       {readingTime && ` • ${readingTime} min de lectura`}
-      <span class="text-muted-foreground/80"> • Por {author}</span>
+      {author && <span class="text-muted-foreground/80"> • Por {author}</span>}
     </time>
 
     <p class="mb-6 text-pretty text-base text-muted-foreground line-clamp-4">
