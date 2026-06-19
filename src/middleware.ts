@@ -33,14 +33,14 @@ export const onRequest = defineMiddleware(
           } else if (session?.user.banned) {
             // Expulsar sesión de usuario baneado
             await prisma.session.deleteMany({ where: { token } }).catch(() => {});
-            cookies.delete("devlog_session", { path: "/" });
+            cookies.delete("devlog_session", { path: "/", secure: process.env.NODE_ENV === "production", sameSite: "lax" });
           } else {
             // Sesión expirada o no encontrada en BD
             await prisma.session.deleteMany({ where: { token } }).catch(() => {});
-            cookies.delete("devlog_session", { path: "/" });
+            cookies.delete("devlog_session", { path: "/", secure: process.env.NODE_ENV === "production", sameSite: "lax" });
           }
         } catch {
-          cookies.delete("devlog_session", { path: "/" });
+          cookies.delete("devlog_session", { path: "/", secure: process.env.NODE_ENV === "production", sameSite: "lax" });
         }
       } else {
         // JWT inválido o expirado
