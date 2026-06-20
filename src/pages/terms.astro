@@ -1,6 +1,8 @@
 ---
 export const prerender = false;
 import BaseLayout from "@/layouts/main.astro";
+
+const { contact_email } = Astro.locals.settings;
 ---
 
 <BaseLayout
@@ -15,7 +17,7 @@ import BaseLayout from "@/layouts/main.astro";
       <p class="text-lg text-muted-foreground">
         Condiciones de uso del sitio web y de los servicios de comunidad ofrecidos en DevLog.
       </p>
-      <p class="text-sm mt-2 text-muted-foreground">Última actualización: 23 de mayo de 2026</p>
+      <p class="text-sm mt-2 text-muted-foreground">Última actualización: 19 de junio de 2026</p>
     </header>
 
     <div
@@ -83,11 +85,21 @@ import BaseLayout from "@/layouts/main.astro";
       <div>
         <h2>4. Registro y cuenta de usuario</h2>
         <p>
-          Para acceder a las funcionalidades de comunidad es necesario crear una cuenta
-          proporcionando un nombre, una dirección de correo electrónico válida y una contraseña.
-          El proceso incluye la verificación de la dirección de correo mediante un enlace enviado
-          al correo proporcionado.
+          Para acceder a las funcionalidades de comunidad es necesario crear una cuenta. Puedes
+          hacerlo de dos formas:
         </p>
+        <ul>
+          <li>
+            <strong>Correo electrónico y contraseña:</strong> proporcionas un nombre, una dirección
+            de correo electrónico válida y una contraseña. El proceso incluye la verificación del
+            correo mediante un enlace enviado a la dirección facilitada.
+          </li>
+          <li>
+            <strong>GitHub OAuth:</strong> usas tu cuenta de GitHub para autenticarte de forma
+            inmediata, sin necesidad de establecer una contraseña. El correo electrónico se obtiene
+            de tu cuenta de GitHub y se considera verificado.
+          </li>
+        </ul>
         <h3>Obligaciones del usuario</h3>
         <ul>
           <li>
@@ -100,8 +112,7 @@ import BaseLayout from "@/layouts/main.astro";
           </li>
           <li>
             Notificar al Titular de forma inmediata si sospechas un acceso no autorizado a tu
-            cuenta, a través del correo{" "}
-            <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a>.
+            cuenta, a través del correo{contact_email && <>{" "}<a href={`mailto:${contact_email}`}>{contact_email}</a></>}.
           </li>
           <li>
             No crear cuentas con fines fraudulentos, automatizados o para suplantar la identidad
@@ -111,17 +122,24 @@ import BaseLayout from "@/layouts/main.astro";
         <h3>Gestión de la cuenta</h3>
         <ul>
           <li>
-            Puedes actualizar tus datos de perfil (nombre, foto de perfil y biografía) desde la
-            sección de perfil de usuario.
+            Puedes actualizar tus datos de perfil (nombre, foto de perfil y biografía), cambiar tu
+            dirección de correo electrónico y gestionar tu contraseña directamente desde la sección
+            de perfil de usuario. Los usuarios que iniciaron sesión con GitHub también pueden
+            añadir una contraseña a su cuenta desde el perfil.
           </li>
           <li>
             Puedes consultar y revocar tus sesiones activas desde tu perfil de usuario.
           </li>
           <li>
-            Puedes solicitar la eliminación completa de tu cuenta contactando al Titular. Esto
-            conllevará la supresión de tus datos personales identificativos. Los comentarios
-            publicados podrán conservarse en formato anonimizado para preservar la coherencia de
-            los hilos de conversación.
+            Puedes descargar una copia de todos tus datos personales (perfil, comentarios,
+            reacciones y sesiones) en formato JSON desde tu perfil, conforme al derecho de
+            portabilidad del artículo 20 del RGPD.
+          </li>
+          <li>
+            Puedes eliminar tu cuenta directamente desde la sección de perfil de usuario, sin
+            necesidad de contactar al Titular. Esto conllevará la supresión de tus datos personales
+            identificativos. Los comentarios publicados podrán conservarse en formato anonimizado
+            para preservar la coherencia de los hilos de conversación.
           </li>
         </ul>
         <h3>Suspensión y cancelación por el Titular</h3>
@@ -349,10 +367,7 @@ import BaseLayout from "@/layouts/main.astro";
       <div class="rounded-2xl border border-border/50 bg-secondary/20 px-6 py-5 text-sm text-muted-foreground">
         <p>
           <strong class="text-foreground">¿Tienes dudas sobre estos Términos?</strong>{" "}
-          Puedes contactar con el Titular en{" "}
-          <a href="mailto:hugocayon@gmail.com" class="text-primary hover:underline"
-            >hugocayon@gmail.com</a
-          >. Para cuestiones relativas a la privacidad y protección de datos, consulta la{" "}
+          {contact_email && <>Puedes contactar con el Titular en{" "}<a href={`mailto:${contact_email}`} class="text-primary hover:underline">{contact_email}</a>. </>}Para cuestiones relativas a la privacidad y protección de datos, consulta la{" "}
           <a href="/privacy" class="text-primary hover:underline">Política de Privacidad</a>.
         </p>
       </div>

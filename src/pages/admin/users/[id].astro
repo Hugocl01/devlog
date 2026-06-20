@@ -27,6 +27,7 @@ const user = await prisma.user.findUnique({
         content: true,
         createdAt: true,
         parentId: true,
+        banned: true,
         post: { select: { slug: true, title: true } },
         parent: {
           select: {

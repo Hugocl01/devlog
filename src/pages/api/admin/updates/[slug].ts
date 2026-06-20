@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
 import { calculateReadingTime } from "@/utils/readingTime";
+import { logAudit } from "@/lib/audit";
 
 export const prerender = false;
 
@@ -42,6 +43,8 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
       select: { slug: true, draft: true, publishedAt: true },
     });
 
+    await logAudit(locals, body.draft ? "UNPUBLISH" : "PUBLISH", "update", slug);
+
     return json({ ok: true, update: updated });
   } catch (err) {
     console.error("[api/admin/updates PATCH]", err);
@@ -59,6 +62,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     if (!existing) return json({ error: "Update no encontrado" }, 404);
 
     await prisma.update.delete({ where: { slug } });
+    await logAudit(locals, "DELETE", "update", slug);
     return json({ ok: true });
   } catch (err) {
     console.error("[api/admin/updates DELETE]", err);
@@ -114,6 +118,8 @@ export const PUT: APIRoute = async ({ params, locals, request }) => {
       },
       select: { slug: true },
     });
+
+    await logAudit(locals, "UPDATE", "update", slug, { title });
 
     return json({ ok: true, slug: updated.slug });
   } catch (err) {

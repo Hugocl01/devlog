@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Users, UserX, FileText, Zap, Tag,
   MessageSquare, MessageSquareOff, Smile, Image,
-  CalendarDays, ClipboardList, Settings, PanelLeftClose, PanelLeftOpen,
+  CalendarDays, ClipboardList, Settings, Download, PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +31,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   CalendarDays,
   ClipboardList,
   Settings,
+  Download,
 };
 
 const STORAGE_KEY = "admin-sidebar-collapsed";

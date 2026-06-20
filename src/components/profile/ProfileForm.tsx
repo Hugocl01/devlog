@@ -13,6 +13,7 @@ interface InitialUser {
   bio: string | null;
   roleId: number;
   emailChangePending: string | null;
+  hasPassword: boolean;
 }
 
 interface SessionItem {
@@ -161,7 +162,7 @@ export default function ProfileForm({ user: initial }: Props) {
     const p = fetch("/api/profile/email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ newEmail, password: emailPwd }),
+      body: JSON.stringify({ newEmail, password: user.hasPassword ? emailPwd : undefined }),
     }).then(async (res) => {
       const d = await res.json();
       if (!res.ok) throw new Error(d.error ?? "Error al solicitar el cambio");
@@ -214,26 +215,28 @@ export default function ProfileForm({ user: initial }: Props) {
       toast.error("Las contraseñas no coinciden");
       return;
     }
+    const isSettingInitial = !user.hasPassword;
     setPwdSaving(true);
     const p = fetch("/api/profile/password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ currentPassword: currentPwd, newPassword: newPwd }),
+      body: JSON.stringify({ currentPassword: currentPwd || undefined, newPassword: newPwd }),
     }).then(async (res) => {
       const d = await res.json();
-      if (!res.ok) throw new Error(d.error ?? "Error al cambiar contraseña");
+      if (!res.ok) throw new Error(d.error ?? "Error al actualizar contraseña");
       return d;
     });
 
     toast.promise(p, {
-      loading: "Actualizando contraseña...",
-      success: "Contraseña actualizada correctamente",
+      loading: isSettingInitial ? "Estableciendo contraseña..." : "Actualizando contraseña...",
+      success: isSettingInitial ? "Contraseña establecida correctamente" : "Contraseña actualizada correctamente",
       error: (err) => err.message,
     });
 
     try {
       await p;
       setCurrentPwd(""); setNewPwd(""); setConfirmPwd("");
+      if (isSettingInitial) setUser((prev) => ({ ...prev, hasPassword: true }));
     } catch {
       // shown by toast
     } finally {
@@ -488,11 +491,13 @@ export default function ProfileForm({ user: initial }: Props) {
             <input id="new-email" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)}
               required disabled={emailSaving} placeholder="nuevo@email.com" className={inputClass(emailSaving)} />
           </div>
-          <div className="space-y-1.5">
-            <label htmlFor="email-pwd" className="text-sm font-medium">Contraseña actual</label>
-            <input id="email-pwd" type="password" value={emailPwd} onChange={(e) => setEmailPwd(e.target.value)}
-              required disabled={emailSaving} placeholder="••••••••" className={inputClass(emailSaving)} />
-          </div>
+          {user.hasPassword && (
+            <div className="space-y-1.5">
+              <label htmlFor="email-pwd" className="text-sm font-medium">Contraseña actual</label>
+              <input id="email-pwd" type="password" value={emailPwd} onChange={(e) => setEmailPwd(e.target.value)}
+                required disabled={emailSaving} placeholder="••••••••" className={inputClass(emailSaving)} />
+            </div>
+          )}
           <div className="flex justify-end pt-1">
             <button type="submit" disabled={emailSaving}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
@@ -506,15 +511,24 @@ export default function ProfileForm({ user: initial }: Props) {
       <div className="bg-card border border-border/60 rounded-2xl shadow-sm p-6">
         <div className="flex items-center gap-2 mb-6">
           <KeyRound className="h-5 w-5 text-primary/70" />
-          <h2 className="text-base font-semibold">Cambiar contraseña</h2>
+          <h2 className="text-base font-semibold">
+            {user.hasPassword ? "Cambiar contraseña" : "Establecer contraseña"}
+          </h2>
         </div>
+        {!user.hasPassword && (
+          <p className="text-sm text-muted-foreground mb-4">
+            Tu cuenta está vinculada a GitHub. Puedes añadir una contraseña para iniciar sesión también con tu correo electrónico.
+          </p>
+        )}
         <form onSubmit={savePassword} className="space-y-4">
-          <div className="space-y-1.5">
-            <label htmlFor="current-pwd" className="text-sm font-medium">Contraseña actual</label>
-            <input id="current-pwd" type={showPwd ? "text" : "password"} value={currentPwd}
-              onChange={(e) => setCurrentPwd(e.target.value)} required disabled={pwdSaving}
-              placeholder="••••••••" className={inputClass(pwdSaving)} />
-          </div>
+          {user.hasPassword && (
+            <div className="space-y-1.5">
+              <label htmlFor="current-pwd" className="text-sm font-medium">Contraseña actual</label>
+              <input id="current-pwd" type={showPwd ? "text" : "password"} value={currentPwd}
+                onChange={(e) => setCurrentPwd(e.target.value)} required disabled={pwdSaving}
+                placeholder="••••••••" className={inputClass(pwdSaving)} />
+            </div>
+          )}
           <div className="space-y-1.5">
             <label htmlFor="new-pwd" className="text-sm font-medium">Nueva contraseña</label>
             <input id="new-pwd" type={showPwd ? "text" : "password"} value={newPwd}
@@ -547,7 +561,9 @@ export default function ProfileForm({ user: initial }: Props) {
           <div className="flex justify-end pt-1">
             <button type="submit" disabled={pwdSaving}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-              {pwdSaving ? "Actualizando..." : "Cambiar contraseña"}
+              {pwdSaving
+                ? (user.hasPassword ? "Actualizando..." : "Estableciendo...")
+                : (user.hasPassword ? "Cambiar contraseña" : "Establecer contraseña")}
             </button>
           </div>
         </form>
@@ -667,21 +683,27 @@ export default function ProfileForm({ user: initial }: Props) {
             </div>
 
             <form onSubmit={deleteAccount} className="space-y-4">
-              <div className="space-y-1.5">
-                <label htmlFor="delete-pwd" className="text-sm font-medium">
-                  Confirma tu contraseña
-                </label>
-                <input
-                  id="delete-pwd"
-                  type="password"
-                  value={deleteConfirmPwd}
-                  onChange={(e) => setDeleteConfirmPwd(e.target.value)}
-                  required
-                  disabled={deleting}
-                  placeholder="••••••••"
-                  className={inputClass(deleting)}
-                />
-              </div>
+              {user.hasPassword ? (
+                <div className="space-y-1.5">
+                  <label htmlFor="delete-pwd" className="text-sm font-medium">
+                    Confirma tu contraseña
+                  </label>
+                  <input
+                    id="delete-pwd"
+                    type="password"
+                    value={deleteConfirmPwd}
+                    onChange={(e) => setDeleteConfirmPwd(e.target.value)}
+                    required
+                    disabled={deleting}
+                    placeholder="••••••••"
+                    className={inputClass(deleting)}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground rounded-lg border border-border/60 bg-secondary/20 px-4 py-3">
+                  Tu cuenta está vinculada a GitHub. No necesitas contraseña para confirmar.
+                </p>
+              )}
               <div className="space-y-1.5">
                 <label htmlFor="delete-confirm" className="text-sm font-medium">
                   Escribe{" "}
@@ -703,7 +725,7 @@ export default function ProfileForm({ user: initial }: Props) {
               </div>
               <button
                 type="submit"
-                disabled={deleting || deleteConfirmText !== "eliminar mi cuenta" || !deleteConfirmPwd}
+                disabled={deleting || deleteConfirmText !== "eliminar mi cuenta" || (user.hasPassword && !deleteConfirmPwd)}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-destructive px-5 py-2.5 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Trash2 className="h-4 w-4" />

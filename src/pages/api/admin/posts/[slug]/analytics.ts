@@ -18,13 +18,19 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
   const slug = params.slug!;
 
+  // Calculate date range first so it can be used in the query
+  const since = new Date();
+  since.setDate(since.getDate() - 29);
+  since.setHours(0, 0, 0, 0);
+
   const post = await prisma.post.findUnique({
     where: { slug },
     select: {
       id: true,
       title: true,
       views: {
-        select: { viewedAt: true, country: true },
+        where: { viewedAt: { gte: since } },
+        select: { viewedAt: true },
         orderBy: { viewedAt: "asc" },
       },
       _count: { select: { comments: true, reactions: true, views: true } },
@@ -32,11 +38,6 @@ export const GET: APIRoute = async ({ params, locals }) => {
   });
 
   if (!post) return json({ error: "Post no encontrado" }, 404);
-
-  // Views grouped by day (last 30 days)
-  const since = new Date();
-  since.setDate(since.getDate() - 29);
-  since.setHours(0, 0, 0, 0);
 
   const dailyMap: Record<string, number> = {};
   for (let i = 0; i < 30; i++) {
@@ -52,23 +53,11 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
   const dailyViews = Object.entries(dailyMap).map(([date, views]) => ({ date, views }));
 
-  // Country breakdown
-  const countryMap: Record<string, number> = {};
-  for (const v of post.views) {
-    const c = v.country ?? "Desconocido";
-    countryMap[c] = (countryMap[c] ?? 0) + 1;
-  }
-  const countryBreakdown = Object.entries(countryMap)
-    .map(([country, views]) => ({ country, views }))
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 10);
-
   return json({
     title: post.title,
     totalViews: post._count.views,
     comments: post._count.comments,
     reactions: post._count.reactions,
     dailyViews,
-    countryBreakdown,
   });
 };

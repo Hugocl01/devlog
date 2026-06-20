@@ -215,10 +215,12 @@ export default function UsersTable({ users: initial, roles, currentUserId }: Pro
     setSelected(new Set());
     setBulkDeleteOpen(false);
     setBulkDeleting(false);
+    const succeeded = ids.length - fail;
     fail > 0
-      ? toast.warning(`${fail} usuario${fail !== 1 ? "s" : ""} no pudo${fail !== 1 ? "ron" : ""} eliminarse`, {
-          description: `${ids.length - fail} eliminado${ids.length - fail !== 1 ? "s" : ""} correctamente.`,
-        })
+      ? toast.warning(
+          `${succeeded} usuario${succeeded !== 1 ? "s" : ""} eliminado${succeeded !== 1 ? "s" : ""}`,
+          { description: `${fail} no pudo${fail !== 1 ? "ron" : ""} eliminarse.` }
+        )
       : toast.success(`${ids.length} usuario${ids.length !== 1 ? "s" : ""} eliminado${ids.length !== 1 ? "s" : ""}`, {
           duration: 3000,
         });

@@ -58,7 +58,7 @@ Blog personal de desarrollo web con panel de administración completo, sistema d
 
 ### Requisitos previos
 
-- Node.js 20+
+- Node.js 22+ (recomendado con `nvm`)
 - PostgreSQL 15+
 
 ### Pasos
@@ -73,33 +73,48 @@ npm install
 
 # 3. Configura las variables de entorno
 cp .env.example .env
-# Edita .env con tus credenciales locales
+# Edita .env — mínimo: DATABASE_URL, JWT_SECRET y NODE_ENV="development"
 
-# 4. Inicializa la base de datos
+# 4. Inicializa la base de datos y carga datos de prueba
 npx prisma migrate dev
-npx prisma db seed
+npm run db:seed
 
 # 5. Arranca el servidor de desarrollo
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:4321`.  
-El panel de administración en `http://localhost:4321/admin` (requiere usuario con rol ADMIN).
+La aplicación estará disponible en `http://localhost:4321`.
+
+**Credenciales tras el seed:**
+
+| Usuario | Email | Contraseña | Rol |
+|---------|-------|-----------|-----|
+| Hugo Cayón Laso | hugocayon@gmail.com | `DevLog2025!` | Admin |
+| María García | maria.garcia@email.com | `DevLog2025!` | Usuario |
+| (resto de usuarios de prueba) | — | `DevLog2025!` | Usuario |
+
+> El panel de administración está en `/admin`. En desarrollo, los emails (verificación, recuperación de contraseña) no se envían — el enlace aparece en la consola del servidor.
+>
+> Consulta [DEV.md](DEV.md) para la guía completa de desarrollo local.
 
 ---
 
 ## Scripts disponibles
 
 ```bash
-npm run dev          # Servidor de desarrollo
-npm run build        # Construye para producción
-npm run start        # Inicia el servidor de producción (tras build)
-npm run preview      # Previsualiza el build localmente
+npm run dev              # Servidor de desarrollo con hot reload
+npm run build            # Construye para producción
+npm run start            # Inicia el servidor de producción (requiere build previo)
+npm run preview          # Previsualiza el build localmente
 
-npm run db:migrate   # Aplica migraciones pendientes (producción)
-npm run db:studio    # Abre Prisma Studio (explorador visual de BD)
-npm run db:seed      # Carga datos iniciales
-npm run db:reset     # Resetea la BD y re-aplica migraciones (¡destruye datos!)
+npm run db:migrate:dev   # Crea y aplica una migración en desarrollo
+npm run db:migrate       # Aplica migraciones pendientes en producción (sin crear)
+npm run db:generate      # Regenera el cliente Prisma tras cambios en el schema
+npm run db:seed          # Seed de desarrollo (usuarios de prueba, comentarios, vistas)
+npm run db:seed:prod     # Seed de producción (solo datos esenciales + usuario admin)
+npm run db:studio        # Abre Prisma Studio — explorador visual de la BD
+npm run db:reset         # ⚠️  Resetea la BD y re-aplica migraciones (destruye datos)
+npm run sync             # Sincroniza contenido desde archivos Markdown a la BD
 ```
 
 ---
@@ -153,6 +168,8 @@ Consulta la [**Guía de instalación**](INSTALL.md) para el proceso completo pas
 - Configuración de HTTPS con Certbot (Let's Encrypt)
 - Resolución de problemas frecuentes
 
+Para subir cambios a un servidor ya instalado consulta la [**Guía de despliegue**](DEPLOY.md).
+
 ---
 
 ## Estructura del proyecto
@@ -164,7 +181,8 @@ devlog/
 ├── prisma/
 │   ├── schema.prisma           # Esquema de la base de datos
 │   ├── migrations/             # Historial de migraciones SQL
-│   └── seed.ts                 # Datos iniciales
+│   ├── seed.ts                 # Seed de desarrollo (datos de prueba)
+│   └── seed-prod.ts            # Seed de producción (datos esenciales)
 ├── public/
 │   └── uploads/                # Archivos subidos (ignorados por git)
 ├── scripts/
@@ -186,7 +204,9 @@ devlog/
 │   └── styles/
 ├── .env.example                # Plantilla de variables de entorno
 ├── ecosystem.config.example.cjs # Plantilla de configuración PM2
+├── DEV.md                      # Guía de desarrollo local
 ├── INSTALL.md                  # Guía de instalación en servidor
+├── DEPLOY.md                   # Guía de despliegue y actualizaciones
 └── prisma.config.ts            # Configuración de Prisma CLI
 ```
 

@@ -210,7 +210,6 @@ model PostView {
   id        Int      @id @default(autoincrement())
   ipHash    String? // IP hasheada — nunca se guarda la IP real
   userAgent String?
-  country   String?
   viewedAt  DateTime @default(now())
 
   postId Int

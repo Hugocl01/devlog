@@ -1,0 +1,183 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import { Download } from "@lucide/astro";
+import { prisma } from "@/lib/prisma";
+import ExportDateFilter from "@/components/admin/ExportDateFilter";
+
+const [
+  postsCount, updatesCount, usersCount, commentsCount,
+  tagsCount, reactionsCount, mediaCount, settingsCount, auditCount,
+] = await Promise.all([
+  prisma.post.count(),
+  prisma.update.count(),
+  prisma.user.count(),
+  prisma.comment.count(),
+  prisma.tag.count(),
+  prisma.reaction.count(),
+  prisma.media.count(),
+  prisma.siteSetting.count(),
+  prisma.auditLog.count(),
+]);
+
+const entities = [
+  { id: "posts",      label: "Posts",       count: postsCount,     md: true,  description: "Contenido, metadatos, autor y estadísticas." },
+  { id: "updates",    label: "Updates",     count: updatesCount,   md: true,  description: "Registro de cambios con tipo y estadísticas." },
+  { id: "users",      label: "Usuarios",    count: usersCount,     md: false, description: "Cuenta, rol y actividad. Sin contraseñas ni tokens." },
+  { id: "comments",   label: "Comentarios", count: commentsCount,  md: false, description: "Todos los comentarios, incluidos borrados y baneados." },
+  { id: "tags",       label: "Etiquetas",   count: tagsCount,      md: false, description: "Etiquetas con slug, color y número de posts." },
+  { id: "reactions",  label: "Reacciones",  count: reactionsCount, md: false, description: "Reacciones por post, usuario y tipo." },
+  { id: "media",      label: "Medios",      count: mediaCount,     md: false, description: "Metadatos de archivos: nombre, tipo, tamaño y URL." },
+  { id: "settings",   label: "Ajustes",     count: settingsCount,  md: false, description: "Configuración del sitio (clave, valor, descripción)." },
+  { id: "audit_logs", label: "Auditoría",   count: auditCount,     md: false, description: "Registro de acciones realizadas en el panel." },
+] as const;
+
+const totalRecords = postsCount + updatesCount + usersCount + commentsCount +
+  tagsCount + reactionsCount + mediaCount + settingsCount + auditCount;
+---
+
+<AdminLayout title="Exportar datos">
+
+  <!-- Filtro de fechas -->
+  <div class="mb-8 rounded-xl border border-border/60 bg-card p-5">
+    <h2 class="text-sm font-semibold mb-1">Filtro por fecha</h2>
+    <p class="text-xs text-muted-foreground mb-4">
+      Acota el rango de datos a exportar. Afecta a todas las entidades con marca de tiempo (posts, updates, usuarios, comentarios, reacciones, medios y auditoría). Deja vacío para exportar todo.
+    </p>
+    <ExportDateFilter client:load />
+  </div>
+
+  <!-- Banner filtro activo -->
+  <div
+    id="filter-banner"
+    class="hidden mb-6 items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-xs text-amber-700 dark:text-amber-400"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span id="filter-banner-text"></span>
+  </div>
+
+  <!-- Por entidad -->
+  <section class="mb-10">
+    <h2 class="text-sm font-semibold mb-1">Por entidad</h2>
+    <p class="text-xs text-muted-foreground mb-5">
+      Descarga cada tabla por separado. CSV para hojas de cálculo, JSON para procesamiento, MD (ZIP) para portabilidad del contenido.
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {entities.map(({ id, label, count, md, description }) => (
+        <div class="rounded-xl border border-border/60 bg-card p-4 flex flex-col gap-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <p class="text-sm font-medium">{label}</p>
+              <p class="text-xs text-muted-foreground mt-0.5">{description}</p>
+            </div>
+            <span class="shrink-0 rounded-full bg-secondary/40 px-2 py-0.5 text-xs font-mono font-medium text-muted-foreground">
+              {count.toLocaleString("es")}
+            </span>
+          </div>
+          <div class="flex items-center flex-wrap gap-1.5 mt-auto">
+            <a
+              data-export
+              data-entity={id}
+              data-format="csv"
+              href={`/api/admin/export?entity=${id}&format=csv`}
+              class="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/30 px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+            >
+              <Download class="h-3 w-3" /> CSV
+            </a>
+            <a
+              data-export
+              data-entity={id}
+              data-format="json"
+              href={`/api/admin/export?entity=${id}&format=json`}
+              class="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/30 px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+            >
+              <Download class="h-3 w-3" /> JSON
+            </a>
+            {md && (
+              <a
+                data-export
+                data-entity={id}
+                data-format="md"
+                href={`/api/admin/export?entity=${id}&format=md`}
+                class="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/30 px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+              >
+                <Download class="h-3 w-3" /> MD
+              </a>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Backup completo -->
+  <section>
+    <h2 class="text-sm font-semibold mb-1">Backup completo</h2>
+    <p class="text-xs text-muted-foreground mb-5">
+      Todas las entidades en un único fichero JSON estructurado por tabla. Útil para migrar o hacer una copia de seguridad completa del contenido.
+    </p>
+    <div class="rounded-xl border border-border/60 bg-card p-5 flex items-center justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium">
+          devlog-backup-<span class="text-muted-foreground font-mono">{new Date().toISOString().slice(0,10)}</span>.json
+        </p>
+        <p class="text-xs text-muted-foreground mt-0.5">
+          {totalRecords.toLocaleString("es")} registros en total —
+          posts, updates, usuarios, comentarios, etiquetas, reacciones, medios, ajustes y auditoría.
+          Sin contraseñas, tokens ni sesiones.
+        </p>
+      </div>
+      <a
+        id="backup-link"
+        href="/api/admin/export?entity=all&format=json"
+        class="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/30 px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+      >
+        <Download class="h-3.5 w-3.5" /> Descargar backup
+      </a>
+    </div>
+  </section>
+</AdminLayout>
+
+<script>
+  function buildUrl(entity: string, fmt: string, from: string, to: string) {
+    const p = new URLSearchParams({ entity, format: fmt });
+    if (from) p.set("from", from);
+    if (to) p.set("to", to);
+    return `/api/admin/export?${p.toString()}`;
+  }
+
+  function formatDate(iso: string) {
+    return new Date(iso).toLocaleDateString("es", { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  function updateLinks(from: string, to: string) {
+    document.querySelectorAll<HTMLAnchorElement>("[data-export]").forEach((a) => {
+      a.href = buildUrl(a.dataset.entity ?? "", a.dataset.format ?? "json", from, to);
+    });
+    const backup = document.getElementById("backup-link") as HTMLAnchorElement | null;
+    if (backup) backup.href = buildUrl("all", "json", from, to);
+
+    const banner = document.getElementById("filter-banner");
+    const bannerText = document.getElementById("filter-banner-text");
+    if (!banner || !bannerText) return;
+
+    if (from || to) {
+      const parts = [];
+      if (from) parts.push(`desde el ${formatDate(from)}`);
+      if (to)   parts.push(`hasta el ${formatDate(to)}`);
+      bannerText.textContent = `Filtro activo — exportando datos ${parts.join(" ")}. Los conteos mostrados son el total real, no el filtrado.`;
+      banner.classList.remove("hidden");
+      banner.classList.add("flex");
+    } else {
+      banner.classList.add("hidden");
+      banner.classList.remove("flex");
+    }
+  }
+
+  document.addEventListener("export-date-change", (e) => {
+    const { from, to } = (e as CustomEvent<{ from: string; to: string }>).detail;
+    updateLinks(from, to);
+  });
+</script>

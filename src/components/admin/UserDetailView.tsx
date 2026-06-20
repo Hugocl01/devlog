@@ -7,6 +7,7 @@ import {
 import {
   ArrowLeft, Shield, CheckCircle2, XCircle, MessageSquare,
   Heart, Monitor, Trash2, ExternalLink, Search, X, Reply, CalendarDays,
+  ShieldOff, ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ConfirmDialog from "./ConfirmDialog";
@@ -16,6 +17,7 @@ interface CommentEntry {
   content: string;
   createdAt: string;
   parentId: string | null;
+  banned: boolean;
   post: { slug: string; title: string };
   parent: { content: string; user: { name: string } } | null;
 }
@@ -95,6 +97,9 @@ export default function UserDetailView({ user }: Props) {
   const [reactionPostFilter, setReactionPostFilter] = useState("all");
   const [reactionTypeFilter, setReactionTypeFilter] = useState("all");
 
+  // Ban
+  const [togglingBan, setTogglingBan] = useState<string | null>(null);
+
   // Delete
   const [deleteTarget, setDeleteTarget] = useState<{ id: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -136,6 +141,28 @@ export default function UserDetailView({ user }: Props) {
       return matchSearch && matchPost && matchType;
     });
   }, [user.reactions, reactionSearch, reactionPostFilter, reactionTypeFilter]);
+
+  const toggleBan = async (id: string, currentBanned: boolean) => {
+    setTogglingBan(id);
+    try {
+      const res = await fetch(`/api/admin/comments/${id}/ban`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ banned: !currentBanned }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Error desconocido");
+      setComments((prev) => prev.map((c) => c.id === id ? { ...c, banned: !currentBanned } : c));
+      toast.success(currentBanned ? "Comentario restaurado" : "Comentario baneado", {
+        description: currentBanned ? "Ya es visible públicamente." : "Ocultado del blog.",
+        duration: 3000,
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al cambiar estado");
+    } finally {
+      setTogglingBan(null);
+    }
+  };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -323,7 +350,7 @@ export default function UserDetailView({ user }: Props) {
                     <th className="px-4 py-3 text-left font-medium text-muted-foreground">Comentario</th>
                     <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">Post</th>
                     <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Fecha</th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">Acción</th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40">
@@ -338,7 +365,8 @@ export default function UserDetailView({ user }: Props) {
                       <tr
                         key={comment.id}
                         className={cn(
-                          "hover:bg-secondary/10 transition-colors",
+                          "transition-colors",
+                          comment.banned ? "bg-orange-500/5 hover:bg-orange-500/10" : "hover:bg-secondary/10",
                           deleting && deleteTarget?.id === comment.id && "opacity-60"
                         )}
                       >
@@ -352,9 +380,14 @@ export default function UserDetailView({ user }: Props) {
                               </p>
                             </div>
                           )}
-                          <p className="truncate text-foreground/90" title={comment.content}>
+                          <p className={cn("truncate", comment.banned ? "text-muted-foreground/50 line-through" : "text-foreground/90")} title={comment.content}>
                             {comment.content}
                           </p>
+                          {comment.banned && (
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-orange-600 dark:text-orange-400">
+                              <ShieldOff className="h-2.5 w-2.5" /> baneado
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 hidden md:table-cell">
                           <a
@@ -371,13 +404,28 @@ export default function UserDetailView({ user }: Props) {
                           {formatDateShort(comment.createdAt)}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={() => setDeleteTarget({ id: comment.id })}
-                            title="Eliminar comentario"
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => toggleBan(comment.id, comment.banned)}
+                              disabled={togglingBan === comment.id}
+                              title={comment.banned ? "Restaurar comentario" : "Banear comentario"}
+                              className={cn(
+                                "inline-flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:opacity-50",
+                                comment.banned
+                                  ? "text-green-600 dark:text-green-400 bg-green-500/10 hover:bg-green-500/20"
+                                  : "text-muted-foreground hover:text-orange-500 hover:bg-orange-500/10"
+                              )}
+                            >
+                              {comment.banned ? <ShieldCheck className="h-3.5 w-3.5" /> : <ShieldOff className="h-3.5 w-3.5" />}
+                            </button>
+                            <button
+                              onClick={() => setDeleteTarget({ id: comment.id })}
+                              title="Eliminar comentario"
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))

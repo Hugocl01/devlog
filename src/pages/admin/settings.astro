@@ -8,10 +8,11 @@ const DEFAULT_SETTINGS = [
   { key: "site_name", label: "Nombre del sitio", description: "Título principal del blog", value: "DevLog" },
   { key: "site_description", label: "Descripción", description: "Descripción corta del sitio para SEO", value: "" },
   { key: "site_author", label: "Autor principal", description: "Nombre del autor por defecto", value: "" },
-  { key: "social_github", label: "GitHub", description: "URL de tu perfil de GitHub", value: "" },
-  { key: "social_twitter", label: "Twitter / X", description: "URL de tu perfil de Twitter", value: "" },
-  { key: "social_linkedin", label: "LinkedIn", description: "URL de tu perfil de LinkedIn", value: "" },
+  { key: "portfolio_url", label: "URL del portfolio", description: "Enlace a tu portfolio personal", value: "" },
+  { key: "social_github", label: "GitHub", description: "URL de tu perfil de GitHub (déjalo vacío para ocultar)", value: "" },
+  { key: "social_linkedin", label: "LinkedIn", description: "URL de tu perfil de LinkedIn (déjalo vacío para ocultar)", value: "" },
   { key: "contact_email", label: "Email de contacto", description: "Email público de contacto", value: "" },
+  { key: "maintenance_mode", label: "Modo mantenimiento", description: "Bloquea el acceso al sitio para todos los usuarios que no sean administradores", value: "false" },
 ];
 
 // Seed defaults if they don't exist

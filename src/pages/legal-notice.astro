@@ -2,17 +2,14 @@
 export const prerender = false;
 import BaseLayout from "@/layouts/main.astro";
 
+const { social_github, social_linkedin, contact_email } = Astro.locals.settings;
+
+const GITHUB_ICON   = "M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z";
+const LINKEDIN_ICON = "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z";
+
 const socialLinks = [
-  {
-    name: "GitHub",
-    href: "https://github.com/Hugocl01",
-    icon: "M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z",
-  },
-  {
-    name: "LinkedIn",
-    href: "https://www.linkedin.com/in/hugo-cay%C3%B3n-laso-1a8248273/",
-    icon: "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z",
-  },
+  ...(social_github   ? [{ name: "GitHub",  href: social_github,   icon: GITHUB_ICON   }] : []),
+  ...(social_linkedin ? [{ name: "LinkedIn", href: social_linkedin, icon: LINKEDIN_ICON }] : []),
 ];
 ---
 
@@ -29,7 +26,7 @@ const socialLinks = [
         Información legal sobre la titularidad, tratamiento de datos y condiciones de uso de este
         sitio.
       </p>
-      <p class="text-sm mt-2 text-muted-foreground">Última actualización: 23 de mayo de 2026</p>
+      <p class="text-sm mt-2 text-muted-foreground">Última actualización: 19 de junio de 2026</p>
     </header>
 
     <div
@@ -49,7 +46,7 @@ const socialLinks = [
           <li><strong>Carácter:</strong> Persona física, actividad sin carácter comercial</li>
           <li>
             <strong>Correo electrónico de contacto:</strong>{" "}
-            <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a>
+            {contact_email ? <a href={`mailto:${contact_email}`}>{contact_email}</a> : "—"}
           </li>
           <li><strong>País:</strong> España</li>
           <li>
@@ -77,8 +74,10 @@ const socialLinks = [
           </li>
           <li>
             <strong>Cuentas de usuario:</strong> registro e inicio de sesión mediante correo
-            electrónico y contraseña, con verificación de dirección de correo y posibilidad de
-            recuperación de contraseña.
+            electrónico y contraseña (con verificación de la dirección de correo y posibilidad de
+            recuperación de contraseña), o mediante la cuenta de <strong>GitHub (OAuth)</strong>.
+            Los usuarios pueden gestionar su perfil, cambiar su correo electrónico o contraseña,
+            y exportar sus datos personales directamente desde su perfil.
           </li>
           <li>
             <strong>Comentarios:</strong> los usuarios registrados pueden publicar comentarios y
@@ -117,8 +116,7 @@ const socialLinks = [
 
         <h3>3.1 Responsable del tratamiento</h3>
         <p>
-          <strong>Hugo Cayón Laso</strong> —{" "}
-          <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a>
+          <strong>Hugo Cayón Laso</strong>{contact_email && <>{" "}— <a href={`mailto:${contact_email}`}>{contact_email}</a></>}
         </p>
 
         <h3>3.2 Datos tratados, finalidades y base legitimadora</h3>
@@ -168,12 +166,12 @@ const socialLinks = [
               </tr>
               <tr class="bg-card/10">
                 <td class="px-4 py-3"
-                  >Hash irreversible de IP, país de acceso, user-agent</td
+                  >Hash irreversible de IP y navegador (user-agent)</td
                 >
                 <td class="px-4 py-3"
-                  >Estadísticas de lectura por artículo (conteo de visitas únicas aproximadas). Los
-                  datos se anonomizan de forma que no permiten identificar individualmente al
-                  visitante</td
+                  >Estadísticas de lectura por artículo y actualización (conteo de visitas únicas
+                  aproximadas). Los datos se anonimizan de forma que no permiten identificar
+                  individualmente al visitante. La IP real nunca se almacena.</td
                 >
                 <td class="px-4 py-3"
                   >Interés legítimo del titular (art. 6.1.f RGPD). El uso de un hash irreversible
@@ -290,7 +288,7 @@ const socialLinks = [
         </ul>
         <p>
           Para ejercer cualquiera de estos derechos, dirígete al titular mediante correo electrónico
-          a <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a>, indicando el derecho que
+          {contact_email ? <> a <a href={`mailto:${contact_email}`}>{contact_email}</a></> : ""}, indicando el derecho que
           deseas ejercer y adjuntando un documento que acredite tu identidad. El titular responderá
           en el plazo máximo de un mes, prorrogable dos meses adicionales en casos de especial
           complejidad.
@@ -324,12 +322,23 @@ const socialLinks = [
             </thead>
             <tbody class="divide-y divide-border/40">
               <tr class="bg-card/30">
-                <td class="px-4 py-3 font-mono text-xs">session</td>
+                <td class="px-4 py-3 font-mono text-xs">devlog_session</td>
                 <td class="px-4 py-3"
                   >Token de sesión que identifica al usuario autenticado y mantiene su sesión
-                  activa</td
+                  activa. Es <code>HttpOnly</code> (JavaScript no puede leerla), <code>Secure</code>
+                  (solo HTTPS) y <code>SameSite=Lax</code> (protección CSRF).</td
                 >
-                <td class="px-4 py-3">Hasta cierre de sesión o expiración</td>
+                <td class="px-4 py-3">7 días (sin «Recuérdame») o 30 días (con «Recuérdame»); o hasta que cierres sesión</td>
+                <td class="px-4 py-3">Técnica necesaria — propia</td>
+              </tr>
+              <tr class="bg-card/10">
+                <td class="px-4 py-3 font-mono text-xs">github_oauth_state</td>
+                <td class="px-4 py-3"
+                  >Token CSRF temporal que protege el flujo de autenticación con GitHub OAuth.
+                  Se crea al iniciar el proceso y se elimina automáticamente al completarlo
+                  o cancelarlo.</td
+                >
+                <td class="px-4 py-3">Sesión (minutos; se elimina al finalizar el proceso)</td>
                 <td class="px-4 py-3">Técnica necesaria — propia</td>
               </tr>
             </tbody>
@@ -460,12 +469,8 @@ const socialLinks = [
 
     <div class="mt-16 text-center not-prose">
       <p class="mb-8 text-lg text-muted-foreground">
-        ¿Tienes alguna consulta sobre privacidad o datos? Escríbeme a{" "}
-        <a
-          href="mailto:hugocayon@gmail.com"
-          class="text-primary hover:underline"
-        >hugocayon@gmail.com</a>{" "}
-        o contáctame a través de mis perfiles:
+        ¿Tienes alguna consulta sobre privacidad o datos?{contact_email && <>{" "}Escríbeme a{" "}<a href={`mailto:${contact_email}`} class="text-primary hover:underline">{contact_email}</a>{" "}</>}
+        {socialLinks.length > 0 && <>o contáctame a través de mis perfiles:</>}
       </p>
       <div class="inline-flex gap-8 justify-center">
         {

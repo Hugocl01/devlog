@@ -9,6 +9,7 @@ import AdminUserMenu from "@/components/admin/AdminUserMenu";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 const { title } = Astro.props;
+const isMaintenanceMode = Astro.locals.settings.maintenance_mode === "true";
 
 const currentPath = Astro.url.pathname;
 
@@ -32,6 +33,7 @@ const navLinks = [
   { href: "/admin/media",            label: "Medios",                icon: "Image"            },
   { href: "/admin/calendar",         label: "Calendario",            icon: "CalendarDays"     },
   { href: "/admin/audit",            label: "Auditoría",             icon: "ClipboardList"    },
+  { href: "/admin/export",           label: "Exportar datos",        icon: "Download"         },
   { href: "/admin/settings",         label: "Ajustes",               icon: "Settings"         },
 ];
 
@@ -95,6 +97,13 @@ const mobileNavLinks = [
         </div>
       </div>
     </header>
+
+    {isMaintenanceMode && (
+      <div class="w-full bg-destructive/10 border-b border-destructive/30 px-4 py-2 text-center text-sm text-destructive font-medium">
+        Modo mantenimiento activo — el sitio está bloqueado para los usuarios.
+        <a href="/admin/settings" class="ml-2 underline underline-offset-2 hover:opacity-80">Desactivar</a>
+      </div>
+    )}
 
     <div class="flex">
       <!-- Sidebar colapsable (desktop) -->

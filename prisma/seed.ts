@@ -516,9 +516,10 @@ async function main() {
 
   // ── 7. UPDATES ────────────────────────────
   console.log("📢 Creando updates...");
+  const createdUpdates: { id: number; slug: string }[] = [];
   for (const { file, type, ...updateData } of updatesData) {
     const content = readContent("updates", file);
-    await prisma.update.create({
+    const update = await prisma.update.create({
       data: {
         ...updateData,
         content,
@@ -526,7 +527,9 @@ async function main() {
         author: { connect: { id: hugo.id } },
         type: { connect: { name: type } },
       },
+      select: { id: true, slug: true },
     });
+    createdUpdates.push(update);
   }
 
   // ── 8. REACCIONES ─────────────────────────
@@ -720,28 +723,60 @@ async function main() {
   });
 
   // ── 10. VISTAS ────────────────────────────
-  console.log("👁️  Creando vistas de posts...");
+  console.log("👁️  Creando vistas...");
 
-  const viewCounts = [180, 95, 312, 78, 234, 456, 187, 67, 145, 223, 198, 89, 134, 289, 167, 156, 78, 201, 143, 178, 234, 189, 67, 145, 312];
-  const countries = ["ES", "MX", "AR", "CO", "CL", "PE", "US", "DE"];
-  const viewsData: { postId: number; ipHash: string; country: string; viewedAt: Date }[] = [];
+  const postViewCounts = [180, 95, 312, 78, 234, 456, 187, 67, 145, 223, 198, 89, 134, 289, 167, 156, 78, 201, 143, 178, 234, 189, 67, 145, 312];
+  const postViewsData: { postId: number; ipHash: string; viewedAt: Date }[] = [];
 
   createdPosts.forEach((post, i) => {
-    const count = viewCounts[i] ?? 50;
+    const count = postViewCounts[i] ?? 50;
     for (let v = 0; v < count; v++) {
       const daysAgo = Math.floor(Math.random() * 180);
       const date = new Date();
       date.setDate(date.getDate() - daysAgo);
-      viewsData.push({
+      postViewsData.push({
         postId: post.id,
         ipHash: `hash_${post.id}_${v}`,
-        country: countries[Math.floor(Math.random() * countries.length)],
         viewedAt: date,
       });
     }
   });
 
-  await prisma.postView.createMany({ data: viewsData });
+  await prisma.postView.createMany({ data: postViewsData });
+
+  const updateViewCounts = [210, 145, 98, 67, 189, 54];
+  const updateViewsData: { updateId: number; ipHash: string; viewedAt: Date }[] = [];
+
+  createdUpdates.forEach((update, i) => {
+    const count = updateViewCounts[i] ?? 40;
+    for (let v = 0; v < count; v++) {
+      const daysAgo = Math.floor(Math.random() * 90);
+      const date = new Date();
+      date.setDate(date.getDate() - daysAgo);
+      updateViewsData.push({
+        updateId: update.id,
+        ipHash: `uhash_${update.id}_${v}`,
+        viewedAt: date,
+      });
+    }
+  });
+
+  await prisma.updateView.createMany({ data: updateViewsData });
+
+  // ── 11. SITE SETTINGS ─────────────────────
+  console.log("⚙️  Creando configuración del sitio...");
+  const siteSettings = [
+    { key: "site_name",        label: "Nombre del sitio",    description: "Título principal del blog",                 value: "DevLog" },
+    { key: "site_description", label: "Descripción",         description: "Descripción corta del sitio para SEO",      value: "Blog de desarrollo web, proyectos y tecnología." },
+    { key: "site_author",      label: "Autor principal",     description: "Nombre del autor por defecto",              value: "Hugo Cayón Laso" },
+    { key: "social_github",    label: "GitHub",              description: "URL de tu perfil de GitHub",                value: "https://github.com/hugocl01" },
+    { key: "social_twitter",   label: "Twitter / X",         description: "URL de tu perfil de Twitter",              value: "" },
+    { key: "social_linkedin",  label: "LinkedIn",            description: "URL de tu perfil de LinkedIn",             value: "" },
+    { key: "contact_email",    label: "Email de contacto",   description: "Email público de contacto",                value: "hugocayon@gmail.com" },
+  ];
+  for (const s of siteSettings) {
+    await prisma.siteSetting.upsert({ where: { key: s.key }, create: s, update: {} });
+  }
 
   // ── RESUMEN ───────────────────────────────
   console.log("\n✅ Seed completado:");
@@ -753,7 +788,8 @@ async function main() {
   console.log(`   - ${postsData.length} posts`);
   console.log(`   - ${updatesData.length} updates`);
   console.log(`   - ${reactionsData.length} reacciones`);
-  console.log(`   - ${viewsData.length} vistas`);
+  console.log(`   - ${postViewsData.length} vistas de posts`);
+  console.log(`   - ${updateViewsData.length} vistas de updates`);
   console.log(`\n   Contraseña de todos los usuarios: ${PASSWORD}`);
 }
 

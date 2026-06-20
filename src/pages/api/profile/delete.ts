@@ -15,13 +15,15 @@ export const DELETE: APIRoute = async ({ locals, cookies, request }) => {
   if (!locals.user) return json({ error: "No autorizado" }, 401);
 
   const { password } = await request.json().catch(() => ({}));
-  if (!password) return json({ error: "La contraseña es obligatoria para confirmar" }, 400);
 
   const user = await prisma.user.findUnique({ where: { id: locals.user.id } });
   if (!user) return json({ error: "Usuario no encontrado" }, 404);
 
-  const valid = await verifyPassword(password, user.password);
-  if (!valid) return json({ error: "La contraseña no es correcta" }, 400);
+  if (user.password) {
+    if (!password) return json({ error: "La contraseña es obligatoria para confirmar" }, 400);
+    const valid = await verifyPassword(password, user.password);
+    if (!valid) return json({ error: "La contraseña no es correcta" }, 400);
+  }
 
   // Anonymize: soft-delete comments to preserve thread structure, then remove PII
   await prisma.$transaction([

@@ -22,6 +22,17 @@ declare namespace App {
       roleId: number;       // 1 = USER, 2 = ADMIN
       hasPassword: boolean; // false para cuentas creadas con GitHub OAuth
     };
+    // Configuración del sitio cargada desde la BD en cada request
+    settings: {
+      site_name: string;
+      site_description: string;
+      site_author: string;
+      portfolio_url: string;
+      maintenance_mode: string;
+      social_github: string;
+      social_linkedin: string;
+      contact_email: string;
+    };
   }
 }
 

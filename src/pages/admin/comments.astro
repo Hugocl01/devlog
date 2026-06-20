@@ -9,7 +9,6 @@ const postParam = Astro.url.searchParams.get("post") ?? undefined;
 const comments = await prisma.comment.findMany({
   where: { deleted: false },
   orderBy: { createdAt: "desc" },
-  take: 200,
   select: {
     id: true,
     content: true,
@@ -22,13 +21,16 @@ const comments = await prisma.comment.findMany({
   },
 });
 
-const bannedCount = await prisma.comment.count({ where: { deleted: false, banned: true } });
+const [totalCount, bannedCount] = await Promise.all([
+  prisma.comment.count({ where: { deleted: false } }),
+  prisma.comment.count({ where: { deleted: false, banned: true } }),
+]);
 ---
 
 <AdminLayout title="Comentarios">
   <div class="mb-4 flex items-center justify-between">
     <p class="text-sm text-muted-foreground">
-      {comments.length} {comments.length === 1 ? "comentario" : "comentarios"} en total
+      {totalCount.toLocaleString("es")} {totalCount === 1 ? "comentario" : "comentarios"} en total
     </p>
     {bannedCount > 0 && (
       <a

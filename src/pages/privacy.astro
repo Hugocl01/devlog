@@ -1,6 +1,8 @@
 ---
 export const prerender = false;
 import BaseLayout from "@/layouts/main.astro";
+
+const { contact_email } = Astro.locals.settings;
 ---
 
 <BaseLayout
@@ -16,7 +18,7 @@ import BaseLayout from "@/layouts/main.astro";
         Información sobre el tratamiento de datos personales en DevLog, conforme al Reglamento
         General de Protección de Datos (RGPD) y la LOPDGDD.
       </p>
-      <p class="text-sm mt-2 text-muted-foreground">Última actualización: 7 de junio de 2026</p>
+      <p class="text-sm mt-2 text-muted-foreground">Última actualización: 19 de junio de 2026</p>
     </header>
 
     <div
@@ -35,7 +37,7 @@ import BaseLayout from "@/layouts/main.astro";
           <li><strong>Carácter:</strong> Persona física, blog personal sin actividad comercial</li>
           <li>
             <strong>Correo electrónico:</strong>{" "}
-            <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a>
+            {contact_email ? <a href={`mailto:${contact_email}`}>{contact_email}</a> : "—"}
           </li>
           <li><strong>País:</strong> España</li>
         </ul>
@@ -118,11 +120,14 @@ import BaseLayout from "@/layouts/main.astro";
           comunidad implica la publicación de dicho contenido.
         </p>
 
-        <h3>2.4 Formulario de contacto</h3>
+        <h3>2.4 Contacto directo</h3>
         <p>
-          Si utilizas el formulario de contacto del sitio, los datos que nos envíes (nombre, correo
-          electrónico y mensaje) se usan únicamente para responder a tu consulta. No se almacenan
-          en la base de datos del sitio ni se usan para ninguna otra finalidad.
+          Si te pones en contacto con el titular directamente a través del correo electrónico
+          indicado en este sitio{contact_email && <>{" "}(<a href={`mailto:${contact_email}`}>{contact_email}</a>)</>},
+          los datos que nos envíes (nombre, dirección de correo electrónico y contenido del mensaje)
+          se utilizan exclusivamente para responder a tu consulta. No se almacenan en la base de
+          datos del sitio ni se usan para ninguna otra finalidad. El sitio no dispone de
+          formulario de contacto integrado.
         </p>
         <p>
           <strong>Base jurídica:</strong> consentimiento del interesado (art. 6.1.a RGPD).
@@ -133,7 +138,7 @@ import BaseLayout from "@/layouts/main.astro";
       <div>
         <h2>3. Cookies</h2>
         <p>
-          DevLog utiliza <strong>una única cookie propia, estrictamente necesaria</strong> para el
+          DevLog utiliza <strong>únicamente cookies propias, estrictamente necesarias</strong> para el
           funcionamiento del servicio de cuentas:
         </p>
         <div class="overflow-x-auto">
@@ -155,13 +160,22 @@ import BaseLayout from "@/layouts/main.astro";
                   leerla), <code>Secure</code> (solo HTTPS) y <code>SameSite=Lax</code>
                   (protección CSRF).
                 </td>
-                <td>30 días (o hasta cerrar sesión)</td>
+                <td>7 días (sin «Recuérdame») o 30 días (con «Recuérdame»); o hasta cerrar sesión</td>
+              </tr>
+              <tr>
+                <td><code>github_oauth_state</code></td>
+                <td>Esencial</td>
+                <td>
+                  Token CSRF temporal que protege el flujo de inicio de sesión con GitHub OAuth.
+                  Se elimina automáticamente al completar o cancelar el proceso.
+                </td>
+                <td>Sesión (minutos; se elimina al finalizar el proceso)</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p>
-          Esta cookie se crea <strong>solo si inicias sesión</strong>. Los visitantes que no se
+          La cookie <code>devlog_session</code> se crea <strong>solo si inicias sesión</strong>. Los visitantes que no se
           registran ni inician sesión <strong>no reciben ninguna cookie</strong>.
         </p>
         <p>
@@ -248,8 +262,7 @@ import BaseLayout from "@/layouts/main.astro";
       <div>
         <h2>7. Cómo ejercer tus derechos</h2>
         <p>
-          Puedes ejercer cualquiera de los derechos anteriores enviando un correo electrónico a{" "}
-          <a href="mailto:hugocayon@gmail.com">hugocayon@gmail.com</a> con el asunto
+          Puedes ejercer cualquiera de los derechos anteriores{contact_email && <>{" "}enviando un correo electrónico a{" "}<a href={`mailto:${contact_email}`}>{contact_email}</a></>} con el asunto
           <em>«Derechos RGPD»</em> e indicando el derecho que deseas ejercer.
         </p>
         <p>

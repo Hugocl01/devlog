@@ -16,8 +16,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
   try {
     const { currentPassword, newPassword } = await request.json();
 
-    if (!currentPassword || !newPassword) {
-      return json({ error: "Todos los campos son obligatorios" }, 400);
+    if (!newPassword) {
+      return json({ error: "La nueva contraseña es obligatoria" }, 400);
     }
 
     if (!isStrongPassword(newPassword)) {
@@ -30,12 +30,15 @@ export const POST: APIRoute = async ({ locals, request }) => {
     const user = await prisma.user.findUnique({ where: { id: locals.user.id } });
     if (!user) return json({ error: "Usuario no encontrado" }, 404);
 
-    if (!user.password) {
-      return json({ error: "Esta cuenta usa GitHub para iniciar sesión. No tienes contraseña configurada." }, 400);
+    if (user.password) {
+      // Cambio de contraseña — requiere la contraseña actual
+      if (!currentPassword) {
+        return json({ error: "La contraseña actual es obligatoria" }, 400);
+      }
+      const valid = await verifyPassword(currentPassword, user.password);
+      if (!valid) return json({ error: "La contraseña actual es incorrecta" }, 400);
     }
-
-    const valid = await verifyPassword(currentPassword, user.password);
-    if (!valid) return json({ error: "La contraseña actual es incorrecta" }, 400);
+    // Si !user.password, es una cuenta OAuth estableciendo contraseña por primera vez
 
     await prisma.user.update({
       where: { id: user.id },

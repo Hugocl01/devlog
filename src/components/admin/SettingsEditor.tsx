@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2, Save, RotateCcw } from "lucide-react";
+import { Loader2, Save, RotateCcw, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +18,13 @@ const inputCls =
   "h-9 w-full rounded-md border border-border/60 bg-background px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/30";
 
 const GROUPS: { label: string; keys: string[] }[] = [
-  { label: "Identidad del sitio", keys: ["site_name", "site_description", "site_author"] },
-  { label: "Redes sociales", keys: ["social_github", "social_twitter", "social_linkedin"] },
+  { label: "Identidad del sitio", keys: ["site_name", "site_description", "site_author", "portfolio_url"] },
+  { label: "Redes sociales", keys: ["social_github", "social_linkedin"] },
   { label: "Contacto", keys: ["contact_email"] },
+  { label: "Sistema", keys: ["maintenance_mode"] },
 ];
+
+const BOOLEAN_KEYS = new Set(["maintenance_mode"]);
 
 export default function SettingsEditor({ initialSettings }: Props) {
   const [values, setValues] = useState<Record<string, string>>(
@@ -85,14 +88,52 @@ export default function SettingsEditor({ initialSettings }: Props) {
                       <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>
                     )}
                   </div>
-                  <div className="md:col-span-2">
-                    <input
-                      id={s.key}
-                      type="text"
-                      className={cn(inputCls, values[s.key] !== original[s.key] && "border-primary/60")}
-                      value={values[s.key] ?? ""}
-                      onChange={(e) => setValues((prev) => ({ ...prev, [s.key]: e.target.value }))}
-                    />
+                  <div className="md:col-span-2 flex items-center gap-2">
+                    {BOOLEAN_KEYS.has(s.key) ? (
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={values[s.key] === "true"}
+                        onClick={() =>
+                          setValues((prev) => ({
+                            ...prev,
+                            [s.key]: prev[s.key] === "true" ? "false" : "true",
+                          }))
+                        }
+                        className={cn(
+                          "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                          values[s.key] === "true" ? "bg-destructive" : "bg-input"
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-background shadow-lg transition-transform",
+                            values[s.key] === "true" ? "translate-x-5" : "translate-x-0"
+                          )}
+                        />
+                      </button>
+                    ) : (
+                      <>
+                        <input
+                          id={s.key}
+                          type="text"
+                          className={cn(inputCls, values[s.key] !== original[s.key] && "border-primary/60")}
+                          value={values[s.key] ?? ""}
+                          onChange={(e) => setValues((prev) => ({ ...prev, [s.key]: e.target.value }))}
+                        />
+                        {values[s.key] && (
+                          <button
+                            type="button"
+                            onClick={() => setValues((prev) => ({ ...prev, [s.key]: "" }))}
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border/60 bg-background text-muted-foreground hover:text-destructive hover:border-destructive/60 transition-colors"
+                            aria-label={`Eliminar ${s.label}`}
+                            title={`Eliminar ${s.label}`}
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               ))}

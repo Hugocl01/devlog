@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { Upload, Trash2, Copy, Check, Loader2, Image, X, Search, AlertTriangle, ScanSearch, HardDrive } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,8 @@ interface Props {
   initialMedia: MediaItem[];
 }
 
+const GRID_PAGE_SIZE = 24;
+
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -31,6 +33,7 @@ export default function MediaLibrary({ initialMedia }: Props) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [visibleCount, setVisibleCount] = useState(GRID_PAGE_SIZE);
   const [deleteTarget, setDeleteTarget] = useState<MediaItem | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [orphanIds, setOrphanIds] = useState<Set<number>>(new Set());
@@ -55,6 +58,11 @@ export default function MediaLibrary({ initialMedia }: Props) {
     const matchOrphan = !showOnlyOrphans || orphanIds.has(m.id);
     return matchSearch && matchOrphan;
   });
+
+  useEffect(() => { setVisibleCount(GRID_PAGE_SIZE); }, [search, showOnlyOrphans]);
+
+  const visibleItems = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
 
   const upload = useCallback(async (files: FileList | File[]) => {
     const list = Array.from(files);
@@ -245,7 +253,7 @@ export default function MediaLibrary({ initialMedia }: Props) {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {filtered.map((item) => {
+          {visibleItems.map((item) => {
             const isOrphan = orphanIds.has(item.id);
             return (
             <div key={item.id} className={cn(
@@ -296,6 +304,20 @@ export default function MediaLibrary({ initialMedia }: Props) {
             </div>
             );
           })}
+        </div>
+      )}
+
+      {hasMore && (
+        <div className="mt-6 flex items-center justify-center gap-3">
+          <button
+            onClick={() => setVisibleCount((n) => n + GRID_PAGE_SIZE)}
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-secondary/30 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+          >
+            Cargar más
+          </button>
+          <span className="text-xs text-muted-foreground/60">
+            {visibleCount} de {filtered.length}
+          </span>
         </div>
       )}
 

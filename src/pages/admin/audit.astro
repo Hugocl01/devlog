@@ -4,15 +4,70 @@ import AdminLayout from "@/layouts/AdminLayout.astro";
 import AuditLogTable from "@/components/admin/AuditLogTable";
 import { prisma } from "@/lib/prisma";
 
-const entries = await prisma.auditLog.findMany({
-  orderBy: { createdAt: "desc" },
-  take: 500,
-});
+const PAGE_SIZE = 50;
+
+const url     = Astro.url;
+const page    = Math.max(1, Number(url.searchParams.get("page") ?? "1"));
+const q       = url.searchParams.get("q") ?? "";
+const action  = url.searchParams.get("action") ?? "";
+const entity  = url.searchParams.get("entity") ?? "";
+
+const where = {
+  AND: [
+    q ? {
+      OR: [
+        { userEmail: { contains: q, mode: "insensitive" as const } },
+        { entity:    { contains: q, mode: "insensitive" as const } },
+        { entityId:  { contains: q, mode: "insensitive" as const } },
+      ],
+    } : {},
+    action ? { action } : {},
+    entity ? { entity } : {},
+  ],
+};
+
+const [entries, total, distinctActions, distinctEntities] = await Promise.all([
+  prisma.auditLog.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    skip: (page - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
+  }),
+  prisma.auditLog.count({ where }),
+  prisma.auditLog.findMany({ select: { action: true }, distinct: ["action"], orderBy: { action: "asc" } }),
+  prisma.auditLog.findMany({ select: { entity: true }, distinct: ["entity"], orderBy: { entity: "asc" } }),
+]);
+
+const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+const safePage  = Math.min(page, pageCount);
+
+function pageUrl(p: number) {
+  const params = new URLSearchParams();
+  if (q)      params.set("q", q);
+  if (action) params.set("action", action);
+  if (entity) params.set("entity", entity);
+  if (p > 1)  params.set("page", String(p));
+  const qs = params.toString();
+  return `/admin/audit${qs ? `?${qs}` : ""}`;
+}
 ---
 
 <AdminLayout title="Log de auditoría">
-  <p class="text-sm text-muted-foreground mb-4">
-    Últimos {entries.length} registros de actividad del panel.
-  </p>
-  <AuditLogTable entries={JSON.parse(JSON.stringify(entries))} client:load />
+  <AuditLogTable
+    entries={JSON.parse(JSON.stringify(entries))}
+    total={total}
+    page={safePage}
+    pageCount={pageCount}
+    pageSize={PAGE_SIZE}
+    q={q}
+    actionFilter={action}
+    entityFilter={entity}
+    allActions={distinctActions.map(r => r.action)}
+    allEntities={distinctEntities.map(r => r.entity)}
+    prevUrl={safePage > 1 ? pageUrl(safePage - 1) : null}
+    nextUrl={safePage < pageCount ? pageUrl(safePage + 1) : null}
+    firstUrl={safePage > 1 ? pageUrl(1) : null}
+    lastUrl={safePage < pageCount ? pageUrl(pageCount) : null}
+    client:load
+  />
 </AdminLayout>

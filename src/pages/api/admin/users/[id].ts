@@ -48,6 +48,11 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
   if (id === locals.user!.id) return json({ error: "No puedes eliminar tu propia cuenta desde aquí" }, 400);
 
   try {
+    // Reactions usan onDelete: SetNull — borrarlas explícitamente
+    await prisma.reaction.deleteMany({ where: { userId: id } });
+    // Las replies de otros usuarios a comentarios de este usuario no tienen
+    // onDelete: Cascade en la relación padre-hijo, hay que borrarlas antes
+    await prisma.comment.deleteMany({ where: { parent: { userId: id } } });
     await prisma.user.delete({ where: { id } });
     await logAudit(locals, "DELETE", "user", id);
     return json({ ok: true });

@@ -28,11 +28,14 @@ export const GET: APIRoute = async ({ locals }) => {
 
   const [
     posts,
+    updates,
     users,
     comments,
     reactions,
     newPostsNow,
     newPostsPrev,
+    newUpdatesNow,
+    newUpdatesPrev,
     newUsersNow,
     newUsersPrev,
     newCommentsNow,
@@ -41,11 +44,14 @@ export const GET: APIRoute = async ({ locals }) => {
     newReactionsPrev,
   ] = await Promise.all([
     prisma.post.count({ where: { draft: false } }),
+    prisma.update.count({ where: { draft: false } }),
     prisma.user.count(),
     prisma.comment.count({ where: { deleted: false } }),
     prisma.reaction.count(),
     prisma.post.count({ where: { draft: false, publishedAt: { gte: weekAgo } } }),
     prisma.post.count({ where: { draft: false, publishedAt: { gte: twoWeeksAgo, lt: weekAgo } } }),
+    prisma.update.count({ where: { draft: false, publishedAt: { gte: weekAgo } } }),
+    prisma.update.count({ where: { draft: false, publishedAt: { gte: twoWeeksAgo, lt: weekAgo } } }),
     prisma.user.count({ where: { createdAt: { gte: weekAgo } } }),
     prisma.user.count({ where: { createdAt: { gte: twoWeeksAgo, lt: weekAgo } } }),
     prisma.comment.count({ where: { deleted: false, createdAt: { gte: weekAgo } } }),
@@ -56,10 +62,11 @@ export const GET: APIRoute = async ({ locals }) => {
 
   return json({
     stats: [
-      { key: "posts",     label: "Posts publicados", value: posts,     trend: pct(newPostsNow,     newPostsPrev)     },
-      { key: "users",     label: "Usuarios",          value: users,     trend: pct(newUsersNow,     newUsersPrev)     },
-      { key: "comments",  label: "Comentarios",       value: comments,  trend: pct(newCommentsNow,  newCommentsPrev)  },
-      { key: "reactions", label: "Reacciones",        value: reactions, trend: pct(newReactionsNow, newReactionsPrev) },
+      { key: "posts",     label: "Posts publicados",   value: posts,     trend: pct(newPostsNow,     newPostsPrev)     },
+      { key: "updates",   label: "Updates publicados", value: updates,   trend: pct(newUpdatesNow,   newUpdatesPrev)   },
+      { key: "users",     label: "Usuarios",           value: users,     trend: pct(newUsersNow,     newUsersPrev)     },
+      { key: "comments",  label: "Comentarios",        value: comments,  trend: pct(newCommentsNow,  newCommentsPrev)  },
+      { key: "reactions", label: "Reacciones",         value: reactions, trend: pct(newReactionsNow, newReactionsPrev) },
     ],
     fetchedAt: new Date().toISOString(),
   });

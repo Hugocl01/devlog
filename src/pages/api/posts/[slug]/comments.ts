@@ -85,7 +85,7 @@ export const POST: APIRoute = async ({ params, locals, request }) => {
 
     if (parentId) {
       const parent = await prisma.comment.findUnique({ where: { id: parentId } });
-      if (!parent || parent.postId !== post.id || parent.parentId !== null || parent.deleted) {
+      if (!parent || parent.postId !== post.id || parent.parentId !== null || parent.deleted || parent.banned) {
         return json({ error: "Comentario padre inválido" }, 400);
       }
     }

@@ -18,11 +18,16 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
   const slug = params.slug!;
 
+  const since = new Date();
+  since.setDate(since.getDate() - 29);
+  since.setHours(0, 0, 0, 0);
+
   const update = await prisma.update.findUnique({
     where: { slug },
     select: {
       title: true,
       views: {
+        where: { viewedAt: { gte: since } },
         select: { viewedAt: true },
         orderBy: { viewedAt: "asc" },
       },
@@ -31,10 +36,6 @@ export const GET: APIRoute = async ({ params, locals }) => {
   });
 
   if (!update) return json({ error: "Update no encontrado" }, 404);
-
-  const since = new Date();
-  since.setDate(since.getDate() - 29);
-  since.setHours(0, 0, 0, 0);
 
   const dailyMap: Record<string, number> = {};
   for (let i = 0; i < 30; i++) {

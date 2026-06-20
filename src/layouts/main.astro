@@ -13,10 +13,16 @@ const {
   description: rawDescription,
   image = "/og-image.png",
   type = "website",
-  author,
+  author: propAuthor,
   canonical: canonicalOverride,
 } = Astro.props;
-const description = rawDescription ?? "DevLog — Artículos sobre desarrollo web, tecnología y proyectos.";
+const { settings } = Astro.locals;
+const siteName = settings.site_name;
+const defaultDesc = settings.site_description
+  ? `${siteName} — ${settings.site_description}`
+  : `${siteName} — Artículos sobre desarrollo web, tecnología y proyectos.`;
+const description = rawDescription ?? defaultDesc;
+const author = propAuthor || (settings.site_author || undefined);
 const imageUrl = new URL(image, Astro.site).toString();
 const pageTitle = metaTitle ?? title;
 const canonicalUrl = canonicalOverride ? new URL(canonicalOverride, Astro.site).toString() : Astro.url.toString();
@@ -45,7 +51,7 @@ const canonicalUrl = canonicalOverride ? new URL(canonicalOverride, Astro.site).
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={pageTitle} />
     <meta property="og:locale" content="es_ES" />
-    <meta property="og:site_name" content="DevLog" />
+    <meta property="og:site_name" content={siteName} />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -59,9 +65,9 @@ const canonicalUrl = canonicalOverride ? new URL(canonicalOverride, Astro.site).
     <link rel="apple-touch-icon" href="/favicon.png" />
 
     <!-- RSS Feed Discovery -->
-    <link rel="alternate" type="application/rss+xml" title="DevLog RSS Feed" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${siteName} RSS Feed`} href="/rss.xml" />
 
-    <title>{pageTitle === 'DevLog' ? pageTitle : `${pageTitle} | DevLog`}</title>
+    <title>{pageTitle === siteName ? pageTitle : `${pageTitle} | ${siteName}`}</title>
 
     <script is:inline>
       const getThemePreference = () => {

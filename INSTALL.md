@@ -1,6 +1,6 @@
 # Guía de instalación — DevLog
 
-> ← [Volver al README](README.md) · [Licencia](LICENSE) · [Plantilla .env](.env.example) · [Plantilla PM2](ecosystem.config.example.cjs) · [Plantilla Nginx](nginx/devlog.conf.example)
+> ← [Volver al README](README.md) · [Licencia](LICENSE) · [Plantilla .env](.env.example) · [Plantilla PM2](ecosystem.config.example.cjs) · [Plantilla Nginx](nginx/devlog.conf.example) · [Guía de despliegue](DEPLOY.md)
 
 Guía paso a paso para desplegar DevLog en un VPS con Ubuntu/Debian. Al final tendrás la aplicación corriendo con PostgreSQL, PM2 y Nginx, con HTTPS activado mediante Certbot.
 
@@ -147,9 +147,20 @@ DATABASE_URL="postgresql://devlog_user:TU_CONTRASEÑA@localhost:5432/devlog?sche
 JWT_SECRET="CLAVE_GENERADA_DE_128_CARACTERES_HEX"
 JWT_EXPIRES_IN="7d"
 
+# resend.com → API Keys → Create API Key
+# Requiere dominio verificado en Resend (Domains → Add Domain)
 RESEND_API_KEY="re_tu_api_key"
 EMAIL_FROM="DevLog <noreply@tudominio.com>"
+
+# github.com/settings/developers → New OAuth App
+# Homepage URL: https://tudominio.com
+# Callback URL: https://tudominio.com/api/auth/github/callback
+GITHUB_CLIENT_ID="Ov23li..."
+GITHUB_CLIENT_SECRET="..."
 ```
+
+> **JWT_SECRET:** cambia la clave entre entornos. La misma clave en dev y prod invalida las sesiones al hacer deploy.
+> **RESEND:** con `HOST="0.0.0.0"` y HTTPS activo, las cookies `Secure` funcionan correctamente — necesario para que el logout funcione en producción.
 
 Instala las dependencias:
 
@@ -172,12 +183,16 @@ npx prisma generate
 # Aplica las migraciones en producción (no borra datos)
 npx prisma migrate deploy
 
-# (Opcional) Carga los datos iniciales — solo en la primera instalación
-npx prisma db seed
+# Primera instalación — carga roles, tipos, tags, tu usuario admin, posts y updates
+# No ejecutes esto si la BD ya tiene datos, sobreescribirá los posts y updates
+npm run db:seed:prod
 
 # Construye la aplicación
 npm run build
 ```
+
+> El seed de producción usa `upsert` — es seguro de volver a ejecutar, no borra datos existentes.
+> La contraseña inicial del admin es `DevLog2025!` — **cámbiala inmediatamente** desde `/auth/forgot-password`.
 
 Comprueba que el servidor arranca manualmente antes de configurar PM2:
 
@@ -355,24 +370,7 @@ Abre `https://tudominio.com` en el navegador. El panel de administración está 
 
 ## 11. Actualizar la aplicación
 
-Cuando publiques cambios en el repositorio, ejecuta esto en el servidor:
-
-```bash
-cd /var/www/devlog
-
-git pull origin main
-
-npm ci --omit=dev
-
-npx prisma generate
-npx prisma migrate deploy
-
-npm run build
-
-pm2 reload devlog
-```
-
-> `pm2 reload` hace un reinicio con zero downtime: levanta el proceso nuevo antes de matar el viejo.
+Consulta [DEPLOY.md](DEPLOY.md) para el proceso completo de despliegue, incluyendo cuándo ejecutar migraciones y cómo gestionar rollbacks.
 
 ---
 

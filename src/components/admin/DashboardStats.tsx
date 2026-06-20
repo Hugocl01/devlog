@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { FileText, Users, MessageSquare, Heart, RefreshCw, TrendingUp, TrendingDown } from "lucide-react";
+import { FileText, Zap, Users, MessageSquare, Heart, RefreshCw, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Trend { value: number; label: string }
@@ -12,12 +12,14 @@ interface Props {
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   posts:     FileText,
+  updates:   Zap,
   users:     Users,
   comments:  MessageSquare,
   reactions: Heart,
 };
 const PALETTE: Record<string, { icon: string; bg: string; ring: string }> = {
   posts:     { icon: "text-blue-500",    bg: "bg-blue-500/10",    ring: "ring-blue-500/20"    },
+  updates:   { icon: "text-cyan-500",    bg: "bg-cyan-500/10",    ring: "ring-cyan-500/20"    },
   users:     { icon: "text-violet-500",  bg: "bg-violet-500/10",  ring: "ring-violet-500/20"  },
   comments:  { icon: "text-emerald-500", bg: "bg-emerald-500/10", ring: "ring-emerald-500/20" },
   reactions: { icon: "text-rose-500",    bg: "bg-rose-500/10",    ring: "ring-rose-500/20"    },
@@ -98,7 +100,7 @@ export default function DashboardStats({ initialStats, refreshInterval = 60_000 
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {stats.map((stat) => {
           const Icon = ICONS[stat.key] ?? FileText;
           const { icon, bg, ring } = PALETTE[stat.key] ?? { icon: "text-muted-foreground", bg: "bg-secondary/30", ring: "" };
