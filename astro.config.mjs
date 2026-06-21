@@ -5,14 +5,10 @@
 //
 // Documentación oficial: https://docs.astro.build/en/reference/configuration-reference/
 //
-// Modelo de renderizado híbrido:
-//   - Por defecto todas las páginas son estáticas (pre-renderizadas en build).
-//   - Las rutas que añaden `export const prerender = false` se renderizan
-//     en el servidor en cada petición (SSR). Esto incluye:
-//       · Todos los endpoints de API  (/api/*)
-//       · El panel de administración  (/admin/*)
-//       · Las páginas de auth         (/auth/*)
-//       · El blog dinámico            (/blog, /tags/*)
+// Modelo de renderizado SSR completo:
+//   - Por defecto todas las páginas se renderizan en el servidor (SSR).
+//   - Las rutas que añaden `export const prerender = true` se pre-renderizan
+//     en build como HTML estático.
 // ═══════════════════════════════════════════════════════════════
 
 import tailwindcss from '@tailwindcss/vite';
@@ -27,10 +23,10 @@ export default defineConfig({
   // el .env tenga SITE_URL=https://tudominio.com antes de ejecutar npm run build.
   site: process.env.SITE_URL ?? "http://localhost:4321",
 
-  // "static" activa el modo híbrido: las páginas son estáticas por defecto
+  // "server" hace que todas las rutas sean SSR por defecto.
   // y solo se renderizan en servidor las que declaran `prerender = false`.
   // Otras opciones: "server" (todo SSR) | "static" (todo estático, sin SSR).
-  output: "static",
+  output: "server",
 
   // Adaptador Node.js en modo standalone:
   // Genera dist/server/entry.mjs, un servidor HTTP independiente que
