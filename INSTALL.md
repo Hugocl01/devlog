@@ -27,7 +27,7 @@ Guía paso a paso para desplegar DevLog en un VPS con Ubuntu/Debian. Al final te
 | Componente   | Versión mínima | Notas                                  |
 |--------------|----------------|----------------------------------------|
 | Ubuntu       | 22.04 LTS      | También funciona en Debian 12          |
-| Node.js      | 20.x LTS       | Se recomienda 22.x                     |
+| Node.js      | 22.12+ LTS     | Requerido por Astro 7                  |
 | PostgreSQL   | 15             |                                        |
 | PM2          | 5.x            | Gestor de procesos Node                |
 | Nginx        | 1.18+          | Servidor proxy inverso                 |
@@ -384,3 +384,4 @@ Consulta [DEPLOY.md](DEPLOY.md) para el proceso completo de despliegue, incluyen
 | PM2 no arranca al reiniciar | Falta ejecutar `pm2 startup` | Ver paso 7 |
 | Certificado SSL caducado | Renovación automática falló | `sudo certbot renew` |
 | Variables de entorno no cargadas | `.env` no existe en producción | Usa `ecosystem.config.cjs` para definirlas |
+| La app no arranca: `JWT_SECRET no está definido` | Falta `JWT_SECRET` en `.env`/`ecosystem.config.cjs` con `NODE_ENV=production` | En producción es obligatorio definirlo — no hay valor por defecto. Genera uno con el comando indicado en el paso 5 |

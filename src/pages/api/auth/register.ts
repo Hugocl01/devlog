@@ -3,14 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, generateToken, isStrongPassword } from "@/lib/auth";
 import { sendVerificationEmail } from "@/lib/email";
 import { checkRateLimit, rateLimitedResponse, getClientIp } from "@/lib/rate-limit";
+import { json } from "@/lib/api";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
 
 export const POST: APIRoute = async ({ request }) => {
   // 5 registros por IP cada hora

@@ -1,26 +1,9 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
+import { json, isAdmin } from "@/lib/api";
+import { slugify } from "@/utils/slug";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-function isAdmin(locals: App.Locals) {
-  return locals.user?.roleId === 2;
-}
-
-function slugify(name: string) {
-  return name
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 export const GET: APIRoute = async ({ locals }) => {
   if (!isAdmin(locals)) return json({ error: "No autorizado" }, 403);

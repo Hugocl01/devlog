@@ -2,17 +2,10 @@ import type { APIRoute } from "astro";
 import { writeFile, mkdir } from "node:fs/promises";
 import { join, extname } from "node:path";
 import { randomBytes } from "node:crypto";
+import { json } from "@/lib/api";
+import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from "@/lib/upload";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
-const MAX_SIZE = 5 * 1024 * 1024;
 
 export const POST: APIRoute = async ({ locals, request }) => {
   if (!locals.user) return json({ error: "No autorizado" }, 401);
@@ -25,13 +18,13 @@ export const POST: APIRoute = async ({ locals, request }) => {
       return json({ error: "No se recibió ningún archivo" }, 400);
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return json({ error: "Tipo de archivo no permitido. Solo imágenes (JPEG, PNG, GIF, WebP, SVG)" }, 400);
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      return json({ error: "Tipo de archivo no permitido. Solo imágenes (JPEG, PNG, GIF, WebP)" }, 400);
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    if (buffer.byteLength > MAX_SIZE) {
+    if (buffer.byteLength > MAX_IMAGE_SIZE) {
       return json({ error: "El archivo supera el límite de 5 MB" }, 400);
     }
 

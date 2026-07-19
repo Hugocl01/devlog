@@ -1,14 +1,10 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/auth";
+import { json } from "@/lib/api";
+import { deleteUpload } from "@/lib/upload";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
 
 // DELETE /api/profile/delete — anonymize and effectively delete user account
 export const DELETE: APIRoute = async ({ locals, cookies, request }) => {
@@ -55,6 +51,8 @@ export const DELETE: APIRoute = async ({ locals, cookies, request }) => {
       },
     }),
   ]);
+
+  if (user.avatar) await deleteUpload(user.avatar);
 
   // Clear the session cookie
   cookies.delete("devlog_session", { path: "/" });

@@ -1,18 +1,10 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { json, isAdmin } from "@/lib/api";
+import { invalidateSiteSettingsCache } from "@/lib/settings";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-function isAdmin(locals: App.Locals) {
-  return locals.user?.roleId === 2;
-}
 
 export const GET: APIRoute = async ({ locals }) => {
   if (!isAdmin(locals)) return json({ error: "No autorizado" }, 403);
@@ -36,6 +28,7 @@ export const PUT: APIRoute = async ({ locals, request }) => {
     );
 
     await logAudit(locals, "UPDATE", "setting", undefined, { keys: updates.map((u) => u.key) });
+    invalidateSiteSettingsCache();
 
     return json({ ok: true });
   } catch (err) {

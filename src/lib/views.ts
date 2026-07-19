@@ -14,18 +14,13 @@ export async function registerView(postId: number, request: Request): Promise<nu
   const ip = getClientIp(request);
   const today = new Date().toISOString().slice(0, 10);
   const ipHash = buildIpHash(ip, today, postId);
-  const startOfDay = new Date(`${today}T00:00:00.000Z`);
+  const userAgent = request.headers.get("user-agent")?.slice(0, 255) ?? null;
 
-  const already = await prisma.postView.findFirst({
-    where: { postId, ipHash, viewedAt: { gte: startOfDay } },
-    select: { id: true },
+  await prisma.postView.upsert({
+    where: { postId_ipHash: { postId, ipHash } },
+    create: { postId, ipHash, userAgent },
+    update: {},
   });
-
-  if (!already) {
-    await prisma.postView.create({
-      data: { postId, ipHash, userAgent: request.headers.get("user-agent")?.slice(0, 255) ?? null },
-    });
-  }
 
   return prisma.postView.count({ where: { postId } });
 }
@@ -34,18 +29,13 @@ export async function registerUpdateView(updateId: number, request: Request): Pr
   const ip = getClientIp(request);
   const today = new Date().toISOString().slice(0, 10);
   const ipHash = buildIpHash(ip, today, updateId);
-  const startOfDay = new Date(`${today}T00:00:00.000Z`);
+  const userAgent = request.headers.get("user-agent")?.slice(0, 255) ?? null;
 
-  const already = await prisma.updateView.findFirst({
-    where: { updateId, ipHash, viewedAt: { gte: startOfDay } },
-    select: { id: true },
+  await prisma.updateView.upsert({
+    where: { updateId_ipHash: { updateId, ipHash } },
+    create: { updateId, ipHash, userAgent },
+    update: {},
   });
-
-  if (!already) {
-    await prisma.updateView.create({
-      data: { updateId, ipHash, userAgent: request.headers.get("user-agent")?.slice(0, 255) ?? null },
-    });
-  }
 
   return prisma.updateView.count({ where: { updateId } });
 }

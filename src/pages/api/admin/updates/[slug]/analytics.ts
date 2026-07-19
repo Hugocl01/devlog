@@ -1,17 +1,8 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
+import { json, isAdmin } from "@/lib/api";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-function isAdmin(locals: App.Locals) {
-  return locals.user?.roleId === 2;
-}
 
 export const GET: APIRoute = async ({ params, locals }) => {
   if (!isAdmin(locals)) return json({ error: "No autorizado" }, 403);

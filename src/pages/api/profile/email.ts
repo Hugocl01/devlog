@@ -3,14 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { verifyPassword, generateToken } from "@/lib/auth";
 import { sendEmailChangeEmail } from "@/lib/email";
 import { checkRateLimit, rateLimitedResponse, getClientIp } from "@/lib/rate-limit";
+import { json } from "@/lib/api";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
 
 // POST — solicita el cambio de email
 export const POST: APIRoute = async ({ locals, request }) => {

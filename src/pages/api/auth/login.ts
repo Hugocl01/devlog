@@ -2,14 +2,9 @@ import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword, createJWT, DUMMY_HASH } from "@/lib/auth";
 import { checkRateLimit, rateLimitedResponse, getClientIp } from "@/lib/rate-limit";
+import { json } from "@/lib/api";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   // 10 intentos por IP cada 15 minutos

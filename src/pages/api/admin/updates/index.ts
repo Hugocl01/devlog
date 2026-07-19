@@ -1,28 +1,10 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
 import { calculateReadingTime } from "@/utils/readingTime";
+import { json, isAdmin } from "@/lib/api";
+import { slugify } from "@/utils/slug";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-function isAdmin(locals: App.Locals) {
-  return locals.user?.roleId === 2;
-}
-
-function slugify(title: string): string {
-  return title
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 60);
-}
 
 export const POST: APIRoute = async ({ locals, request }) => {
   if (!isAdmin(locals)) return json({ error: "No autorizado" }, 403);
@@ -39,7 +21,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
     const updateType = await prisma.updateType.findUnique({ where: { name: typeName } });
     if (!updateType) return json({ error: `Tipo de update desconocido: ${typeName}` }, 400);
 
-    const slug = slugify(title);
+    const slug = slugify(title, 60);
     const isDraft = draft ?? true;
     const publishedAt = isDraft ? null : scheduledAt ? new Date(scheduledAt) : new Date();
 

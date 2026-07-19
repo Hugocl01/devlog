@@ -4,21 +4,10 @@ import { logAudit } from "@/lib/audit";
 import { writeFile, mkdir } from "node:fs/promises";
 import { join, extname } from "node:path";
 import { randomBytes } from "node:crypto";
+import { json, isAdmin } from "@/lib/api";
+import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from "@/lib/upload";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-function isAdmin(locals: App.Locals) {
-  return locals.user?.roleId === 2;
-}
-
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
-const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 
 export const GET: APIRoute = async ({ locals }) => {
   if (!isAdmin(locals)) return json({ error: "No autorizado" }, 403);
@@ -51,13 +40,13 @@ export const POST: APIRoute = async ({ locals, request }) => {
       return json({ error: "No se recibió ningún archivo" }, 400);
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return json({ error: "Tipo de archivo no permitido. Solo imágenes (JPEG, PNG, GIF, WebP, SVG)" }, 400);
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      return json({ error: "Tipo de archivo no permitido. Solo imágenes (JPEG, PNG, GIF, WebP)" }, 400);
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    if (buffer.byteLength > MAX_SIZE) {
+    if (buffer.byteLength > MAX_IMAGE_SIZE) {
       return json({ error: "El archivo supera el límite de 5 MB" }, 400);
     }
 

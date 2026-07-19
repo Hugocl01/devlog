@@ -2,36 +2,10 @@ import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
 import { calculateReadingTime } from "@/utils/readingTime";
 import { logAudit } from "@/lib/audit";
-
-async function applyTags(postId: number, tags: string[]) {
-  await prisma.postTag.deleteMany({ where: { postId } });
-  for (const name of tags) {
-    const slug = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const tag = await prisma.tag.upsert({
-      where: { slug },
-      create: { name, slug },
-      update: {},
-      select: { id: true },
-    });
-    await prisma.postTag.upsert({
-      where: { postId_tagId: { postId, tagId: tag.id } },
-      create: { postId, tagId: tag.id },
-      update: {},
-    });
-  }
-}
+import { json, isAdmin } from "@/lib/api";
+import { applyTags } from "@/lib/tags";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-function isAdmin(locals: App.Locals) {
-  return locals.user?.roleId === 2;
-}
 
 export const PATCH: APIRoute = async ({ params, locals, request }) => {
   if (!isAdmin(locals)) return json({ error: "No autorizado" }, 403);

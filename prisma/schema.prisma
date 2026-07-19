@@ -215,6 +215,7 @@ model PostView {
   postId Int
   post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
+  @@unique([postId, ipHash])
   @@index([postId])
   @@index([viewedAt])
   @@map("post_views")
@@ -229,6 +230,7 @@ model UpdateView {
   updateId Int
   update   Update @relation(fields: [updateId], references: [id], onDelete: Cascade)
 
+  @@unique([updateId, ipHash])
   @@index([updateId])
   @@index([viewedAt])
   @@map("update_views")

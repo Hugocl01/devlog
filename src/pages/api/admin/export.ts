@@ -2,12 +2,9 @@ import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
 import { zipSync } from "fflate";
+import { isAdmin } from "@/lib/api";
 
 export const prerender = false;
-
-function isAdmin(locals: App.Locals) {
-  return locals.user?.roleId === 2;
-}
 
 function toCSV(rows: Record<string, unknown>[]): string {
   if (rows.length === 0) return "";

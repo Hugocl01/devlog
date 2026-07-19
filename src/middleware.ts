@@ -1,6 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { verifyJWT } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getSiteSettings } from "@/lib/settings";
 
 // Rutas de autenticación — si el usuario ya está logueado, redirigir al blog
 const AUTH_ONLY_PATHS = [
@@ -13,8 +14,8 @@ export const onRequest = defineMiddleware(
   async ({ locals, cookies, url, redirect }, next) => {
     const token = cookies.get("devlog_session")?.value;
 
-    // Arranca en paralelo con la comprobación de sesión
-    const settingsPromise = prisma.siteSetting.findMany({ select: { key: true, value: true } });
+    // Arranca en paralelo con la comprobación de sesión (cacheado en memoria, TTL 30s)
+    const settingsPromise = getSiteSettings();
 
     if (token) {
       const payload = verifyJWT(token);
@@ -52,18 +53,7 @@ export const onRequest = defineMiddleware(
     }
 
     // Resolver settings (la query ya lleva ejecutándose en paralelo)
-    const rawSettings = await settingsPromise;
-    const s = Object.fromEntries(rawSettings.map((r) => [r.key, r.value]));
-    locals.settings = {
-      site_name:        s.site_name        || "DevLog",
-      site_description: s.site_description || "",
-      site_author:      s.site_author      || "",
-      portfolio_url:    s.portfolio_url    || "",
-      maintenance_mode: s.maintenance_mode || "false",
-      social_github:    s.social_github    || "",
-      social_linkedin:  s.social_linkedin  || "",
-      contact_email:    s.contact_email    || "",
-    };
+    locals.settings = await settingsPromise;
 
     const path = url.pathname;
 

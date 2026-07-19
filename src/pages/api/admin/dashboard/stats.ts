@@ -1,17 +1,8 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
+import { json, isAdmin } from "@/lib/api";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-function isAdmin(locals: App.Locals) {
-  return locals.user?.roleId === 2;
-}
 
 function pct(current: number, previous: number): { value: number; label: string } | null {
   if (previous === 0) return current > 0 ? { value: 100, label: "+100%" } : null;

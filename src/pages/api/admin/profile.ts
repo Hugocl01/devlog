@@ -2,18 +2,10 @@ import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, verifyPassword, isStrongPassword } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
+import { json, isAdmin } from "@/lib/api";
+import { deleteUpload } from "@/lib/upload";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-function isAdmin(locals: App.Locals) {
-  return locals.user?.roleId === 2;
-}
 
 // PATCH /api/admin/profile — update name, bio, avatar
 export const PATCH: APIRoute = async ({ locals, request }) => {
@@ -32,11 +24,17 @@ export const PATCH: APIRoute = async ({ locals, request }) => {
 
     if (Object.keys(data).length === 0) return json({ error: "Nada que actualizar" }, 400);
 
+    const previousAvatar = locals.user!.avatar;
+
     const updated = await prisma.user.update({
       where: { id: locals.user!.id },
       data,
       select: { id: true, name: true, email: true, bio: true, avatar: true },
     });
+
+    if ("avatar" in data && previousAvatar && previousAvatar !== data.avatar) {
+      await deleteUpload(previousAvatar);
+    }
 
     await logAudit(locals, "UPDATE", "user", locals.user!.id, { fields: Object.keys(data) });
 

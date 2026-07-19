@@ -1,13 +1,8 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
+import { json } from "@/lib/api";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
 
 // GET /api/profile/sessions — list all sessions for the current user
 export const GET: APIRoute = async ({ locals, cookies }) => {

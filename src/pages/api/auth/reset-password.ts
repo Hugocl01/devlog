@@ -1,14 +1,9 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, isStrongPassword } from "@/lib/auth";
+import { json } from "@/lib/api";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
 
 export const POST: APIRoute = async ({ request }) => {
   try {

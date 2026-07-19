@@ -1,13 +1,9 @@
 import type { APIRoute } from "astro";
 import { prisma } from "@/lib/prisma";
+import { json } from "@/lib/api";
+import { deleteUpload } from "@/lib/upload";
 
 export const prerender = false;
-
-const json = (data: object, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
 
 export const PATCH: APIRoute = async ({ locals, request }) => {
   if (!locals.user) return json({ error: "No autorizado" }, 401);
@@ -52,11 +48,17 @@ export const PATCH: APIRoute = async ({ locals, request }) => {
       return json({ error: "No hay cambios que guardar" }, 400);
     }
 
+    const previousAvatar = locals.user.avatar;
+
     const updated = await prisma.user.update({
       where: { id: locals.user.id },
       data: updates,
       select: { id: true, name: true, email: true, avatar: true, bio: true, roleId: true },
     });
+
+    if ("avatar" in updates && previousAvatar && previousAvatar !== updates.avatar) {
+      await deleteUpload(previousAvatar);
+    }
 
     return json({ ok: true, user: updated });
   } catch (err) {

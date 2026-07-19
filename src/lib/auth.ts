@@ -2,10 +2,25 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-const JWT_SECRET =
-  (import.meta.env?.JWT_SECRET as string | undefined) ??
-  process.env.JWT_SECRET ??
-  "dev-secret-cambiar-en-produccion";
+const isProd =
+  (import.meta.env?.MODE as string | undefined) === "production" ||
+  process.env.NODE_ENV === "production";
+
+const JWT_SECRET = (() => {
+  const secret =
+    (import.meta.env?.JWT_SECRET as string | undefined) ?? process.env.JWT_SECRET;
+
+  if (!secret) {
+    if (isProd) {
+      throw new Error(
+        "JWT_SECRET no está definido. Configúralo en el .env antes de arrancar en producción."
+      );
+    }
+    return "dev-secret-cambiar-en-produccion";
+  }
+
+  return secret;
+})();
 const JWT_EXPIRES_IN = (
   (import.meta.env?.JWT_EXPIRES_IN as string | undefined) ??
   process.env.JWT_EXPIRES_IN ??
