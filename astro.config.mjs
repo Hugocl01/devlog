@@ -40,6 +40,18 @@ export default defineConfig({
   // Mejora la percepción de velocidad sin coste visible para el usuario.
   prefetch: true,
 
+  // La protección CSRF "checkOrigin" de Astro compara la cabecera Origin
+  // del navegador con la URL reconstruida internamente. Detrás de Nginx,
+  // @astrojs/node no confía en X-Forwarded-Proto para el protocolo, así
+  // que la reconstruye como "http://" aunque el sitio sea HTTPS — el
+  // Origin (https://) nunca coincide y todo POST/PUT/DELETE/PATCH sin
+  // Content-Type JSON explícito (borrados, subida de avatar/media,
+  // logout) recibe un 403 falso. La cookie de sesión ya lleva
+  // SameSite=Lax, que cubre la protección CSRF real.
+  security: {
+    checkOrigin: false,
+  },
+
   vite: {
     plugins: [
       // Plugin oficial de Tailwind CSS v4 para Vite.
