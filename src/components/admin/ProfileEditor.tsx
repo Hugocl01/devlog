@@ -120,7 +120,7 @@ export default function ProfileEditor({ user }: Props) {
   });
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6">
       {/* Header card */}
       <div className="rounded-xl border border-border/60 bg-card p-5 flex items-center gap-4">
         <div className="h-14 w-14 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 overflow-hidden text-xl font-bold">
