@@ -54,7 +54,7 @@ export default function AdminUserMenu({ user }: Props) {
             {initials}
           </AvatarFallback>
         </Avatar>
-        <span>{firstName}</span>
+        <span className="hidden sm:inline-block max-w-24 truncate">{firstName}</span>
         <ChevronDown
           className={`h-3 w-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />

@@ -2,7 +2,10 @@
 import "../styles/global.css";
 import ThemeToggle from "@/components/ThemeToggle.astro";
 import { ClientRouter } from "astro:transitions";
-import { ChevronsLeftRightEllipsis, ShieldCheck, MessageSquare, FileText, Zap, Tag, CalendarDays, Image, Settings, ClipboardList, Smile, UserX, MessageSquareOff } from "@lucide/astro";
+import {
+  ChevronsLeftRightEllipsis, ShieldCheck, LayoutDashboard, Users, UserX, FileText, Zap, Tag,
+  MessageSquare, MessageSquareOff, Smile, Image, CalendarDays, ClipboardList, Download, Settings,
+} from "@lucide/astro";
 import { Toaster } from "sonner";
 import AdminSearch from "@/components/admin/AdminSearch";
 import AdminUserMenu from "@/components/admin/AdminUserMenu";
@@ -19,7 +22,12 @@ const adminUser = {
   avatar: Astro.locals.user?.avatar ?? null,
 };
 
-// icon field must match a key in AdminSidebar's ICON_MAP
+// icon field must match a key in AdminSidebar's ICON_MAP and in ICON_MAP below
+const ICON_MAP = {
+  LayoutDashboard, Users, UserX, FileText, Zap, Tag,
+  MessageSquare, MessageSquareOff, Smile, Image, CalendarDays, ClipboardList, Download, Settings,
+};
+
 const navLinks = [
   { href: "/admin",                  label: "Dashboard",             icon: "LayoutDashboard"  },
   { href: "/admin/users",            label: "Usuarios",              icon: "Users"            },
@@ -37,17 +45,6 @@ const navLinks = [
   { href: "/admin/settings",         label: "Ajustes",               icon: "Settings"         },
 ];
 
-// Mobile nav still uses @lucide/astro icons directly
-const mobileNavLinks = [
-  { href: "/admin",                 label: "Dashboard",            Icon: "LayoutDashboard" as const  },
-  { href: "/admin/users",           label: "Usuarios",             Icon: "Users" as const            },
-  { href: "/admin/posts",           label: "Posts",                Icon: "FileText" as const         },
-  { href: "/admin/updates",         label: "Updates",              Icon: "Zap" as const              },
-  { href: "/admin/tags",            label: "Etiquetas",            Icon: "Tag" as const              },
-  { href: "/admin/comments",        label: "Comentarios",          Icon: "MessageSquare" as const    },
-  { href: "/admin/media",           label: "Medios",               Icon: "Image" as const            },
-  { href: "/admin/settings",        label: "Ajustes",              Icon: "Settings" as const         },
-];
 ---
 
 <html lang="es" class="scroll-smooth">
@@ -110,24 +107,28 @@ const mobileNavLinks = [
       <AdminSidebar links={navLinks} currentPath={currentPath} client:load />
 
       <div class="flex-1 min-w-0">
-        <!-- Mobile nav tabs (solo los principales) -->
+        <!-- Mobile nav tabs -->
         <nav class="lg:hidden flex border-b border-border/50 px-4 gap-1 overflow-x-auto">
-          {mobileNavLinks.map(({ href, label }) => (
-            <a
-              href={href}
-              class={`flex items-center gap-1.5 px-3 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                currentPath === href || (href !== "/admin" && currentPath.startsWith(href))
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {label}
-            </a>
-          ))}
+          {navLinks.map(({ href, label, icon }) => {
+            const Icon = ICON_MAP[icon as keyof typeof ICON_MAP];
+            return (
+              <a
+                href={href}
+                class={`flex items-center gap-1.5 px-3 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                  currentPath === href || (href !== "/admin" && currentPath.startsWith(href))
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon class="h-4 w-4 shrink-0" />
+                {label}
+              </a>
+            );
+          })}
         </nav>
 
         <!-- Page content -->
-        <main class="p-4 sm:p-6 lg:p-8 max-w-6xl">
+        <main class="p-4 sm:p-6 lg:p-8">
           <h1 class="text-2xl font-bold mb-6">{title}</h1>
           <slot />
         </main>

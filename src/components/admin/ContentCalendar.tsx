@@ -130,72 +130,74 @@ export default function ContentCalendar({ items }: Props) {
       </div>
 
       {/* Calendar grid */}
-      <div className="rounded-xl border border-border/60 overflow-hidden">
-        {/* Day headers */}
-        <div className="grid grid-cols-7 border-b border-border/50 bg-secondary/20">
-          {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((d) => (
-            <div key={d} className="px-2 py-2 text-center text-xs font-medium text-muted-foreground">
-              {d}
+      <div className="rounded-xl border border-border/60 overflow-x-auto">
+        <div className="min-w-160">
+          {/* Day headers */}
+          <div className="grid grid-cols-7 border-b border-border/50 bg-secondary/20">
+            {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((d) => (
+              <div key={d} className="px-2 py-2 text-center text-xs font-medium text-muted-foreground">
+                {d}
+              </div>
+            ))}
+          </div>
+
+          {/* Weeks */}
+          {weeks.map((week, wi) => (
+            <div key={wi} className={cn("grid grid-cols-7 divide-x divide-border/30", wi > 0 && "border-t border-border/30")}>
+              {week.map((day, di) => {
+                const dayItems = day ? (byDay[day] ?? []) : [];
+                const isToday = day === todayDay;
+                return (
+                  <div
+                    key={di}
+                    className={cn(
+                      "min-h-[80px] p-1.5 sm:p-2",
+                      !day && "bg-secondary/10",
+                      isToday && "bg-primary/5"
+                    )}
+                  >
+                    {day && (
+                      <>
+                        <span className={cn(
+                          "inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium mb-1",
+                          isToday ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                        )}>
+                          {day}
+                        </span>
+                        <div className="space-y-0.5">
+                          {dayItems.slice(0, 3).map((item) => {
+                            const status = getStatus(item);
+                            return (
+                              <a
+                                key={item.slug}
+                                href={`/admin/${item.type === "post" ? "posts" : "updates"}/${item.slug}/edit`}
+                                className={cn(
+                                  "flex items-center gap-1 rounded border px-1 py-0.5 text-[10px] font-medium leading-tight hover:opacity-80 transition-opacity truncate",
+                                  STATUS_COLORS[status]
+                                )}
+                                title={item.title}
+                              >
+                                {item.type === "post"
+                                  ? <FileText className="h-2.5 w-2.5 shrink-0" />
+                                  : <Zap className="h-2.5 w-2.5 shrink-0" />}
+                                <span className="truncate">{item.title}</span>
+                              </a>
+                            );
+                          })}
+                          {dayItems.length > 3 && (
+                            <span className="block text-[10px] text-muted-foreground px-1">
+                              +{dayItems.length - 3} más
+                            </span>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>
-
-        {/* Weeks */}
-        {weeks.map((week, wi) => (
-          <div key={wi} className={cn("grid grid-cols-7 divide-x divide-border/30", wi > 0 && "border-t border-border/30")}>
-            {week.map((day, di) => {
-              const dayItems = day ? (byDay[day] ?? []) : [];
-              const isToday = day === todayDay;
-              return (
-                <div
-                  key={di}
-                  className={cn(
-                    "min-h-[80px] p-1.5 sm:p-2",
-                    !day && "bg-secondary/10",
-                    isToday && "bg-primary/5"
-                  )}
-                >
-                  {day && (
-                    <>
-                      <span className={cn(
-                        "inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium mb-1",
-                        isToday ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-                      )}>
-                        {day}
-                      </span>
-                      <div className="space-y-0.5">
-                        {dayItems.slice(0, 3).map((item) => {
-                          const status = getStatus(item);
-                          return (
-                            <a
-                              key={item.slug}
-                              href={`/admin/${item.type === "post" ? "posts" : "updates"}/${item.slug}/edit`}
-                              className={cn(
-                                "flex items-center gap-1 rounded border px-1 py-0.5 text-[10px] font-medium leading-tight hover:opacity-80 transition-opacity truncate",
-                                STATUS_COLORS[status]
-                              )}
-                              title={item.title}
-                            >
-                              {item.type === "post"
-                                ? <FileText className="h-2.5 w-2.5 shrink-0" />
-                                : <Zap className="h-2.5 w-2.5 shrink-0" />}
-                              <span className="truncate">{item.title}</span>
-                            </a>
-                          );
-                        })}
-                        {dayItems.length > 3 && (
-                          <span className="block text-[10px] text-muted-foreground px-1">
-                            +{dayItems.length - 3} más
-                          </span>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        ))}
       </div>
     </div>
   );
